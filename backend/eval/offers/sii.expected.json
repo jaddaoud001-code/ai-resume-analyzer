@@ -1,0 +1,29 @@
+{
+  "offer": "sii.txt",
+  "notes": "Offre publique Groupe SII (stage IA applicatif, assistant de traitement des tickets). Claude et les LLM internes décrivent l'environnement du stage : leur extraction est défendable mais pas exigée (acceptable). Chaque exigence attendue porte des mots-clés de rapprochement (match) : voir eval/README.md.",
+  "requirements": [
+    {"label": "École d'ingénieurs", "category": "formation", "importance": "obligatoire", "match": [["ingenieur"], ["ingenieurs"]]},
+    {"label": "Python", "category": "compétence technique", "importance": "obligatoire", "match": [["python"]]},
+    {"label": "RAG", "category": "compétence technique", "importance": "souhaitée", "match": [["rag"], ["retrieval", "augmented"]]},
+    {"label": "Embeddings", "category": "compétence technique", "importance": "souhaitée", "match": [["embeddings"], ["embedding"]]},
+    {"label": "Évaluation de LLM", "category": "compétence technique", "importance": "souhaitée", "match": [["evaluation"]]},
+    {"label": "Anonymisation de données", "category": "compétence technique", "importance": "souhaitée", "match": [["anonymisation"], ["anonymization"]]},
+    {"label": "Intégration à un outil ITSM", "category": "compétence technique", "importance": "souhaitée", "match": [["itsm"]]},
+    {"label": "Analyse de données de tickets", "category": "compétence technique", "importance": "souhaitée", "match": [["analyse", "tickets"], ["analyse", "ticket"], ["historique", "tickets"], ["analyse", "historique"]]},
+    {"label": "Compréhension des besoins utilisateurs", "category": "savoir-être", "importance": "souhaitée", "match": [["besoins"], ["utilisateurs"], ["utilisateur"]]},
+    {"label": "Autonomie", "category": "savoir-être", "importance": "souhaitée", "match": [["autonomie"], ["autonome"]]},
+    {"label": "Rigueur", "category": "savoir-être", "importance": "souhaitée", "match": [["rigueur"], ["rigoureux"]]},
+    {"label": "Travail en équipe", "category": "savoir-être", "importance": "souhaitée", "match": [["equipe"], ["collaboration"]]},
+    {"label": "Résolution de problèmes concrets", "category": "savoir-être", "importance": "souhaitée", "match": [["problemes"], ["probleme"], ["problematiques"], ["solutions", "concretes"]]}
+  ],
+  "acceptable": [
+    {"label": "Claude / API Anthropic", "match": [["claude"], ["anthropic"]]},
+    {"label": "LLM hébergés en interne / open source", "match": [["heberges"], ["auto", "hebergement"], ["open", "source"], ["on", "premise"], ["internes"], ["interne"]]},
+    {"label": "Restitution / reporting des résultats", "match": [["restitution"], ["reporting"]]}
+  ],
+  "must_not_extract": [
+    {"label": "Lieu (Rennes)", "match": [["rennes"]]},
+    {"label": "Date de début", "match": [["fevrier"], ["2027"], ["debut"]]},
+    {"label": "Durée du stage", "match": [["6", "mois"], ["duree"]]}
+  ]
+}

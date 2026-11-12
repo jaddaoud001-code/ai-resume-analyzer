@@ -1,0 +1,26 @@
+{
+  "offer": "hager.txt",
+  "notes": "Offre publique Hager (stage ingénieur informatique & IA). Chaque exigence attendue porte des mots-clés de rapprochement (match) : voir eval/README.md.",
+  "requirements": [
+    {"label": "Bac+5 informatique & IA", "category": "formation", "importance": "obligatoire", "match": [["bac", "5"], ["master"]]},
+    {"label": "Anglais professionnel", "category": "langue", "importance": "obligatoire", "match": [["anglais"], ["english"]]},
+    {"label": "Java", "category": "compétence technique", "importance": "obligatoire", "match": [["java"]]},
+    {"label": "JSP", "category": "compétence technique", "importance": "obligatoire", "match": [["jsp"]]},
+    {"label": "XML", "category": "compétence technique", "importance": "obligatoire", "match": [["xml"]]},
+    {"label": "SQL", "category": "compétence technique", "importance": "obligatoire", "match": [["sql"]]},
+    {"label": "Git", "category": "compétence technique", "importance": "obligatoire", "match": [["git"]]},
+    {"label": "Outils d'IA générative", "category": "compétence technique", "importance": "obligatoire", "match": [["generative"], ["genai"], ["llm"]]},
+    {"label": "PLM Windchill", "category": "compétence technique", "importance": "souhaitée", "match": [["plm"], ["windchill"]]},
+    {"label": "Rétro-ingénierie de code", "category": "compétence technique", "importance": "souhaitée", "match": [["retro", "ingenierie"], ["reverse", "engineering"]]},
+    {"label": "Documentation technique", "category": "compétence technique", "importance": "souhaitée", "match": [["documentation"]]},
+    {"label": "Initiative / autonomie", "category": "savoir-être", "importance": "souhaitée", "match": [["initiative"], ["autonomie"]]},
+    {"label": "Travail en équipe", "category": "savoir-être", "importance": "souhaitée", "match": [["equipe"], ["collaboration"], ["teamwork"]]},
+    {"label": "Analyse et synthèse", "category": "savoir-être", "importance": "souhaitée", "match": [["synthese"], ["capacites", "analyse"]]}
+  ],
+  "must_not_extract": [
+    {"label": "Disponibilité / dates et durée du stage", "match": [["disponibilite"], ["disponible"], ["janvier"], ["2027"], ["6", "mois"], ["duree"]]},
+    {"label": "Lieu / mobilité (Obernai)", "match": [["obernai"], ["mobilite"]]},
+    {"label": "Rémunération", "match": [["gratification"], ["remuneration"], ["salaire"]]},
+    {"label": "Télétravail", "match": [["teletravail"]]}
+  ]
+}

@@ -1,0 +1,38 @@
+# docker compose up --build   ->   http://localhost
+# Clés et réglages : .env à la racine (modèle : .env.example).
+services:
+  backend:
+    build: ./backend
+    env_file: .env
+    environment:
+      # Routes /debug/* désactivées par défaut ; ENABLE_DEBUG_ROUTES=true dans l'environnement
+      # du shell pour les réactiver.
+      ENABLE_DEBUG_ROUTES: ${ENABLE_DEBUG_ROUTES:-false}
+      EMBEDDINGS_CACHE_DIR: /models
+    volumes:
+      # Modèle d'embeddings local : téléchargé au premier démarrage, conservé ensuite.
+      - models:/models
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      start_period: 20s
+      retries: 5
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1:8080/ || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  models:

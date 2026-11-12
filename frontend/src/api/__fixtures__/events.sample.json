@@ -1,0 +1,497 @@
+[
+  {
+    "type": "started",
+    "phases": [
+      "indexing",
+      "extraction",
+      "evaluation"
+    ],
+    "timeout_s": 600.0
+  },
+  {
+    "type": "cv_indexed",
+    "chunk_count": 8,
+    "seconds": 3.2
+  },
+  {
+    "type": "requirements_extracted",
+    "job_title": "Développeuse backend",
+    "requirements": [
+      {
+        "id": "R1",
+        "label": "Python",
+        "category": "compétence technique",
+        "importance": "obligatoire",
+        "min_years": 3,
+        "search_queries": [
+          "Python",
+          "développement Python"
+        ]
+      },
+      {
+        "id": "R2",
+        "label": "Go",
+        "category": "compétence technique",
+        "importance": "obligatoire",
+        "min_years": null,
+        "search_queries": [
+          "Go",
+          "Golang"
+        ]
+      },
+      {
+        "id": "R3",
+        "label": "Docker",
+        "category": "compétence technique",
+        "importance": "souhaitée",
+        "min_years": null,
+        "search_queries": [
+          "Docker",
+          "conteneurs"
+        ]
+      },
+      {
+        "id": "R4",
+        "label": "Autonomie",
+        "category": "savoir-être",
+        "importance": "souhaitée",
+        "min_years": null,
+        "search_queries": [
+          "autonomie",
+          "travail autonome"
+        ]
+      }
+    ],
+    "seconds": 21.4,
+    "from_cache": false
+  },
+  {
+    "type": "status",
+    "reason": "rate_limit",
+    "wait_s": 60.0,
+    "message": "En attente du quota du fournisseur, reprise dans 60 s"
+  },
+  {
+    "type": "requirement_evaluated",
+    "result": {
+      "requirement": {
+        "id": "R1",
+        "label": "Python",
+        "category": "compétence technique",
+        "importance": "obligatoire",
+        "min_years": 3,
+        "search_queries": [
+          "Python",
+          "développement Python"
+        ]
+      },
+      "status": "ok",
+      "level": "mentionné",
+      "llm_level": "solide",
+      "evidence": [
+        {
+          "chunk_id": 3,
+          "quote": "Conception d'API REST en Python avec FastAPI"
+        }
+      ],
+      "rejected_evidence": 1,
+      "rejected_evidence_items": [
+        {
+          "chunk_id": 7,
+          "quote": "Expert Python depuis 10 ans"
+        }
+      ],
+      "periods": [
+        {
+          "start": "2023-09",
+          "end": "en cours"
+        }
+      ],
+      "rejected_periods": 0,
+      "total_months": 14,
+      "downgraded": false,
+      "capped_for_duration": true,
+      "capped_soft_skill": false,
+      "second_chance": false,
+      "gaps": [
+        "Durée prouvée inférieure aux 3 ans demandés"
+      ],
+      "justification": "Python est utilisé en stage, mais sur 14 mois seulement.",
+      "retrieved_chunk_ids": [
+        3,
+        1,
+        7,
+        2,
+        5
+      ],
+      "points": 40,
+      "weight": 2.0,
+      "error": null
+    },
+    "done": 1,
+    "total": 4
+  },
+  {
+    "type": "requirement_evaluated",
+    "result": {
+      "requirement": {
+        "id": "R2",
+        "label": "Go",
+        "category": "compétence technique",
+        "importance": "obligatoire",
+        "min_years": null,
+        "search_queries": [
+          "Go",
+          "Golang"
+        ]
+      },
+      "status": "ok",
+      "level": "non démontré",
+      "llm_level": "mentionné",
+      "evidence": [],
+      "rejected_evidence": 1,
+      "rejected_evidence_items": [
+        {
+          "chunk_id": 4,
+          "quote": "Développement de microservices en Go"
+        }
+      ],
+      "periods": [],
+      "rejected_periods": 0,
+      "total_months": null,
+      "downgraded": true,
+      "capped_for_duration": false,
+      "capped_soft_skill": false,
+      "second_chance": true,
+      "gaps": [
+        "Go n'apparaît dans aucun extrait"
+      ],
+      "justification": "Aucune preuve vérifiable.",
+      "retrieved_chunk_ids": [
+        1,
+        2,
+        4,
+        5,
+        6
+      ],
+      "points": 0,
+      "weight": 2.0,
+      "error": null
+    },
+    "done": 2,
+    "total": 4
+  },
+  {
+    "type": "requirement_evaluated",
+    "result": {
+      "requirement": {
+        "id": "R3",
+        "label": "Docker",
+        "category": "compétence technique",
+        "importance": "souhaitée",
+        "min_years": null,
+        "search_queries": [
+          "Docker",
+          "conteneurs"
+        ]
+      },
+      "status": "error",
+      "level": null,
+      "llm_level": null,
+      "evidence": [],
+      "rejected_evidence": 0,
+      "rejected_evidence_items": [],
+      "periods": [],
+      "rejected_periods": 0,
+      "total_months": null,
+      "downgraded": false,
+      "capped_for_duration": false,
+      "capped_soft_skill": false,
+      "second_chance": false,
+      "gaps": [],
+      "justification": "",
+      "retrieved_chunk_ids": [
+        2,
+        4,
+        1,
+        3,
+        6
+      ],
+      "points": null,
+      "weight": 1.0,
+      "error": "Évaluation impossible (HTTPStatusError 429)."
+    },
+    "done": 3,
+    "total": 4
+  },
+  {
+    "type": "requirement_evaluated",
+    "result": {
+      "requirement": {
+        "id": "R4",
+        "label": "Autonomie",
+        "category": "savoir-être",
+        "importance": "souhaitée",
+        "min_years": null,
+        "search_queries": [
+          "autonomie",
+          "travail autonome"
+        ]
+      },
+      "status": "ok",
+      "level": "démontré",
+      "llm_level": "solide",
+      "evidence": [
+        {
+          "chunk_id": 4,
+          "quote": "Projet mené seul de la conception au déploiement"
+        }
+      ],
+      "rejected_evidence": 0,
+      "rejected_evidence_items": [],
+      "periods": [],
+      "rejected_periods": 0,
+      "total_months": null,
+      "downgraded": false,
+      "capped_for_duration": false,
+      "capped_soft_skill": true,
+      "second_chance": false,
+      "gaps": [],
+      "justification": "Projet personnel conduit en autonomie.",
+      "retrieved_chunk_ids": [
+        4,
+        2,
+        1,
+        3,
+        5
+      ],
+      "points": 75,
+      "weight": 0.5,
+      "error": null
+    },
+    "done": 4,
+    "total": 4
+  },
+  {
+    "type": "report",
+    "report": {
+      "job_title": "Développeuse backend",
+      "score": 33,
+      "requirements": [
+        {
+          "requirement": {
+            "id": "R1",
+            "label": "Python",
+            "category": "compétence technique",
+            "importance": "obligatoire",
+            "min_years": 3,
+            "search_queries": [
+              "Python",
+              "développement Python"
+            ]
+          },
+          "status": "ok",
+          "level": "mentionné",
+          "llm_level": "solide",
+          "evidence": [
+            {
+              "chunk_id": 3,
+              "quote": "Conception d'API REST en Python avec FastAPI"
+            }
+          ],
+          "rejected_evidence": 1,
+          "rejected_evidence_items": [
+            {
+              "chunk_id": 7,
+              "quote": "Expert Python depuis 10 ans"
+            }
+          ],
+          "periods": [
+            {
+              "start": "2023-09",
+              "end": "en cours"
+            }
+          ],
+          "rejected_periods": 0,
+          "total_months": 14,
+          "downgraded": false,
+          "capped_for_duration": true,
+          "capped_soft_skill": false,
+          "second_chance": false,
+          "gaps": [
+            "Durée prouvée inférieure aux 3 ans demandés"
+          ],
+          "justification": "Python est utilisé en stage, mais sur 14 mois seulement.",
+          "retrieved_chunk_ids": [
+            3,
+            1,
+            7,
+            2,
+            5
+          ],
+          "points": 40,
+          "weight": 2.0,
+          "error": null
+        },
+        {
+          "requirement": {
+            "id": "R2",
+            "label": "Go",
+            "category": "compétence technique",
+            "importance": "obligatoire",
+            "min_years": null,
+            "search_queries": [
+              "Go",
+              "Golang"
+            ]
+          },
+          "status": "ok",
+          "level": "non démontré",
+          "llm_level": "mentionné",
+          "evidence": [],
+          "rejected_evidence": 1,
+          "rejected_evidence_items": [
+            {
+              "chunk_id": 4,
+              "quote": "Développement de microservices en Go"
+            }
+          ],
+          "periods": [],
+          "rejected_periods": 0,
+          "total_months": null,
+          "downgraded": true,
+          "capped_for_duration": false,
+          "capped_soft_skill": false,
+          "second_chance": true,
+          "gaps": [
+            "Go n'apparaît dans aucun extrait"
+          ],
+          "justification": "Aucune preuve vérifiable.",
+          "retrieved_chunk_ids": [
+            1,
+            2,
+            4,
+            5,
+            6
+          ],
+          "points": 0,
+          "weight": 2.0,
+          "error": null
+        },
+        {
+          "requirement": {
+            "id": "R3",
+            "label": "Docker",
+            "category": "compétence technique",
+            "importance": "souhaitée",
+            "min_years": null,
+            "search_queries": [
+              "Docker",
+              "conteneurs"
+            ]
+          },
+          "status": "error",
+          "level": null,
+          "llm_level": null,
+          "evidence": [],
+          "rejected_evidence": 0,
+          "rejected_evidence_items": [],
+          "periods": [],
+          "rejected_periods": 0,
+          "total_months": null,
+          "downgraded": false,
+          "capped_for_duration": false,
+          "capped_soft_skill": false,
+          "second_chance": false,
+          "gaps": [],
+          "justification": "",
+          "retrieved_chunk_ids": [
+            2,
+            4,
+            1,
+            3,
+            6
+          ],
+          "points": null,
+          "weight": 1.0,
+          "error": "Évaluation impossible (HTTPStatusError 429)."
+        },
+        {
+          "requirement": {
+            "id": "R4",
+            "label": "Autonomie",
+            "category": "savoir-être",
+            "importance": "souhaitée",
+            "min_years": null,
+            "search_queries": [
+              "autonomie",
+              "travail autonome"
+            ]
+          },
+          "status": "ok",
+          "level": "démontré",
+          "llm_level": "solide",
+          "evidence": [
+            {
+              "chunk_id": 4,
+              "quote": "Projet mené seul de la conception au déploiement"
+            }
+          ],
+          "rejected_evidence": 0,
+          "rejected_evidence_items": [],
+          "periods": [],
+          "rejected_periods": 0,
+          "total_months": null,
+          "downgraded": false,
+          "capped_for_duration": false,
+          "capped_soft_skill": true,
+          "second_chance": false,
+          "gaps": [],
+          "justification": "Projet personnel conduit en autonomie.",
+          "retrieved_chunk_ids": [
+            4,
+            2,
+            1,
+            3,
+            5
+          ],
+          "points": 75,
+          "weight": 0.5,
+          "error": null
+        }
+      ],
+      "missing_mandatory": [
+        {
+          "id": "R2",
+          "label": "Go",
+          "category": "compétence technique",
+          "importance": "obligatoire",
+          "min_years": null,
+          "search_queries": [
+            "Go",
+            "Golang"
+          ]
+        }
+      ],
+      "rejected_evidence_count": 1,
+      "errors": [
+        "R3"
+      ],
+      "extraction_model": "mistral-large-4-0",
+      "match_model": "mistral-large-4-0",
+      "requirements_from_cache": false,
+      "chunk_count": 8,
+      "timings": {
+        "extraction_s": 21.4,
+        "indexing_s": 3.2,
+        "retrieval_s": 0.4,
+        "evaluation_s": 96.1
+      }
+    }
+  },
+  {
+    "type": "error",
+    "code": "timeout",
+    "message": "L'analyse a dépassé la durée maximale de 600 s."
+  }
+]

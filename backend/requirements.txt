@@ -1,0 +1,20 @@
+# API
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+sse-starlette>=2.1
+pydantic-settings>=2.4
+
+# Pipeline LLM
+langchain>=0.3
+langchain-openai>=0.2
+langchain-mistralai>=1.1
+# FAISS (vectorstore LangChain) ; paquet en fin de vie, voir Structure.md
+langchain-community>=0.3
+langchain-text-splitters>=1.0
+faiss-cpu>=1.8
+# Embeddings locaux via ONNX : PyTorch n'a pas de wheel macOS x86_64 pour Python 3.13
+fastembed>=0.9,<1
+# <2 : la 2.0 (majeure) ne publie pas de wheel macOS x86_64
+pymupdf>=1.24,<2
+

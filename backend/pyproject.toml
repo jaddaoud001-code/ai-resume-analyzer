@@ -1,0 +1,17 @@
+# Configuration des outils de qualité (le projet n'est pas un paquet installable).
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+# pycodestyle, pyflakes, isort, bugbear, pyupgrade, simplifications.
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "eval", "tests"]
+
+[tool.ruff.lint.per-file-ignores]
+# Contenu HTML du CV de démonstration : une ligne par paragraphe, plus lisible ainsi.
+"eval/cvs/make_demo_cv.py" = ["E501"]
