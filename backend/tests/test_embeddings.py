@@ -7,13 +7,15 @@ from langchain_mistralai import MistralAIEmbeddings
 from langchain_openai import OpenAIEmbeddings
 
 from app import embeddings as embeddings_module
-from app.config import Settings
 from app.embeddings import LocalEmbeddings, MissingAPIKeyError, embeddings_model, get_embeddings
 from tests.conftest import make_settings
 
 
-def test_local_is_the_default_provider(settings: Settings) -> None:
-    embeddings = get_embeddings(settings)
+def test_local_is_the_default_provider(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Valeurs par défaut du code, pas celles de l'environnement (la CI fixe EMBEDDINGS_CACHE_DIR).
+    for variable in ("EMBEDDINGS_PROVIDER", "EMBEDDINGS_MODEL", "EMBEDDINGS_CACHE_DIR"):
+        monkeypatch.delenv(variable, raising=False)
+    embeddings = get_embeddings(make_settings())
 
     assert isinstance(embeddings, LocalEmbeddings)
     assert embeddings.model_name == "intfloat/multilingual-e5-large"

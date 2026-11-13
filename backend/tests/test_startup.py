@@ -17,7 +17,7 @@ from app.llm_calls import RateLimiter
 from app.main import create_app
 from app.matcher import analyze
 from app.schemas import MatchEvent
-from tests.conftest import FakeStructuredChatModel, KeywordEmbeddings, make_settings
+from tests.conftest import FakeStructuredChatModel, KeywordEmbeddings, create_test_app, make_settings
 from tests.test_analyze_stream import OFFER, AsyncFakeModel, make_app, parse_sse
 from tests.test_llm_calls import FakeClock, _http_error
 from tests.test_matcher import EXTRACTED, _responder
@@ -144,7 +144,7 @@ class TestEmbeddingsWarmup:
 
 
 def test_public_config_exposes_limits() -> None:
-    app = create_app(make_settings(max_pdf_size_bytes=1234, max_pdf_pages=3, max_job_offer_chars=500))
+    app = create_test_app(make_settings(max_pdf_size_bytes=1234, max_pdf_pages=3, max_job_offer_chars=500))
 
     with TestClient(app) as client:
         response = client.get("/config")

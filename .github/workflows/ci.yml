@@ -1,5 +1,6 @@
 # Tests hors ligne et qualité, à chaque push et pull request. Aucun secret : les tests
-# n'appellent ni le LLM ni un fournisseur d'embeddings (réseau bloqué par une fixture).
+# n'appellent ni le LLM ni un fournisseur d'embeddings (réseau bloqué par une fixture), et
+# ne chargent jamais le vrai modèle d'embeddings local (garde-fou dans tests/conftest.py).
 name: CI
 
 on:
@@ -30,8 +31,15 @@ jobs:
         run: ruff check .
       - name: Format (ruff)
         run: ruff format --check .
-      - name: Tests (sans réseau ; contrat des événements avec le frontend compris)
-        run: pytest
+      # Cache des modèles d'embeddings vide et explicite : les tests ne doivent dépendre
+      # d'aucun modèle présent sur la machine (aucun n'est chargé ni téléchargé).
+      - name: Tests (sans réseau, cache des modèles vide ; contrat des événements compris)
+        env:
+          EMBEDDINGS_CACHE_DIR: ${{ runner.temp }}/empty-embeddings-cache
+        run: |
+          mkdir -p "$EMBEDDINGS_CACHE_DIR"
+          pytest
+          test -z "$(ls -A "$EMBEDDINGS_CACHE_DIR")" || { echo "Un modèle a été écrit dans le cache pendant les tests"; exit 1; }
 
   frontend:
     runs-on: ubuntu-latest

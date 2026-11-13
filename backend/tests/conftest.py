@@ -9,6 +9,7 @@ from typing import Any
 
 import pymupdf
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from langchain_core.embeddings import Embeddings
 from langchain_core.language_models import BaseChatModel
@@ -17,6 +18,7 @@ from langchain_core.outputs import ChatResult
 from langchain_core.runnables import Runnable, RunnableLambda
 from pydantic import Field
 
+from app import embeddings as embeddings_module
 from app.config import Settings
 from app.main import create_app
 
@@ -33,6 +35,33 @@ def no_network(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch) 
 
     monkeypatch.setattr(socket, "getaddrinfo", blocked)
     monkeypatch.setattr(socket.socket, "connect", blocked)
+
+
+@pytest.fixture(autouse=True)
+def no_real_embeddings_model(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
+    """Aucun test ne charge ni ne télécharge le vrai modèle fastembed : sinon le résultat
+    dépendrait du cache de la machine (présent en local, vide en CI). Toute tentative fait
+    échouer le test, même depuis le thread de préchargement de l'application (dont l'erreur
+    serait sinon seulement journalisée). Un test peut remplacer TextEmbedding par un faux."""
+    if request.node.get_closest_marker("integration"):
+        yield
+        return
+    attempts: list[str] = []
+
+    class ForbiddenTextEmbedding:
+        def __init__(self, model_name: str, *args: object, **kwargs: object) -> None:
+            attempts.append(model_name)
+            raise AssertionError(f"Chargement du vrai modèle d'embeddings interdit dans les tests : {model_name}")
+
+    monkeypatch.setattr(embeddings_module, "TextEmbedding", ForbiddenTextEmbedding)
+    embeddings_module._cached_model.cache_clear()
+    yield
+    embeddings_module._cached_model.cache_clear()
+    if attempts:
+        pytest.fail(
+            f"Le test a tenté de charger le vrai modèle d'embeddings ({attempts[0]}) : "
+            "utilisez create_test_app (embeddings factices) ou un faux modèle."
+        )
 
 
 class FakeStructuredChatModel(BaseChatModel):
@@ -182,9 +211,17 @@ def settings() -> Settings:
     return make_settings()
 
 
+def create_test_app(settings: Settings, **kwargs: Any) -> FastAPI:
+    """create_app avec des embeddings factices par défaut : le préchargement du modèle local
+    (lifespan) ne touche jamais au vrai modèle. Les tests du préchargement passent leur faux
+    modèle par `embeddings_factory`."""
+    kwargs.setdefault("embeddings_factory", lambda _: KeywordEmbeddings())
+    return create_app(settings, **kwargs)
+
+
 @pytest.fixture
 def client(settings: Settings) -> Iterator[TestClient]:
-    with TestClient(create_app(settings)) as test_client:
+    with TestClient(create_test_app(settings)) as test_client:
         yield test_client
 
 

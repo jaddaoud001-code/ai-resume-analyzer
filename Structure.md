@@ -149,7 +149,7 @@ Variables de `.env` (modèle complet dans `.env.example`) :
 - Typage partout (type hints Python, TypeScript strict)
 - Toute sortie LLM passe par un modèle Pydantic (pas de parsing de texte libre)
 - Les clés (`OPENAI_API_KEY`, `MISTRAL_API_KEY`) viennent de `.env`, jamais en dur ; fournir `.env.example`
-- Aucun appel réseau ni téléchargement de modèle dans les tests (réseau bloqué par une fixture) : embeddings factices et déterministes, appels LLM mockés
+- Aucun appel réseau ni téléchargement de modèle dans les tests (réseau bloqué par une fixture) : embeddings factices et déterministes, appels LLM mockés ; les apps de test sont créées par `create_test_app` (embeddings factices, donc préchargement sans vrai modèle), et une fixture fait échouer tout test qui construirait le vrai modèle fastembed (les tests ne dépendent pas du cache de la machine ; la CI les lance avec `EMBEDDINGS_CACHE_DIR` vide et vérifie qu'il le reste)
 - Aucune donnée personnelle (email, téléphone, URL, nom) n'est envoyée à un fournisseur : l'anonymisation est faite dans `chunk_cv`
 - Petits commits, un par étape fonctionnelle
 - Pas de stockage persistant des CV (données personnelles) : tout reste en mémoire le temps de l'analyse

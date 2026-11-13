@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from httpx import Response
 
 from app.config import Settings
-from app.main import create_app
+from tests.conftest import create_test_app
 
 
 def _upload(client: TestClient, data: bytes, filename: str = "cv.pdf") -> Response:
@@ -31,7 +31,10 @@ def test_logs_fingerprints_at_debug_level(
 
     text = _upload(client, simple_cv_pdf).json()["text"]
 
-    [message] = [r.getMessage() for r in caplog.records if r.name == "app.main"]
+    # Le message de /debug/parse parmi les logs de l'app (d'autres peuvent s'y trouver).
+    messages = [r.getMessage() for r in caplog.records if r.name == "app.main" and "pdf_sha256=" in r.getMessage()]
+    assert len(messages) == 1
+    [message] = messages
     assert f"text_sha256={hashlib.sha256(text.encode()).hexdigest()[:12]}" in message
     assert f"pdf_sha256={hashlib.sha256(simple_cv_pdf).hexdigest()[:12]}" in message
     assert "host=testserver" in message
@@ -71,7 +74,7 @@ def test_file_too_large_returns_413(settings: Settings, simple_cv_pdf: bytes) ->
     tiny = settings.model_copy(update={"max_pdf_size_bytes": 1024 * 1024 // 2})
     oversized = simple_cv_pdf + b"\0" * tiny.max_pdf_size_bytes
 
-    with TestClient(create_app(tiny)) as client:
+    with TestClient(create_test_app(tiny)) as client:
         response = _upload(client, oversized)
 
     assert response.status_code == 413
@@ -85,5 +88,5 @@ def test_missing_file_returns_422(client: TestClient) -> None:
 def test_route_absent_when_debug_disabled(settings: Settings, simple_cv_pdf: bytes) -> None:
     disabled = settings.model_copy(update={"enable_debug_routes": False})
 
-    with TestClient(create_app(disabled)) as client:
+    with TestClient(create_test_app(disabled)) as client:
         assert _upload(client, simple_cv_pdf).status_code == 404
