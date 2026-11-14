@@ -49,7 +49,7 @@ def test_returns_job_requirements(settings: Settings) -> None:
 
 
 def test_offer_too_long_returns_413_even_without_key(settings: Settings) -> None:
-    no_key = make_settings(mistral_api_key=None, max_job_offer_chars=50)
+    no_key = make_settings(groq_api_key=None, max_job_offer_chars=50)
 
     with TestClient(create_test_app(no_key)) as client:
         response = client.post("/debug/requirements", json={"job_offer": "x" * 51})
@@ -70,11 +70,11 @@ def test_no_requirement_returns_422(settings: Settings) -> None:
 
 
 def test_missing_key_returns_500() -> None:
-    with TestClient(create_test_app(make_settings(mistral_api_key=None))) as client:
+    with TestClient(create_test_app(make_settings(groq_api_key=None))) as client:
         response = client.post("/debug/requirements", json={"job_offer": "Stage IA."})
 
     assert response.status_code == 500
-    assert "MISTRAL_API_KEY" in response.json()["detail"]
+    assert "GROQ_API_KEY" in response.json()["detail"]
 
 
 def test_provider_failure_returns_502_after_one_retry(settings: Settings) -> None:

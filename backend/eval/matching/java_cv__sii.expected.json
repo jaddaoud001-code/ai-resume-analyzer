@@ -1,0 +1,111 @@
+{
+  "cv": "java_cv.pdf",
+  "offer": "sii",
+  "requirements": [
+    {
+      "id": "R1",
+      "label": "Diplôme d'ingénieur",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "« BUT Informatique » : pas un diplôme d'ingénieur."
+    },
+    {
+      "id": "R2",
+      "label": "Python",
+      "levels": [
+        "mentionné"
+      ],
+      "justification": "« Langages : Java, SQL, XML, notions de Python » : liste de compétences seulement."
+    },
+    {
+      "id": "R3",
+      "label": "RAG",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune trace de RAG."
+    },
+    {
+      "id": "R4",
+      "label": "Embeddings",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune trace d'embeddings."
+    },
+    {
+      "id": "R5",
+      "label": "Intégration d'un outil ITSM",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucun outil ITSM ; le suivi des expéditions n'en est pas un."
+    },
+    {
+      "id": "R6",
+      "label": "Anonymisation des données",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune anonymisation."
+    },
+    {
+      "id": "R7",
+      "label": "Évaluation de modèles IA",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune évaluation de modèles d'IA ; les tests JUnit ne portent pas sur des modèles."
+    },
+    {
+      "id": "R8",
+      "label": "Analyse de données de tickets",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune analyse de tickets ; « recherches de colis » n'en est pas une."
+    },
+    {
+      "id": "R9",
+      "label": "Autonomie",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Autonomie ni nommée ni décrite."
+    },
+    {
+      "id": "R10",
+      "label": "Rigueur",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Rigueur ni nommée ni décrite."
+    },
+    {
+      "id": "R11",
+      "label": "Travail en équipe",
+      "levels": [
+        "démontré"
+      ],
+      "justification": "« Travail en équipe de quatre avec Git : branches, revues de merge requests » (stage)."
+    },
+    {
+      "id": "R12",
+      "label": "Résolution de problèmes concrets",
+      "levels": [
+        "non démontré",
+        "mentionné"
+      ],
+      "justification": "Savoir-être non nommé ; « correction d'anomalies » ne suffit pas à le décrire."
+    },
+    {
+      "id": "R13",
+      "label": "Orientation utilisateur",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune mention des utilisateurs ou de leurs besoins."
+    }
+  ]
+}

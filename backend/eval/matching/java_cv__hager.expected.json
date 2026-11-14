@@ -1,0 +1,122 @@
+{
+  "cv": "java_cv.pdf",
+  "offer": "hager",
+  "requirements": [
+    {
+      "id": "R1",
+      "label": "BAC+5 en informatique et intelligence artificielle",
+      "levels": [
+        "non démontré",
+        "mentionné"
+      ],
+      "justification": "« BUT Informatique, parcours développement » (2022 – 2025) : Bac+3 sans IA, pas un Bac+5 en informatique et IA."
+    },
+    {
+      "id": "R2",
+      "label": "Anglais professionnel",
+      "levels": [
+        "démontré",
+        "mentionné"
+      ],
+      "justification": "« Anglais : B1 (TOEIC 785) » : score officiel (au moins démontré selon la règle), mais niveau B1 en deçà d'un anglais professionnel."
+    },
+    {
+      "id": "R3",
+      "label": "Java",
+      "levels": [
+        "solide"
+      ],
+      "justification": "« Alternance développeur backend Java » (Spring Boot, JPA), « application Java EE » (stage), projet « Spring Boot » : plusieurs expériences."
+    },
+    {
+      "id": "R4",
+      "label": "JSP",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune trace de JSP ; Java EE et Thymeleaf ne prouvent pas JSP."
+    },
+    {
+      "id": "R5",
+      "label": "XML",
+      "levels": [
+        "démontré"
+      ],
+      "justification": "« Échanges avec les transporteurs au format XML : génération avec JAXB et validation par schéma XSD » (alternance)."
+    },
+    {
+      "id": "R6",
+      "label": "SQL",
+      "levels": [
+        "solide",
+        "démontré"
+      ],
+      "justification": "« Requêtes SQL et index sur PostgreSQL » (alternance) + « base MySQL » (projet)."
+    },
+    {
+      "id": "R7",
+      "label": "Git",
+      "levels": [
+        "démontré",
+        "solide"
+      ],
+      "justification": "« Travail en équipe de quatre avec Git : branches, revues de merge requests sur GitLab » (stage)."
+    },
+    {
+      "id": "R8",
+      "label": "Outils d'IA générative",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune IA générative."
+    },
+    {
+      "id": "R9",
+      "label": "PLM Windchill",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune trace de PLM ni de Windchill."
+    },
+    {
+      "id": "R10",
+      "label": "Rétro-ingénierie assistée par IA",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "« Maintenance d'une application Java EE : correction d'anomalies » : maintenance, pas rétro-ingénierie, et sans IA."
+    },
+    {
+      "id": "R11",
+      "label": "Documentation technique",
+      "levels": [
+        "démontré"
+      ],
+      "justification": "« Rédaction de la documentation technique de l'API (OpenAPI) et d'un guide d'exploitation » (alternance)."
+    },
+    {
+      "id": "R12",
+      "label": "Initiative et autonomie",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Ni initiative ni autonomie nommées ou décrites."
+    },
+    {
+      "id": "R13",
+      "label": "Travail en équipe",
+      "levels": [
+        "démontré"
+      ],
+      "justification": "« Travail en équipe de quatre avec Git » (stage) ; savoir-être plafonné à démontré."
+    },
+    {
+      "id": "R14",
+      "label": "Capacités d'analyse et de synthèse",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Ni analyse ni synthèse nommées ou décrites."
+    }
+  ]
+}

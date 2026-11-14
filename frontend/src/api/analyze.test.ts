@@ -42,7 +42,7 @@ describe('analyze', () => {
     [429, 'Trop d\'analyses en cours, réessayez dans quelques instants.'],
     [413, 'L\'offre dépasse la taille maximale de 15000 caractères (16000 reçus).'],
     [400, 'Le fichier n\'est pas un PDF valide.'],
-    [500, 'Clé MISTRAL_API_KEY manquante.'],
+    [500, 'Clé GROQ_API_KEY manquante.'],
   ])('lit le message du backend sur une erreur HTTP %i avant le flux', async (status, detail) => {
     vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(jsonResponse({ detail }, status))))
 

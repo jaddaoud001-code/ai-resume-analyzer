@@ -93,7 +93,7 @@ describe('analyse', () => {
     await submit()
 
     const alert = await screen.findByRole('alert')
-    expect(alert).toHaveTextContent('Serveur occupé')
+    expect(alert).toHaveTextContent('Analyse impossible pour le moment')
     expect(alert).toHaveTextContent('Trop d\'analyses en cours, réessayez dans quelques instants.')
     expect(screen.getByRole('button', { name: 'Analyser' })).toBeEnabled()
   })

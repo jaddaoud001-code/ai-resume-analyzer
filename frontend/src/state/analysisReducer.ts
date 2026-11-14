@@ -8,6 +8,7 @@ import type {
   MatchReport,
   Requirement,
   RequirementMatch,
+  RequirementsSource,
 } from '../api/types'
 
 export type AnalysisStatus = 'idle' | 'running' | 'done' | 'error' | 'cancelled'
@@ -32,7 +33,7 @@ export interface AnalysisState {
   status: AnalysisStatus
   phases: Record<AnalysisPhase, PhaseState>
   jobTitle: string | null
-  fromCache: boolean
+  requirementsSource: RequirementsSource | null
   requirements: RequirementEntry[]
   evaluated: number
   total: number | null
@@ -59,7 +60,7 @@ export const initialAnalysisState: AnalysisState = {
   status: 'idle',
   phases: PENDING_PHASES,
   jobTitle: null,
-  fromCache: false,
+  requirementsSource: null,
   requirements: [],
   evaluated: 0,
   total: null,
@@ -93,7 +94,7 @@ function applyEvent(state: AnalysisState, event: AnalysisEvent): AnalysisState {
         ...base,
         phases: withEvaluationPhase({ ...base.phases, extraction: 'done' }),
         jobTitle: event.job_title,
-        fromCache: event.from_cache,
+        requirementsSource: event.requirements_source,
         requirements: mandatoryFirst(event.requirements.map((requirement) => ({ requirement, result: null }))),
         total: event.requirements.length,
       }
@@ -113,7 +114,7 @@ function applyEvent(state: AnalysisState, event: AnalysisEvent): AnalysisState {
         status: 'done',
         phases: { indexing: 'done', extraction: 'done', evaluation: 'done' },
         jobTitle: event.report.job_title,
-        fromCache: event.report.requirements_from_cache,
+        requirementsSource: event.report.requirements_source,
         requirements: mandatoryFirst(
           event.report.requirements.map((result) => ({ requirement: result.requirement, result })),
         ),

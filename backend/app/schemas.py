@@ -82,6 +82,11 @@ class MatchTimings(BaseModel):
     evaluation_s: float = 0.0
 
 
+# Origine des exigences : extraites par le LLM, servies par le cache (même offre, même
+# modèle, même version du prompt) ou fournies par l'appelant (évaluation, liste figée).
+RequirementsSource = Literal["extracted", "cache", "provided"]
+
+
 class MatchReport(BaseModel):
     job_title: str
     score: int | None = Field(description="Moyenne pondérée 0-100 ; None si aucune exigence évaluée.")
@@ -92,8 +97,7 @@ class MatchReport(BaseModel):
     errors: list[str] = Field(description="Identifiants des exigences dont l'évaluation a échoué.")
     extraction_model: str
     match_model: str
-    # Exigences servies par le cache (même offre, même modèle, même version du prompt).
-    requirements_from_cache: bool = False
+    requirements_source: RequirementsSource = "extracted"
     chunk_count: int
     timings: MatchTimings
 
@@ -103,7 +107,7 @@ class RequirementsExtracted(BaseModel):
     job_title: str
     requirements: list[Requirement]
     seconds: float
-    from_cache: bool = False
+    requirements_source: RequirementsSource = "extracted"
 
 
 class CVIndexed(BaseModel):
@@ -149,7 +153,15 @@ MatchEvent = Annotated[
     Field(discriminator="type"),
 ]
 
-AnalysisErrorCode = Literal["llm_provider_error", "no_requirements", "embeddings_error", "timeout", "internal_error"]
+AnalysisErrorCode = Literal[
+    "llm_provider_error",
+    "quota_exceeded",
+    "provider_access_denied",
+    "no_requirements",
+    "embeddings_error",
+    "timeout",
+    "internal_error",
+]
 
 
 class AnalysisError(BaseModel):

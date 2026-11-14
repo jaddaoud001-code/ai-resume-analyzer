@@ -3,7 +3,8 @@ import { ERROR_CODE_TITLES } from './labels'
 
 function title(error: AnalysisFailure): string {
   if (error.kind === 'stream' && error.code) return ERROR_CODE_TITLES[error.code]
-  if (error.kind === 'http' && error.status === 429) return 'Serveur occupé'
+  // 429 : trop d'analyses en cours, ou quota journalier du fournisseur ; le message précise.
+  if (error.kind === 'http' && error.status === 429) return 'Analyse impossible pour le moment'
   if (error.kind === 'http') return 'Analyse refusée'
   if (error.kind === 'connection') return 'Connexion perdue'
   return 'Erreur'

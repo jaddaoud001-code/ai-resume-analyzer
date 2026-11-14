@@ -27,7 +27,14 @@ from pydantic import BaseModel, Field
 from app.chunking import chunk_cv
 from app.config import Settings
 from app.llm import llm_model, match_llm_model
-from app.llm_calls import AnalysisMonitor, RateLimiter, current_monitor, describe_error, invoke_structured
+from app.llm_calls import (
+    AnalysisMonitor,
+    ProviderBlockedError,
+    RateLimiter,
+    current_monitor,
+    describe_error,
+    invoke_structured,
+)
 from app.pdf_parser import extract_text
 from app.requirements import RequirementsCache, check_job_offer, extract_requirements_cached
 from app.schemas import (
@@ -48,6 +55,7 @@ from app.schemas import (
     RequirementEvaluated,
     RequirementMatch,
     RequirementsExtracted,
+    RequirementsSource,
     SearchResult,
 )
 from app.vectorstore import CVIndex
@@ -460,6 +468,8 @@ async def _second_chance(
         retry = await invoke_structured(
             llm, RequirementAssessment, build_second_chance_messages(messages, first, shown), limiter, settings
         )
+    except ProviderBlockedError:
+        raise
     except Exception as error:
         logger.warning("Seconde chance pour %s : échec (%s)", requirement.id, describe_error(error))
         return first.model_copy(update={"second_chance": True})
@@ -483,7 +493,9 @@ async def evaluate_requirement(
     settings: Settings,
     today: date,
 ) -> RequirementMatch:
-    """Ne lève jamais : une erreur devient un résultat « error », exclu du score."""
+    """Une erreur devient un résultat « error », exclu du score, sauf ProviderBlockedError
+    (quota journalier, clé ou modèle refusés), levée : elle vaudrait pour toutes les exigences,
+    l'analyse s'arrête donc avec un message clair."""
     common = {
         "retrieved_chunk_ids": [r.chunk.index for r in retrieved],
         "weight": requirement_weight(requirement, settings.match_weights),
@@ -495,6 +507,8 @@ async def evaluate_requirement(
         result = verify_assessment(assessment, requirement, shown, today)
         if result.downgraded and result.rejected_evidence_items:
             result = await _second_chance(result, messages, requirement, shown, llm, limiter, settings, today)
+    except ProviderBlockedError:
+        raise
     except Exception as error:
         logger.warning("Évaluation de %s : échec (%s)", requirement.id, describe_error(error))
         return RequirementMatch(
@@ -513,7 +527,7 @@ def build_report(
     settings: Settings,
     chunk_count: int,
     timings: MatchTimings,
-    requirements_from_cache: bool = False,
+    requirements_source: RequirementsSource = "extracted",
 ) -> MatchReport:
     return MatchReport(
         job_title=job.job_title,
@@ -528,7 +542,7 @@ def build_report(
         errors=[r.requirement.id for r in results if r.status == "error"],
         extraction_model=llm_model(settings),
         match_model=match_llm_model(settings),
-        requirements_from_cache=requirements_from_cache,
+        requirements_source=requirements_source,
         chunk_count=chunk_count,
         timings=timings,
     )
@@ -571,6 +585,20 @@ def rate_limit_status(seconds: float) -> AnalysisStatus:
     )
 
 
+async def _requirements(
+    job_offer: str,
+    provided: JobRequirements | None,
+    llm: BaseChatModel,
+    settings: Settings,
+    limiter: RateLimiter,
+    cache: RequirementsCache | None,
+) -> tuple[JobRequirements, RequirementsSource]:
+    if provided is not None:
+        return provided, "provided"
+    job, from_cache = await extract_requirements_cached(job_offer, llm, settings, limiter, cache)
+    return job, "cache" if from_cache else "extracted"
+
+
 async def analyze(
     cv: ParsedCV | bytes,
     job_offer: str,
@@ -581,6 +609,7 @@ async def analyze(
     match_llm: BaseChatModel,
     limiter: RateLimiter,
     requirements_cache: RequirementsCache | None = None,
+    requirements: JobRequirements | None = None,
     today: date | None = None,
     sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
 ) -> AsyncIterator[MatchEvent]:
@@ -593,7 +622,10 @@ async def analyze(
     fatales (PDF, offre, extraction, embeddings, AnalysisTimeoutError au-delà de
     ANALYSIS_TIMEOUT_S, mesurés avec `sleep`) sont levées ; une erreur sur une exigence ne
     l'est pas. Si le consommateur s'arrête (client déconnecté), toutes les tâches sont
-    annulées : aucun nouvel appel au LLM n'est lancé."""
+    annulées : aucun nouvel appel au LLM n'est lancé.
+
+    `requirements` : exigences fournies par l'appelant (liste figée de l'évaluation) ;
+    l'extraction n'est alors pas appelée, et `requirements_source` vaut "provided"."""
     today = today or date.today()
     check_job_offer(job_offer, settings)
     # Premier événement, avant tout travail : le client sait que l'analyse a démarré.
@@ -626,14 +658,14 @@ async def analyze(
     deadline.add_done_callback(lambda t: None if t.cancelled() else queue.put_nowait(_TIMEOUT))
     preparation: list[asyncio.Task[Any]] = [
         start(
-            _timed(extract_requirements_cached(job_offer, extraction_llm, settings, limiter, requirements_cache)),
+            _timed(_requirements(job_offer, requirements, extraction_llm, settings, limiter, requirements_cache)),
             "extraction",
         ),
         start(_timed(_build_index(chunks, embeddings, settings)), "indexing"),
     ]
     evaluations: list[asyncio.Task[RequirementMatch]] = []
     job: JobRequirements | None = None
-    from_cache = False
+    source: RequirementsSource = "extracted"
     index: CVIndex | None = None
     try:
         while job is None or index is None:
@@ -644,26 +676,26 @@ async def analyze(
             kind, task = item  # type: ignore[misc]
             value, seconds = task.result()
             if kind == "extraction":
-                job, from_cache = value
+                job, source = value
                 timings.extraction_s = seconds
                 yield RequirementsExtracted(
-                    job_title=job.job_title, requirements=job.requirements, seconds=seconds, from_cache=from_cache
+                    job_title=job.job_title, requirements=job.requirements, seconds=seconds, requirements_source=source
                 )
             else:
                 index, timings.indexing_s = value, seconds
                 yield CVIndexed(chunk_count=len(chunks), seconds=seconds)
-        cv_index, requirements = index, job.requirements
+        cv_index, to_evaluate = index, job.requirements
 
         started = time.perf_counter()
         retrieved = await asyncio.to_thread(
-            lambda: [retrieve_for_requirement(cv_index, r, settings) for r in requirements]
+            lambda: [retrieve_for_requirement(cv_index, r, settings) for r in to_evaluate]
         )
         timings.retrieval_s = time.perf_counter() - started
 
         started = time.perf_counter()
         evaluations = [
             start(evaluate_requirement(requirement, hits, match_llm, limiter, settings, today), "evaluation")
-            for requirement, hits in zip(requirements, retrieved, strict=True)
+            for requirement, hits in zip(to_evaluate, retrieved, strict=True)
         ]
         results: dict[str, RequirementMatch] = {}
         while len(results) < len(evaluations):
@@ -677,8 +709,8 @@ async def analyze(
             yield RequirementEvaluated(result=result, done=len(results), total=len(evaluations))
         timings.evaluation_s = time.perf_counter() - started
 
-        ordered = [results[r.id] for r in requirements]
-        yield ReportReady(report=build_report(job, ordered, settings, len(chunks), timings, from_cache))
+        ordered = [results[r.id] for r in to_evaluate]
+        yield ReportReady(report=build_report(job, ordered, settings, len(chunks), timings, source))
     finally:
         # Consommateur parti (client déconnecté), délai dépassé ou erreur : rien ne doit
         # continuer. Une tâche annulée avant son départ dans le limiteur n'appelle jamais le LLM.

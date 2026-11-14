@@ -25,14 +25,16 @@ from app.matcher import (
     verify_assessment,
     weighted_score,
 )
-from app.requirements import ExtractedRequirement, ExtractedRequirements, LLMProviderError
+from app.requirements import ExtractedRequirement, ExtractedRequirements, LLMProviderError, _finalize
 from app.schemas import (
     Chunk,
     Evidence,
+    JobRequirements,
     MatchEvent,
     Period,
     Requirement,
     RequirementMatch,
+    RequirementsExtracted,
     SearchResult,
 )
 from app.vectorstore import CVIndex
@@ -670,7 +672,7 @@ class TestAnalyze:
         assert report.rejected_evidence_count == 1
         # (Python 100×2 + Go 0×2 + Kubernetes 0×1 + React 75×1 + Rigueur 0×0,5) / 6,5 = 42,3
         assert report.score == 42
-        assert report.match_model == "ministral-14b-2512"
+        assert report.match_model == "openai/gpt-oss-120b"  # défaut du fournisseur (groq)
 
     def test_failure_on_one_requirement_does_not_block_others(
         self, settings: Settings, sectioned_cv_pdf: bytes
@@ -740,3 +742,44 @@ class TestAnalyze:
 
         with pytest.raises(LLMProviderError):
             asyncio.run(run())
+
+
+def test_provided_requirements_skip_the_extraction(settings: Settings, sectioned_cv_pdf: bytes) -> None:
+    """Exigences fournies (liste figée de l'évaluation) : même pipeline, sans extraction."""
+    provided = JobRequirements(
+        job_title="Liste figée",
+        requirements=[r for r in _finalize(EXTRACTED, 15).requirements if r.label in {"Go", "React"}],
+    )
+    extraction_llm = FakeStructuredChatModel(responses=[])  # tout appel échouerait
+
+    async def run() -> list[MatchEvent]:
+        stream = analyze(
+            sectioned_cv_pdf,
+            "Offre : Go, React.",
+            settings=settings,
+            embeddings=KeywordEmbeddings(),
+            extraction_llm=extraction_llm,
+            match_llm=FakeStructuredChatModel(responder=_responder),
+            limiter=RateLimiter.from_settings(settings),
+            requirements=provided,
+            today=TODAY,
+        )
+        return [event async for event in stream]
+
+    events = asyncio.run(run())
+
+    assert extraction_llm.calls == []
+    [extracted] = [e for e in events if isinstance(e, RequirementsExtracted)]
+    assert (extracted.requirements_source, extracted.requirements) == ("provided", provided.requirements)
+    report = events[-1].report  # type: ignore[union-attr]
+    assert report.requirements_source == "provided"
+    assert report.job_title == "Liste figée"
+    assert [r.requirement.label for r in report.requirements] == ["Go", "React"]
+
+
+def test_extracted_requirements_are_reported_as_extracted(settings: Settings, sectioned_cv_pdf: bytes) -> None:
+    events = _collect(sectioned_cv_pdf, settings, FakeStructuredChatModel(responder=_responder))
+
+    [extracted] = [e for e in events if isinstance(e, RequirementsExtracted)]
+    assert extracted.requirements_source == "extracted"
+    assert events[-1].report.requirements_source == "extracted"  # type: ignore[union-attr]

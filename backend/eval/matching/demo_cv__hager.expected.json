@@ -1,0 +1,123 @@
+{
+  "cv": "demo_cv.pdf",
+  "offer": "hager",
+  "requirements": [
+    {
+      "id": "R1",
+      "label": "BAC+5 en informatique et intelligence artificielle",
+      "levels": [
+        "démontré",
+        "solide"
+      ],
+      "justification": "« Diplôme d'ingénieure, informatique et IA · École d'ingénieurs de la Côte d'Opale » (2021 – 2026) : un diplôme vaut au moins démontré ; solide défendable (domaine exact)."
+    },
+    {
+      "id": "R2",
+      "label": "Anglais professionnel",
+      "levels": [
+        "démontré"
+      ],
+      "justification": "« Anglais : B2 (TOEIC 905) » : score officiel, au moins démontré ; aucune pratique professionnelle décrite."
+    },
+    {
+      "id": "R3",
+      "label": "Java",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune trace de Java (TypeScript, Python seulement)."
+    },
+    {
+      "id": "R4",
+      "label": "JSP",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune trace de JSP."
+    },
+    {
+      "id": "R5",
+      "label": "XML",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune trace de XML."
+    },
+    {
+      "id": "R6",
+      "label": "SQL",
+      "levels": [
+        "démontré",
+        "solide"
+      ],
+      "justification": "« Tableaux de bord de suivi des demandes de support en SQL et Python » (alternance, 16 mois) + PostgreSQL : une expérience décrite ; solide défendable."
+    },
+    {
+      "id": "R7",
+      "label": "Git",
+      "levels": [
+        "mentionné"
+      ],
+      "justification": "« Docker, Git, GitLab CI, Linux » : liste de compétences seulement ; aucune expérience ne décrit l'usage de Git."
+    },
+    {
+      "id": "R8",
+      "label": "Outils d'IA générative",
+      "levels": [
+        "solide",
+        "démontré"
+      ],
+      "justification": "« Assistant de recherche documentaire (RAG) » et « comparaison de trois LLM » (stage) + « avec scikit-learn puis un LLM » (projet) : usage répété."
+    },
+    {
+      "id": "R9",
+      "label": "PLM Windchill",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune trace de PLM ni de Windchill."
+    },
+    {
+      "id": "R10",
+      "label": "Rétro-ingénierie assistée par IA",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune rétro-ingénierie décrite."
+    },
+    {
+      "id": "R11",
+      "label": "Documentation technique",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "« recherche documentaire » porte sur des fiches à interroger, pas sur la rédaction de documentation technique."
+    },
+    {
+      "id": "R12",
+      "label": "Initiative et autonomie",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Ni initiative ni autonomie nommées ou décrites."
+    },
+    {
+      "id": "R13",
+      "label": "Travail en équipe",
+      "levels": [
+        "non démontré",
+        "mentionné"
+      ],
+      "justification": "« déploiement Docker sur le serveur de l'équipe » : une équipe existe, le travail en équipe n'est pas décrit."
+    },
+    {
+      "id": "R14",
+      "label": "Capacités d'analyse et de synthèse",
+      "levels": [
+        "non démontré",
+        "mentionné"
+      ],
+      "justification": "Savoir-être non nommé ; « avant analyse » désigne l'analyse de données, pas la capacité d'analyse et de synthèse."
+    }
+  ]
+}

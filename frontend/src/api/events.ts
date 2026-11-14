@@ -39,7 +39,7 @@ const REPORT_FIELDS: Record<string, Check> = {
   requirements: 'array',
   missing_mandatory: 'array',
   errors: 'array',
-  requirements_from_cache: 'boolean',
+  requirements_source: 'string',
 }
 
 /** Champs exigés pour chaque type d'événement (les autres sont acceptés tels quels). */
@@ -50,7 +50,7 @@ export const EVENT_FIELDS: Record<AnalysisEventType, Record<string, Check>> = {
     job_title: 'string',
     requirements: 'array',
     seconds: 'number',
-    from_cache: 'boolean',
+    requirements_source: 'string',
   },
   status: { reason: 'string', wait_s: 'number', message: 'string' },
   requirement_evaluated: { result: 'object', done: 'number', total: 'number' },

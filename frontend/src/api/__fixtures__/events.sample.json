@@ -63,7 +63,7 @@
       }
     ],
     "seconds": 21.4,
-    "from_cache": false
+    "requirements_source": "extracted"
   },
   {
     "type": "status",
@@ -479,7 +479,7 @@
       ],
       "extraction_model": "mistral-large-4-0",
       "match_model": "mistral-large-4-0",
-      "requirements_from_cache": false,
+      "requirements_source": "extracted",
       "chunk_count": 8,
       "timings": {
         "extraction_s": 21.4,

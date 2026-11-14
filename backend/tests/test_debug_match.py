@@ -73,9 +73,9 @@ def test_extraction_failure_returns_502(settings: Settings, sectioned_cv_pdf: by
 
 
 def test_missing_key_returns_500(sectioned_cv_pdf: bytes) -> None:
-    settings = make_settings(mistral_api_key=None)
+    settings = make_settings(groq_api_key=None)
     with TestClient(create_app(settings, embeddings_factory=lambda _: KeywordEmbeddings())) as client:
         response = _post(client, sectioned_cv_pdf)
 
     assert response.status_code == 500
-    assert "MISTRAL_API_KEY" in response.json()["detail"]
+    assert "GROQ_API_KEY" in response.json()["detail"]

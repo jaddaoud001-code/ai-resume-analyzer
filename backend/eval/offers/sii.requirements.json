@@ -1,0 +1,173 @@
+{
+  "offer": "sii.txt",
+  "extraction_model": "openai/gpt-oss-120b",
+  "extraction_prompt_version": 2,
+  "frozen_on": "2026-11-14",
+  "job_title": "Stagiaire IA Applicatif H/F",
+  "requirements": [
+    {
+      "id": "R1",
+      "label": "Diplôme d'ingénieur",
+      "category": "formation",
+      "importance": "obligatoire",
+      "min_years": null,
+      "search_queries": [
+        "Diplôme d'ingénieur",
+        "École d'ingénieurs",
+        "Bac+5 ingénierie"
+      ]
+    },
+    {
+      "id": "R2",
+      "label": "Python",
+      "category": "compétence technique",
+      "importance": "obligatoire",
+      "min_years": null,
+      "search_queries": [
+        "Python",
+        "développement Python",
+        "programmation Python"
+      ]
+    },
+    {
+      "id": "R3",
+      "label": "RAG",
+      "category": "compétence technique",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "RAG",
+        "retrieval augmented generation",
+        "recherche documentaire avec LLM"
+      ]
+    },
+    {
+      "id": "R4",
+      "label": "Embeddings",
+      "category": "compétence technique",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "embeddings",
+        "représentations vectorielles",
+        "recherche sémantique"
+      ]
+    },
+    {
+      "id": "R5",
+      "label": "Intégration d'un outil ITSM",
+      "category": "compétence technique",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "ITSM",
+        "outil de gestion des tickets",
+        "ServiceNow"
+      ]
+    },
+    {
+      "id": "R6",
+      "label": "Anonymisation des données",
+      "category": "compétence technique",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "anonymisation données",
+        "data anonymisation",
+        "privacy data"
+      ]
+    },
+    {
+      "id": "R7",
+      "label": "Évaluation de modèles IA",
+      "category": "compétence technique",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "évaluation IA",
+        "benchmark modèles IA",
+        "qualité modèle IA"
+      ]
+    },
+    {
+      "id": "R8",
+      "label": "Analyse de données de tickets",
+      "category": "compétence technique",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "analyse de tickets",
+        "historique des tickets",
+        "analyse des demandes de support"
+      ]
+    },
+    {
+      "id": "R9",
+      "label": "Autonomie",
+      "category": "savoir-être",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "autonome",
+        "travail autonome"
+      ]
+    },
+    {
+      "id": "R10",
+      "label": "Rigueur",
+      "category": "savoir-être",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "rigoureux",
+        "rigueur"
+      ]
+    },
+    {
+      "id": "R11",
+      "label": "Travail en équipe",
+      "category": "savoir-être",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "travail en équipe",
+        "teamwork",
+        "collaboration"
+      ]
+    },
+    {
+      "id": "R12",
+      "label": "Résolution de problèmes concrets",
+      "category": "savoir-être",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "résolution de problèmes",
+        "solution concrète",
+        "problem solving"
+      ]
+    },
+    {
+      "id": "R13",
+      "label": "Orientation utilisateur",
+      "category": "savoir-être",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "orientation utilisateur",
+        "compréhension des besoins",
+        "user centric"
+      ]
+    }
+  ],
+  "review": {
+    "reviewed_on": "2026-11-14",
+    "reference": "sii.expected.json",
+    "corrections": [
+      "Remplacée : « Connaissance des LLM (RAG, embeddings, évaluation) » (obligatoire) -> « RAG » et « Embeddings » (souhaitées) : l'offre dit « curieux des LLM (RAG, embeddings, évaluation) », nuance qui vaut pour toute l'énumération ; le corrigé en fait des exigences séparées et souhaitées ; « évaluation » est déjà couverte par « Évaluation de modèles IA ».",
+      "Ajoutée : « Analyse de données de tickets » (souhaitée, compétence technique), présente dans le corrigé, manquante à l'extraction ; requêtes de recherche écrites à la relecture.",
+      "Retirée : « Mesure des gains / analyse de performance », absente du corrigé (ni attendue ni acceptable).",
+      "Conservées telles quelles : « Diplôme d'ingénieur » (= École d'ingénieurs), « Orientation utilisateur » (= Compréhension des besoins utilisateurs) ; les autres importances sont conformes au corrigé."
+    ]
+  }
+}

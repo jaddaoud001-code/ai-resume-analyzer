@@ -23,7 +23,7 @@ from app.chunking import chunk_cv
 from app.config import ENV_FILE, Settings, get_settings, warn_about_env_file
 from app.embeddings import embeddings_model, get_embeddings
 from app.llm import get_llm, match_settings
-from app.llm_calls import RateLimiter
+from app.llm_calls import ProviderAccessDeniedError, ProviderBlockedError, ProviderQuotaExceededError, RateLimiter
 from app.matcher import AnalysisTimeoutError, EmbeddingsError, analyze
 from app.pdf_parser import PDFParseError, PDFTooLargeError, TooManyPagesError, extract_text
 from app.providers import MissingAPIKeyError
@@ -150,12 +150,50 @@ def _preparation_http_error(error: Exception) -> HTTPException | None:
     return None
 
 
+# Quota journalier épuisé sans délai de reprise annoncé : analyses refusées pendant 1 h.
+_QUOTA_BLOCK_S = 3600.0
+
+
+class ProviderBlock:
+    """Dernier refus durable du fournisseur (quota journalier, clé ou modèle refusés) constaté
+    par une analyse : les suivantes reçoivent la même réponse avant d'ouvrir le flux, sans
+    appeler le fournisseur. Quota : jusqu'à la reprise annoncée ; accès refusé : jusqu'au
+    redémarrage (le .env n'est lu qu'au démarrage)."""
+
+    def __init__(self, clock: Callable[[], float] = time.monotonic) -> None:
+        self._clock = clock
+        self._error: ProviderBlockedError | None = None
+        self._until: float | None = None
+
+    def record(self, error: ProviderBlockedError) -> None:
+        self._error = error
+        if isinstance(error, ProviderQuotaExceededError):
+            self._until = self._clock() + max(error.retry_after or _QUOTA_BLOCK_S, 60.0)
+        else:
+            self._until = None
+
+    def current(self) -> ProviderBlockedError | None:
+        if self._error is not None and self._until is not None and self._clock() >= self._until:
+            self._error = self._until = None
+        return self._error
+
+
+def _blocked_http_error(error: ProviderBlockedError) -> HTTPException:
+    if isinstance(error, ProviderQuotaExceededError):
+        return HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, str(error))
+    return HTTPException(status.HTTP_502_BAD_GATEWAY, str(error))
+
+
 def _stream_error(error: Exception) -> AnalysisError:
     """Erreur fatale pendant le flux -> événement « error » (jamais le détail d'une exception
     inattendue, qui pourrait contenir des données)."""
     code: AnalysisErrorCode
     if isinstance(error, AnalysisTimeoutError):
         code, message = "timeout", str(error)
+    elif isinstance(error, ProviderQuotaExceededError):
+        code, message = "quota_exceeded", str(error)
+    elif isinstance(error, ProviderAccessDeniedError):
+        code, message = "provider_access_denied", str(error)
     elif isinstance(error, LLMProviderError):
         code, message = "llm_provider_error", str(error)
     elif isinstance(error, NoRequirementsError):
@@ -185,6 +223,7 @@ def create_app(
         # Settings lus depuis le .env : signaler les variables mal nommées ou en double.
         warn_about_env_file(ENV_FILE)
     embeddings_state = _EmbeddingsState()
+    provider_block = ProviderBlock()
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
@@ -202,6 +241,7 @@ def create_app(
     requirements_cache = RequirementsCache(settings.requirements_cache_size)
     slots = AnalysisSlots(settings.analysis_concurrency)
     app.state.analysis_slots = slots
+    app.state.provider_block = provider_block
 
     # Embeddings construits une seule fois par application, au premier usage (le modèle
     # local, ~2 Go, est en plus partagé par le processus : voir app.embeddings).
@@ -286,7 +326,9 @@ def create_app(
                 async for event in events:
                     yield sse(event, event.type)
         except Exception as error:
-            if not isinstance(error, AnalysisTimeoutError | LLMProviderError | NoRequirementsError | EmbeddingsError):
+            if isinstance(error, ProviderBlockedError):
+                provider_block.record(error)
+            elif not isinstance(error, AnalysisTimeoutError | LLMProviderError | NoRequirementsError | EmbeddingsError):
                 logger.error("Analyse : erreur inattendue %s", type(error).__name__)
             payload = _stream_error(error)
             yield sse(payload, payload.type)
@@ -301,12 +343,16 @@ def create_app(
             400: {"description": "PDF invalide ou sans texte."},
             413: {"description": "PDF ou offre trop volumineux."},
             422: {"description": "Champ manquant ou vide."},
-            429: {"description": TOO_MANY_ANALYSES},
+            429: {"description": TOO_MANY_ANALYSES + " Ou quota journalier du fournisseur LLM atteint."},
             500: {"description": "Clé du fournisseur absente."},
+            502: {"description": "Clé ou modèle refusés par le fournisseur LLM (constaté par une analyse précédente)."},
             503: {"description": "Modèle d'embeddings indisponible (chargement échoué)."},
         },
     )
     async def analyze_stream(file: UploadFile, job_offer: Annotated[str, Form(min_length=1)]) -> EventSourceResponse:
+        # Refus durable déjà constaté (quota journalier, clé ou modèle) : réponse avant le flux.
+        if (blocked := provider_block.current()) is not None:
+            raise _blocked_http_error(blocked)
         slot = slots.try_acquire()
         if slot is None:
             raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, TOO_MANY_ANALYSES)
@@ -433,6 +479,9 @@ def create_app(
                 raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from error
             except LLMProviderError as error:
                 raise HTTPException(status.HTTP_502_BAD_GATEWAY, str(error)) from error
+            except ProviderBlockedError as error:
+                provider_block.record(error)
+                raise _blocked_http_error(error) from error
 
         @app.post("/debug/match", response_model=MatchDebugResponse)
         async def debug_match(file: UploadFile, job_offer: Annotated[str, Form(min_length=1)]) -> MatchDebugResponse:
@@ -456,6 +505,9 @@ def create_app(
                 raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from error
             except LLMProviderError as error:
                 raise HTTPException(status.HTTP_502_BAD_GATEWAY, str(error)) from error
+            except ProviderBlockedError as error:
+                provider_block.record(error)
+                raise _blocked_http_error(error) from error
             except AnalysisTimeoutError as error:
                 raise HTTPException(status.HTTP_504_GATEWAY_TIMEOUT, str(error)) from error
             except EmbeddingsError as error:

@@ -201,6 +201,6 @@ def test_debug_match_reports_whether_requirements_came_from_cache(settings: Sett
             for _ in range(2)
         ]
 
-    assert [r["requirements_from_cache"] for r in reports] == [False, True]
+    assert [r["requirements_source"] for r in reports] == ["extracted", "cache"]
     assert len(extraction.calls) == 1
     assert reports[0]["requirements"] == reports[1]["requirements"]

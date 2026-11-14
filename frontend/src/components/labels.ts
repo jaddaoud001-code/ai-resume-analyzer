@@ -18,6 +18,8 @@ export const LEVEL_LABELS: Record<EvidenceLevel, string> = {
 
 export const ERROR_CODE_TITLES: Record<AnalysisErrorCode, string> = {
   llm_provider_error: 'Le fournisseur d’IA n’a pas répondu',
+  quota_exceeded: 'Quota journalier du fournisseur d’IA atteint',
+  provider_access_denied: 'Le fournisseur d’IA refuse l’accès au modèle',
   no_requirements: 'Aucune exigence trouvée dans l’offre',
   embeddings_error: 'Le CV n’a pas pu être indexé',
   timeout: 'L’analyse a pris trop de temps',

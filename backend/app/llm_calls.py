@@ -1,12 +1,14 @@
 """Appels au LLM : limiteur de débit partagé, nouvelles tentatives, sortie structurée.
 
 Tous les appels au LLM d'un processus (extraction et évaluation) passent par le même
-`RateLimiter` : l'offre gratuite Mistral limite le compte entier à 1 requête par seconde.
+`RateLimiter` : les offres gratuites limitent le compte entier (requêtes et tokens par
+minute, quota journalier).
 """
 
 import asyncio
 import email.utils
 import logging
+import re
 import time
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
@@ -30,6 +32,55 @@ _MAX_RETRY_AFTER_S = 60.0
 # Fenêtre des limites « par minute » ; attendre sa durée entière garantit qu'elle est
 # écoulée, qu'elle soit fixe ou glissante.
 _TOKEN_WINDOW_S = 60.0
+# Quota journalier épuisé : aucun en-tête chez Groq (seulement les limites par minute et le
+# nombre de requêtes du jour) ; le message du 429 nomme la limite atteinte, par exemple
+# « … on tokens per day (TPD): Limit 200000 … ».
+_DAILY_LIMIT = re.compile(r"per day|\((?:TPD|RPD)\)|daily", re.IGNORECASE)
+# 429 sur les tokens par minute (Groq : « … on tokens per minute (TPM) … »).
+_MINUTE_TOKENS_LIMIT = re.compile(r"tokens per minute|\(TPM\)", re.IGNORECASE)
+# Durée Groq des en-têtes x-ratelimit-reset-* : « 7.66s », « 1m26.4s », « 2h3m4s », « 120ms ».
+_GO_DURATION = re.compile(r"(?:(\d+)h)?(?:(\d+)m(?!s))?(?:([\d.]+)s)?(?:([\d.]+)ms)?$")
+
+
+class ProviderBlockedError(RuntimeError):
+    """Le fournisseur refuse durablement les appels : réessayer ne servirait à rien.
+    L'analyse s'arrête (erreur fatale) au lieu de marquer les exigences en erreur."""
+
+
+class ProviderQuotaExceededError(ProviderBlockedError):
+    """Quota journalier du fournisseur épuisé (429 « per day »)."""
+
+    def __init__(self, retry_after: float | None = None) -> None:
+        self.retry_after = retry_after
+        hint = ""
+        if retry_after is not None and retry_after > 0:
+            hint = f" (le fournisseur indique une reprise possible dans environ {_human_duration(retry_after)})"
+        super().__init__(f"Quota journalier du fournisseur LLM atteint : réessayez demain{hint}.")
+
+
+class ProviderAccessDeniedError(ProviderBlockedError):
+    """Clé refusée (401) ou modèle non autorisé par l'abonnement (403)."""
+
+    def __init__(self, status: int, model: str | None = None) -> None:
+        self.status = status
+        if status == 401:
+            message = "Le fournisseur LLM refuse la clé API (401) : vérifiez la clé du fournisseur choisi dans .env."
+        else:
+            target = f"au modèle {model}" if model else "au modèle demandé"
+            message = (
+                f"Le fournisseur LLM refuse l'accès {target} ({status} : abonnement ou modèle non autorisé). "
+                "Vérifiez LLM_PROVIDER, LLM_MODEL et MATCH_LLM_MODEL dans .env."
+            )
+        super().__init__(message)
+
+
+def _human_duration(seconds: float) -> str:
+    minutes = round(seconds / 60)
+    if minutes < 1:
+        return f"{max(1, round(seconds))} s"
+    if minutes < 90:
+        return f"{minutes} min"
+    return f"{minutes / 60:.0f} h"
 
 
 class AnalysisMonitor:
@@ -174,16 +225,22 @@ async def call_with_retry(
     backoff_s: float,
     other_retries: int = 1,
     sleep: Callable[[float], Awaitable[None]] | None = None,
+    model: str | None = None,
 ) -> T:
     """Chaque tentative passe par le limiteur. Sur 429 : jusqu'à `rate_limit_retries`
     nouvelles tentatives, après une attente de :
-    - Retry-After, s'il est fourni ;
-    - sinon, si x-ratelimit-remaining-tokens-minute vaut 0, la fin de la fenêtre d'une
-      minute : 60 s (le fournisseur n'indique pas quand elle se termine), pendant lesquelles
-      le limiteur ne lance aucun appel (ils échoueraient aussi) ;
+    - si le 429 porte sur les tokens de la minute (x-ratelimit-remaining-tokens-minute chez
+      Mistral ou x-ratelimit-remaining-tokens chez Groq à 0, ou message « tokens per
+      minute ») : Retry-After, sinon x-ratelimit-reset-tokens (Groq), sinon 60 s (fenêtre
+      entière, quand le fournisseur n'indique pas sa fin) ; pendant cette attente, le
+      limiteur ne lance aucun appel (ils échoueraient aussi) ;
+    - sinon Retry-After, s'il est fourni ;
     - sinon 60 / x-ratelimit-limit-req-minute secondes, et le limiteur est ralenti à ce
       débit (jusqu'à `RateLimiter.restore()`) ;
     - sinon backoff_s, 2×, 4×…
+    Jamais de nouvelle tentative (ProviderBlockedError) : quota journalier épuisé (429 dont
+    le message nomme une limite « per day ») ; clé refusée (401) ; modèle ou abonnement
+    refusé (403, `model` nommé dans le message).
     Sur toute autre erreur : `other_retries` nouvelle(s) tentative(s).
     Les attentes passent par `sleep`, à défaut par celle du limiteur (horloge simulée en test)."""
     rate_limited = other = 0
@@ -193,19 +250,27 @@ async def call_with_retry(
                 return await call()
         except Exception as error:
             status, retry_after = rate_limit_info(error)
+            if status in (401, 403):
+                logger.warning("%d : accès refusé par le fournisseur LLM (modèle %s)", status, model)
+                raise ProviderAccessDeniedError(status, model) from error
             if status == 429:
                 limits = rate_limit_headers(error)
+                if _DAILY_LIMIT.search(_error_text(error)):
+                    logger.warning("429 : quota journalier du fournisseur épuisé ; limites %s", limits)
+                    raise ProviderQuotaExceededError(retry_after) from error
                 if rate_limited >= rate_limit_retries:
                     logger.warning("429 : abandon après %d nouvelles tentatives ; limites %s", rate_limited, limits)
                     raise
                 per_minute = _requests_per_minute(limits)
                 pauses_limiter = False
-                if retry_after is not None:
-                    delay = retry_after
-                elif _tokens_exhausted(limits):
-                    delay = _TOKEN_WINDOW_S
-                    limiter.hold(delay)
+                minute_tokens = _tokens_exhausted(limits) or bool(_MINUTE_TOKENS_LIMIT.search(_error_text(error)))
+                if minute_tokens:
+                    # Quota de tokens de la minute : aucun appel ne passerait avant sa reprise.
+                    delay = retry_after if retry_after is not None else _reset_tokens(limits) or _TOKEN_WINDOW_S
+                    limiter.hold(min(delay, _MAX_RETRY_AFTER_S))
                     pauses_limiter = True
+                elif retry_after is not None:
+                    delay = retry_after
                 elif per_minute:
                     delay = 60.0 / per_minute
                     limiter.slow_down(delay)
@@ -273,7 +338,48 @@ def _requests_per_minute(limits: dict[str, str]) -> int | None:
 
 
 def _tokens_exhausted(limits: dict[str, str]) -> bool:
-    return _header_int(limits, "x-ratelimit-remaining-tokens-minute") == 0
+    """Tokens de la minute épuisés : en-tête Mistral, ou Groq (x-ratelimit-*-tokens y est par minute)."""
+    return 0 in (
+        _header_int(limits, "x-ratelimit-remaining-tokens-minute"),
+        _header_int(limits, "x-ratelimit-remaining-tokens"),
+    )
+
+
+def _reset_tokens(limits: dict[str, str]) -> float | None:
+    """x-ratelimit-reset-tokens (Groq) : délai avant la reprise du quota de tokens."""
+    for name, value in limits.items():
+        if name.lower() == "x-ratelimit-reset-tokens":
+            return parse_go_duration(value)
+    return None
+
+
+def parse_go_duration(value: str) -> float | None:
+    """« 7.66s », « 1m26.4s », « 2h3m4s », « 120ms » -> secondes ; None si illisible."""
+    match = _GO_DURATION.match(value.strip())
+    if not value.strip() or match is None or not any(match.groups()):
+        return None
+    hours, minutes, seconds, millis = match.groups()
+    return int(hours or 0) * 3600 + int(minutes or 0) * 60 + float(seconds or 0) + float(millis or 0) / 1000
+
+
+def _error_text(error: BaseException) -> str:
+    """Messages de la chaîne d'exceptions (et corps des erreurs d'API) : pour reconnaître la
+    limite atteinte. Jamais journalisé (le message du fournisseur peut nommer le compte)."""
+    parts: list[str] = []
+    seen: set[int] = set()
+    current: BaseException | None = error
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        parts.append(str(current))
+        body = getattr(current, "body", None)
+        if body is not None:
+            parts.append(str(body))
+        response = getattr(current, "response", None)
+        text = getattr(response, "text", None)
+        if isinstance(text, str):
+            parts.append(text)
+        current = current.__cause__ or current.__context__
+    return "\n".join(parts)
 
 
 def rate_limit_headers(error: BaseException) -> dict[str, str]:
@@ -323,4 +429,13 @@ async def invoke_structured(
         limiter,
         rate_limit_retries=settings.llm_rate_limit_retries,
         backoff_s=settings.llm_rate_limit_backoff_s,
+        model=_model_name(llm),
     )
+
+
+def _model_name(llm: BaseChatModel) -> str | None:
+    for attribute in ("model_name", "model"):
+        value = getattr(llm, attribute, None)
+        if isinstance(value, str):
+            return value
+    return None

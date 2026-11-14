@@ -13,5 +13,5 @@ select = ["E", "F", "I", "B", "UP", "SIM"]
 known-first-party = ["app", "eval", "tests"]
 
 [tool.ruff.lint.per-file-ignores]
-# Contenu HTML du CV de démonstration : une ligne par paragraphe, plus lisible ainsi.
-"eval/cvs/make_demo_cv.py" = ["E501"]
+# Contenu HTML des CV fictifs : une ligne par paragraphe, plus lisible ainsi.
+"eval/cvs/make_*_cv.py" = ["E501"]

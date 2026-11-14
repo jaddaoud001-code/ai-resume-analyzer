@@ -12,6 +12,7 @@ from tests.conftest import make_settings
 
 DEMO_DIR = Path(__file__).resolve().parents[1] / "eval" / "cvs"
 DEMO_PDF = DEMO_DIR / "demo_cv.pdf"
+JAVA_PDF = DEMO_DIR / "java_cv.pdf"
 
 
 def _pdf(fill: object) -> bytes:
@@ -136,4 +137,49 @@ class TestDemoCV:
         for placeholder in ("[PHONE]", "[EMAIL]", "[URL]"):
             assert placeholder in chunks[0].text
         for personal in ("Camille Lefèvre", "39 98 42 17", "example.com"):
+            assert personal not in everything
+
+
+class TestJavaCV:
+    """Second CV fictif (une seule colonne), utilisé par l'évaluation du matching."""
+
+    def test_pdf_is_up_to_date_with_its_script(self) -> None:
+        sys.path.insert(0, str(DEMO_DIR))
+        try:
+            from make_java_cv import build
+        finally:
+            sys.path.remove(str(DEMO_DIR))
+
+        assert build() == JAVA_PDF.read_bytes(), "régénérer : .venv/bin/python eval/cvs/make_java_cv.py"
+
+    def test_single_column_sections_and_items(self) -> None:
+        chunks = chunk_cv(_text(JAVA_PDF.read_bytes()))
+
+        sections = list(dict.fromkeys(c.section for c in chunks))
+        assert sections == [
+            HEADER_SECTION,
+            "PROFIL",
+            "EXPÉRIENCE PROFESSIONNELLE",
+            "PROJETS",
+            "FORMATION",
+            "COMPÉTENCES",
+            "LANGUES",
+            "CENTRES D'INTÉRÊT",
+        ]
+        experiences = [c for c in chunks if c.section == "EXPÉRIENCE PROFESSIONNELLE"]
+        assert [c.text.splitlines()[0] for c in experiences] == [
+            "Alternance développeur backend Java · Valmorin Logistique",
+            "Stage développeur · Atelier Numérique Brisecôte",
+        ]
+        assert experiences[0].text.endswith("Java 17 · Spring Boot · PostgreSQL · Maven")
+        assert experiences[1].text.endswith("Java · JUnit · Git")
+
+    def test_contact_details_are_masked(self) -> None:
+        chunks = chunk_cv(_text(JAVA_PDF.read_bytes()))
+        everything = "\n".join(c.text for c in chunks)
+
+        assert chunks[0].text.startswith(NAME_PLACEHOLDER)
+        for placeholder in ("[PHONE]", "[EMAIL]"):
+            assert placeholder in chunks[0].text
+        for personal in ("Bastien Corlay", "39 98 27 64", "example.com"):
             assert personal not in everything

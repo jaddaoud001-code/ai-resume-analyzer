@@ -73,15 +73,20 @@ export interface MatchReport {
   errors: string[]
   extraction_model: string
   match_model: string
-  requirements_from_cache: boolean
+  requirements_source: RequirementsSource
   chunk_count: number
   timings: MatchTimings
 }
+
+/** Origine des exigences : extraites par le LLM, servies par le cache, ou fournies (évaluation). */
+export type RequirementsSource = 'extracted' | 'cache' | 'provided'
 
 export type AnalysisPhase = 'indexing' | 'extraction' | 'evaluation'
 
 export type AnalysisErrorCode =
   | 'llm_provider_error'
+  | 'quota_exceeded'
+  | 'provider_access_denied'
   | 'no_requirements'
   | 'embeddings_error'
   | 'timeout'
@@ -104,7 +109,7 @@ export interface RequirementsExtractedEvent {
   job_title: string
   requirements: Requirement[]
   seconds: number
-  from_cache: boolean
+  requirements_source: RequirementsSource
 }
 
 export interface StatusEvent {

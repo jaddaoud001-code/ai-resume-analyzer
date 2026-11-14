@@ -18,7 +18,9 @@ logger = logging.getLogger(__name__)
 ENV_FILE = Path(__file__).resolve().parents[2] / ".env"
 
 EmbeddingsProvider = Literal["local", "openai", "mistral"]
-LLMProvider = Literal["mistral", "openai"]
+LLMProvider = Literal["groq", "mistral", "openai"]
+# Effort de raisonnement des modèles qui raisonnent (gpt-oss chez Groq ou OpenAI).
+ReasoningEffort = Literal["low", "medium", "high"]
 
 
 class Settings(BaseSettings):
@@ -31,6 +33,7 @@ class Settings(BaseSettings):
     # Seule la clé du fournisseur choisi est exigée, au moment où on l'utilise.
     openai_api_key: SecretStr | None = None
     mistral_api_key: SecretStr | None = None
+    groq_api_key: SecretStr | None = None
     cors_origins: list[str] = ["http://localhost:5173"]
 
     # Embeddings : "local" n'envoie aucune donnée à l'extérieur.
@@ -39,11 +42,16 @@ class Settings(BaseSettings):
     embeddings_model: str | None = None
     embeddings_cache_dir: Path = Path("~/.cache/ai-resume-analyzer/fastembed")
     # LLM : extraction des exigences, puis évaluation de la correspondance.
-    llm_provider: LLMProvider = "mistral"
+    llm_provider: LLMProvider = "groq"
     # None : modèle par défaut du fournisseur (voir app.llm.DEFAULT_LLM_MODELS).
     llm_model: str | None = None
     # Modèle d'évaluation des exigences (un appel par exigence) ; None : défaut du fournisseur.
     match_llm_model: str | None = None
+    # Effort de raisonnement (low | medium | high) des modèles qui raisonnent (gpt-oss) :
+    # extraction, puis évaluation des exigences. None : défaut du modèle. Ignoré par les
+    # fournisseurs et modèles qui ne raisonnent pas (Mistral) ; refusé par l'API sinon.
+    llm_reasoning_effort: ReasoningEffort | None = None
+    match_llm_reasoning_effort: ReasoningEffort | None = None
     llm_timeout_s: float = 60
     # Graine transmise au fournisseur (random_seed chez Mistral, seed chez OpenAI) pour des
     # résultats reproductibles ; None : aucune graine.

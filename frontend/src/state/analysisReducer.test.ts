@@ -25,6 +25,7 @@ describe('analysisReducer', () => {
     state = run(events(extracted), state)
     expect(state.phases).toEqual({ indexing: 'done', extraction: 'done', evaluation: 'active' })
     expect(state.total).toBe(extracted.requirements.length)
+    expect(state.requirementsSource).toBe('extracted')
     expect(state.requirements.every((entry) => entry.result === null)).toBe(true)
     // Obligatoires d'abord.
     const importances = state.requirements.map((e) => e.requirement.importance)

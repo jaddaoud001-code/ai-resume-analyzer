@@ -129,7 +129,7 @@ def sample_events() -> list[BaseModel]:
         errors=["R3"],
         extraction_model="mistral-large-4-0",
         match_model="mistral-large-4-0",
-        requirements_from_cache=False,
+        requirements_source="extracted",
         chunk_count=8,
         timings=MatchTimings(extraction_s=21.4, indexing_s=3.2, retrieval_s=0.4, evaluation_s=96.1),
     )
@@ -140,7 +140,7 @@ def sample_events() -> list[BaseModel]:
             job_title="Développeuse backend",
             requirements=[m.requirement for m in MATCHES],
             seconds=21.4,
-            from_cache=False,
+            requirements_source="extracted",
         ),
         rate_limit_status(60),
         *[

@@ -1,0 +1,187 @@
+{
+  "offer": "hager.txt",
+  "extraction_model": "openai/gpt-oss-120b",
+  "extraction_prompt_version": 2,
+  "frozen_on": "2026-11-14",
+  "job_title": "Stagiaire Ingénieur(e) informatique & IA",
+  "requirements": [
+    {
+      "id": "R1",
+      "label": "BAC+5 en informatique et intelligence artificielle",
+      "category": "formation",
+      "importance": "obligatoire",
+      "min_years": null,
+      "search_queries": [
+        "Master informatique IA",
+        "Diplôme Bac+5 IA",
+        "Formation IA"
+      ]
+    },
+    {
+      "id": "R2",
+      "label": "Anglais professionnel",
+      "category": "langue",
+      "importance": "obligatoire",
+      "min_years": null,
+      "search_queries": [
+        "anglais professionnel",
+        "anglais business",
+        "anglais technique"
+      ]
+    },
+    {
+      "id": "R3",
+      "label": "Java",
+      "category": "compétence technique",
+      "importance": "obligatoire",
+      "min_years": null,
+      "search_queries": [
+        "Java",
+        "développement Java",
+        "programmation Java"
+      ]
+    },
+    {
+      "id": "R4",
+      "label": "JSP",
+      "category": "compétence technique",
+      "importance": "obligatoire",
+      "min_years": null,
+      "search_queries": [
+        "JSP",
+        "JavaServer Pages",
+        "développement JSP"
+      ]
+    },
+    {
+      "id": "R5",
+      "label": "XML",
+      "category": "compétence technique",
+      "importance": "obligatoire",
+      "min_years": null,
+      "search_queries": [
+        "XML",
+        "format XML",
+        "manipulation XML"
+      ]
+    },
+    {
+      "id": "R6",
+      "label": "SQL",
+      "category": "compétence technique",
+      "importance": "obligatoire",
+      "min_years": null,
+      "search_queries": [
+        "SQL",
+        "bases de données SQL",
+        "requêtes SQL"
+      ]
+    },
+    {
+      "id": "R7",
+      "label": "Git",
+      "category": "compétence technique",
+      "importance": "obligatoire",
+      "min_years": null,
+      "search_queries": [
+        "Git",
+        "gestion de version Git",
+        "contrôle de source Git"
+      ]
+    },
+    {
+      "id": "R8",
+      "label": "Outils d'IA générative",
+      "category": "compétence technique",
+      "importance": "obligatoire",
+      "min_years": null,
+      "search_queries": [
+        "IA générative",
+        "outils IA générative",
+        "génération IA"
+      ]
+    },
+    {
+      "id": "R9",
+      "label": "PLM Windchill",
+      "category": "compétence technique",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "Windchill",
+        "PLM Windchill",
+        "gestion PLM Windchill"
+      ]
+    },
+    {
+      "id": "R10",
+      "label": "Rétro-ingénierie assistée par IA",
+      "category": "compétence technique",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "rétro-ingénierie IA",
+        "reverse engineering IA",
+        "analyse rétro IA"
+      ]
+    },
+    {
+      "id": "R11",
+      "label": "Documentation technique",
+      "category": "compétence technique",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "documentation technique",
+        "rédaction de documentation",
+        "documenter un système"
+      ]
+    },
+    {
+      "id": "R12",
+      "label": "Initiative et autonomie",
+      "category": "savoir-être",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "initiative",
+        "autonomie",
+        "travail autonome"
+      ]
+    },
+    {
+      "id": "R13",
+      "label": "Travail en équipe",
+      "category": "savoir-être",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "travail en équipe",
+        "collaboration",
+        "esprit d'équipe"
+      ]
+    },
+    {
+      "id": "R14",
+      "label": "Capacités d'analyse et de synthèse",
+      "category": "savoir-être",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "analyse",
+        "synthèse",
+        "capacités d'analyse"
+      ]
+    }
+  ],
+  "review": {
+    "reviewed_on": "2026-11-14",
+    "reference": "hager.expected.json",
+    "corrections": [
+      "Ajoutée : « Documentation technique » (souhaitée, compétence technique), présente dans le corrigé, manquante à l'extraction ; requêtes de recherche écrites à la relecture.",
+      "Fusionnées : « Initiative » et « Autonomie » -> « Initiative et autonomie » (souhaitée, savoir-être), une seule exigence dans le corrigé (« Initiative / autonomie »).",
+      "Libellé : trait d'union insécable (U+2011) remplacé par un trait d'union simple dans « Rétro-ingénierie assistée par IA ».",
+      "Importances : toutes conformes au corrigé, aucune correction."
+    ]
+  }
+}

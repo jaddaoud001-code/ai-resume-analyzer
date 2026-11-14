@@ -204,12 +204,12 @@ def test_empty_offer_returns_422_without_stream(sectioned_cv_pdf: bytes) -> None
 
 
 def test_missing_key_returns_500_without_stream(sectioned_cv_pdf: bytes) -> None:
-    app = create_app(stream_settings(mistral_api_key=None), embeddings_factory=lambda _: KeywordEmbeddings())
+    app = create_app(stream_settings(groq_api_key=None), embeddings_factory=lambda _: KeywordEmbeddings())
 
     response = run_post(app, sectioned_cv_pdf)
 
     _assert_plain_http_error(response, 500, app)
-    assert "MISTRAL_API_KEY" in response.json()["detail"]
+    assert "GROQ_API_KEY" in response.json()["detail"]
 
 
 # --- Événements status, error, timeout -----------------------------------------------

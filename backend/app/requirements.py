@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 
 from app.config import Settings
 from app.llm import llm_model
-from app.llm_calls import RateLimiter, invoke_structured
+from app.llm_calls import ProviderBlockedError, RateLimiter, invoke_structured
 from app.schemas import (
     JobRequirements,
     Requirement,
@@ -157,6 +157,8 @@ async def extract_requirements(
             limiter or RateLimiter.from_settings(settings),
             settings,
         )
+    except ProviderBlockedError:
+        raise  # quota journalier, clé ou modèle refusés : message propre, sans nouvelle tentative
     except Exception as error:
         logger.warning("Extraction des exigences : échec du LLM (%s)", type(error).__name__)
         raise LLMProviderError(f"Le fournisseur LLM n'a pas répondu correctement ({type(error).__name__}).") from error
