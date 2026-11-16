@@ -47,6 +47,8 @@ export interface RequirementMatch {
   downgraded: boolean
   capped_for_duration: boolean
   capped_soft_skill: boolean
+  /** Langue : niveau relevé à « démontré » par une certification ou un score officiel cité. */
+  certification_floor: boolean
   /** Toutes les citations rejetées : le LLM a été invité une fois à les recopier mot pour mot. */
   second_chance: boolean
   gaps: string[]

@@ -132,6 +132,6 @@ Toutes les mesures sont données **séparément pour deux groupes** : exigences 
 - **citations rejetées**, **secondes chances** (et combien ont retrouvé une preuve exacte), **erreurs**, **durée** ;
 - avec `--runs N` : agrégation, et les exigences dont le niveau varie d'une exécution à l'autre.
 
-Le rapport indique la version du prompt d'évaluation (`MATCH_PROMPT_VERSION`) : deux runs ne se comparent qu'en sachant laquelle a servi (v1 : référence ; v2 : règle des savoir-être nommés ou décrits, rappel des scores officiels).
+Le rapport indique la version du prompt d'évaluation (`MATCH_PROMPT_VERSION`) : deux runs ne se comparent qu'en sachant laquelle a servi (v1 : référence ; v2 : règle des savoir-être nommés ou décrits, rappel des scores officiels ; v3 : une affirmation du profil sans expérience qui l'illustre vaut « mentionné »). Le plancher des certifications de langue, appliqué par le code depuis la v3, n'a pas de numéro de version propre : il est daté dans `Structure.md`.
 
 Une exigence en erreur n'est comptée ni exacte ni fausse (colonne « erreur »). Un refus durable du fournisseur (quota journalier, modèle refusé) arrête l'évaluation ; un autre échec marque le cas en échec et passe au suivant. La date est fixée (`EVAL_TODAY`) pour que les périodes « en cours » ne changent pas d'un jour à l'autre.

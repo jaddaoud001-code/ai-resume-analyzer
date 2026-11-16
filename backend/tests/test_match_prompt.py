@@ -24,7 +24,7 @@ PROMPT = _flat(_SYSTEM_PROMPT)
 def test_prompt_change_requires_a_new_version() -> None:
     """Les runs de l'évaluation du matching se comparent par version du prompt. Après une
     modification voulue : incrémenter MATCH_PROMPT_VERSION et mettre à jour l'empreinte."""
-    fingerprints = {2: "cc7ffad3ab5c9914d44e465d97bc93c4a651596722132521e2ec6d60281ea9d0"}
+    fingerprints = {3: "770bb98e42e52f3104fc3636090f1ffc0ae1312c197217badf422780b54d2162"}
 
     assert hashlib.sha256(_SYSTEM_PROMPT.encode()).hexdigest() == fingerprints.get(MATCH_PROMPT_VERSION), (
         "prompt d'évaluation modifié : incrémenter MATCH_PROMPT_VERSION et mettre à jour l'empreinte"
@@ -47,9 +47,9 @@ class TestSoftSkillRule:
         ):
             assert wrong_inference in PROMPT, wrong_inference
 
-    def test_without_description_the_level_is_at_most_mentioned(self) -> None:
-        assert "le savoir-être est au plus « mentionné » si le CV en donne un indice explicite" in PROMPT
-        assert "sinon « non démontré »" in PROMPT
+    def test_without_description_a_named_soft_skill_is_mentioned(self) -> None:
+        assert "le savoir-être est « mentionné » si le CV l'affirme ou le nomme explicitement" in PROMPT
+        assert "(dans le profil, le résumé ou une liste de qualités), sinon « non démontré »" in PROMPT
 
     def test_the_llm_is_told_the_requirement_is_a_soft_skill(self) -> None:
         requirement = Requirement(
@@ -75,6 +75,22 @@ class TestSoftSkillRule:
         result = verify_assessment(_assess("solide", (0, text)), requirement, {0: text}, TODAY)
 
         assert (result.level, result.capped_soft_skill) == ("démontré", True)
+
+
+class TestProfileClaimRule:
+    """v3 : une affirmation du profil sans expérience qui l'illustre vaut « mentionné »."""
+
+    def test_explicit_profile_claim_is_mentioned_for_any_requirement(self) -> None:
+        assert (
+            "Une affirmation explicite dans le profil ou le résumé du CV, sans expérience, projet ou formation "
+            "qui l'illustre, vaut « mentionné », y compris pour un savoir-être"
+        ) in PROMPT
+
+    def test_the_example_is_generic(self) -> None:
+        # Exemple propre au prompt (le test des prompts génériques vérifie qu'il ne vient
+        # d'aucun cas d'évaluation).
+        assert "« je présente régulièrement mes travaux à des publics non techniques »" in PROMPT
+        assert "vaut « mentionné » pour « Communication »" in PROMPT
 
 
 class TestOfficialScoreRule:

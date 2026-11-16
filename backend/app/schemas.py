@@ -64,6 +64,9 @@ class RequirementMatch(BaseModel):
     capped_for_duration: bool = False
     # Savoir-être plafonné à « démontré » : un CV ne peut pas le prouver solidement.
     capped_soft_skill: bool = False
+    # Langue : niveau relevé à « démontré » car une preuve valide cite une certification ou un
+    # score officiel dans la langue demandée (règle du code, voir app.certifications).
+    certification_floor: bool = False
     # Toutes les citations rejetées : un second appel au LLM a demandé de les recopier mot
     # pour mot (ou de baisser le niveau) ; le résultat est celui de ce second appel.
     second_chance: bool = False

@@ -24,6 +24,7 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
+from app.certifications import proves_language
 from app.chunking import chunk_cv
 from app.config import Settings
 from app.llm import llm_model, match_llm_model
@@ -83,8 +84,10 @@ class RequirementAssessment(BaseModel):
 # Version du prompt d'évaluation, rapportée par l'évaluation du matching (eval_matching.py)
 # pour comparer les runs : à incrémenter à chaque modification du prompt (un test compare
 # son empreinte à celle enregistrée pour la version courante). v1 : run de référence du
-# 2026-11-14 ; v2 : savoir-être nommés ou décrits explicitement, rappel des scores officiels.
-MATCH_PROMPT_VERSION = 2
+# 2026-11-14 ; v2 : savoir-être nommés ou décrits explicitement, rappel des scores officiels ;
+# v3 : une affirmation explicite du profil ou du résumé, sans expérience qui l'illustre, vaut
+# « mentionné » (savoir-être compris).
+MATCH_PROMPT_VERSION = 3
 
 _SYSTEM_PROMPT = """Tu évalues si un CV démontre une exigence d'une offre d'emploi.
 
@@ -107,6 +110,10 @@ compétences. Quand plusieurs preuves existent, le niveau se fonde sur la plus f
 simple mention dans une liste n'abaisse jamais le niveau d'une utilisation décrite dans une \
 expérience ou un projet. Un terme proche ne compte que s'il désigne réellement la même \
 compétence.
+Une affirmation explicite dans le profil ou le résumé du CV, sans expérience, projet ou \
+formation qui l'illustre, vaut « mentionné », y compris pour un savoir-être : par exemple, \
+un profil qui affirme « je présente régulièrement mes travaux à des publics non \
+techniques », sans expérience décrite, vaut « mentionné » pour « Communication ».
 Une technologie qui implique directement la compétence en est une preuve, au même niveau \
 que si la compétence était nommée : un framework prouve son langage (Django → Python, \
 Laravel → PHP, Ruby on Rails → Ruby) ; un SGBD relationnel prouve SQL (Oracle Database, \
@@ -139,9 +146,9 @@ Une réalisation technique ne prouve pas à elle seule un savoir-être : corrige
 prouve pas l'autonomie ; optimiser une application ne prouve pas la résolution de \
 problèmes ; produire des tableaux de bord ne prouve pas la capacité d'analyse et de \
 synthèse ; citer une équipe (« outil interne de l'équipe ») ne prouve pas le travail en \
-équipe. Sans description explicite, le savoir-être est au plus « mentionné » si le CV en \
-donne un indice explicite (le mot lui-même, dans le profil ou une liste de qualités), \
-sinon « non démontré ».
+équipe. Sans description explicite dans une expérience, un projet ou une formation, le \
+savoir-être est « mentionné » si le CV l'affirme ou le nomme explicitement (dans le \
+profil, le résumé ou une liste de qualités), sinon « non démontré ».
 
 evidence : pour chaque preuve, chunk_id (l'id du chunk) et quote, un extrait recopié \
 EXACTEMENT du texte de ce chunk, sans reformulation. Pour abréger, sépare des morceaux \
@@ -369,7 +376,8 @@ def verify_assessment(
     shown: dict[int, str],
     today: date,
 ) -> RequirementMatch:
-    """Applique les règles du code à la réponse du LLM : citations, rétrogradation, durées."""
+    """Applique les règles du code à la réponse du LLM : citations, rétrogradation, plancher des
+    certifications de langue, durées, plafond des savoir-être."""
     evidence: list[Evidence] = []
     rejected: list[Evidence] = []
     seen: set[tuple[int, str]] = set()
@@ -387,6 +395,16 @@ def verify_assessment(
     downgraded = False
     if level != "non démontré" and not evidence:
         level, downgraded = "non démontré", True
+
+    # Langue : une certification ou un score officiel cité dans une preuve valide vaut au moins
+    # « démontré » (le LLM l'a parfois ignoré, par exemple pour un niveau B1 certifié).
+    certification_floor = False
+    if (
+        requirement.category == "langue"
+        and level in ("non démontré", "mentionné")
+        and any(proves_language(e.quote, requirement) for e in evidence)
+    ):
+        level, certification_floor = "démontré", True
 
     periods: list[Period] = []
     rejected_periods = 0
@@ -419,6 +437,7 @@ def verify_assessment(
         downgraded=downgraded,
         capped_for_duration=capped,
         capped_soft_skill=capped_soft_skill,
+        certification_floor=certification_floor,
         gaps=[g for g in assessment.gaps if g.strip()],
         justification=assessment.justification.strip(),
     )

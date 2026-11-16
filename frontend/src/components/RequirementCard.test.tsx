@@ -76,6 +76,24 @@ describe('RequirementCard', () => {
     expect(screen.getByText(/le modèle a recopié ses preuves mot pour mot/)).toBeInTheDocument()
   })
 
+  it('explique le niveau relevé par une certification de langue', () => {
+    const python = result('Python')
+    const english = {
+      ...python,
+      requirement: { ...python.requirement, label: 'Anglais professionnel', category: 'langue' as const, min_years: null },
+      level: 'démontré' as const,
+      llm_level: 'mentionné' as const,
+      rejected_evidence: 0,
+      rejected_evidence_items: [],
+      capped_for_duration: false,
+      certification_floor: true,
+    }
+    render(<RequirementCard entry={{ requirement: english.requirement, result: english }} />)
+
+    expect(screen.getByText(/Niveau relevé à « démontré » : le CV cite une certification ou un score officiel/)).toBeInTheDocument()
+    expect(screen.getByText('Démontré')).toBeInTheDocument()
+  })
+
   it('affiche « Non évaluée » quand l’analyse s’est arrêtée avant', () => {
     const go = result('Go')
     render(<RequirementCard entry={{ requirement: go.requirement, result: null }} interrupted />)

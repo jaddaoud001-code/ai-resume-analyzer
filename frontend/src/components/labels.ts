@@ -61,6 +61,9 @@ export function flagExplanations(result: RequirementMatch): string[] {
       `Durée insuffisante : ${months} mois prouvés pour ${years} ${plural(years, 'an demandé', 'ans demandés')} ; niveau limité à « mentionné ».`,
     )
   }
+  if (result.certification_floor) {
+    flags.push('Niveau relevé à « démontré » : le CV cite une certification ou un score officiel dans cette langue.')
+  }
   if (result.capped_soft_skill) {
     flags.push('Savoir-être limité à « démontré » : un CV ne peut pas le prouver davantage.')
   }
