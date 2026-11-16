@@ -119,6 +119,8 @@ Le corrigé a été écrit **avant tout run du matching**, en lisant uniquement 
 - celles du code : savoir-être plafonné à « démontré » (aucune durée minimale dans ces listes) ;
 - **une règle propre au corrigé** : un savoir-être doit être **nommé ou décrit** (« travail en équipe de quatre ») ; il ne se déduit pas d'une réalisation technique. Le prompt ne l'impose pas : l'écart est mesuré à part (voir ci-dessous).
 
+**Corrigé modifié après des runs** (tracé dans le champ `review` du fichier) : le 2026-11-16, dans `java_cv__hager`, R2 « Anglais professionnel » (« Anglais : B1 (TOEIC 785) ») est passé de « démontré / mentionné » à « démontré » seul, pour l'aligner sur une règle ajoutée **après** les runs v1 et v2 : le plancher des certifications de langue, appliqué par le code. Les résultats publiés de v1 et v2 restent tels quels (calculés avec l'ancien corrigé, où « mentionné » était accepté) ; un run ultérieur se compare donc à eux en tenant compte de ce changement.
+
 **Transparence** : pour le cas `demo_cv__sii`, des résultats de l'outil avaient été vus avant l'écriture du corrigé (niveaux d'« École d'ingénieurs » et de Python, scores de 60 à 65) ; ce cas est le moins aveugle des quatre.
 
 ### Mesures

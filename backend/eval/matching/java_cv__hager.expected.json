@@ -15,10 +15,9 @@
       "id": "R2",
       "label": "Anglais professionnel",
       "levels": [
-        "démontré",
-        "mentionné"
+        "démontré"
       ],
-      "justification": "« Anglais : B1 (TOEIC 785) » : score officiel (au moins démontré selon la règle), mais niveau B1 en deçà d'un anglais professionnel."
+      "justification": "« Anglais : B1 (TOEIC 785) » : score officiel ; le plancher des certifications (règle du code, certification_floor) le porte au moins à « démontré », même pour un niveau B1."
     },
     {
       "id": "R3",
@@ -118,5 +117,22 @@
       ],
       "justification": "Ni analyse ni synthèse nommées ou décrites."
     }
-  ]
+  ],
+  "review": {
+    "changes": [
+      {
+        "date": "2026-11-16",
+        "id": "R2",
+        "label": "Anglais professionnel",
+        "before": [
+          "démontré",
+          "mentionné"
+        ],
+        "after": [
+          "démontré"
+        ],
+        "reason": "Corrigé aligné sur une règle ajoutée après les runs v1 (2026-11-14) et v2 (2026-11-16) : le plancher des certifications de langue, appliqué par le code, porte un score officiel au moins à « démontré ». Les résultats publiés de v1 et v2 restent tels quels (« mentionné » y était accepté)."
+      }
+    ]
+  }
 }
