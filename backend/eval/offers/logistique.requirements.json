@@ -1,0 +1,162 @@
+{
+  "offer": "logistique.txt",
+  "extraction_model": "openai/gpt-oss-120b",
+  "extraction_prompt_version": 2,
+  "frozen_on": "2026-11-16",
+  "job_title": "Développeur·se backend confirmé·e – Plateforme de suivi logistique",
+  "requirements": [
+    {
+      "id": "R1",
+      "label": "Développement backend",
+      "category": "expérience",
+      "importance": "obligatoire",
+      "min_years": 2,
+      "search_queries": [
+        "développement backend",
+        "backend developer",
+        "expérience backend"
+      ]
+    },
+    {
+      "id": "R2",
+      "label": "Python",
+      "category": "compétence technique",
+      "importance": "obligatoire",
+      "min_years": 3,
+      "search_queries": [
+        "Python",
+        "développement Python",
+        "Python 3 ans"
+      ]
+    },
+    {
+      "id": "R3",
+      "label": "SQL et bases de données relationnelles",
+      "category": "compétence technique",
+      "importance": "obligatoire",
+      "min_years": null,
+      "search_queries": [
+        "SQL",
+        "bases de données relationnelles",
+        "SQL PostgreSQL"
+      ]
+    },
+    {
+      "id": "R4",
+      "label": "Déploiement cloud",
+      "category": "compétence technique",
+      "importance": "obligatoire",
+      "min_years": null,
+      "search_queries": [
+        "déploiement cloud",
+        "cloud deployment",
+        "AWS Azure GCP"
+      ]
+    },
+    {
+      "id": "R5",
+      "label": "Anglais professionnel",
+      "category": "langue",
+      "importance": "obligatoire",
+      "min_years": null,
+      "search_queries": [
+        "anglais professionnel",
+        "anglais courant",
+        "anglais technique"
+      ]
+    },
+    {
+      "id": "R6",
+      "label": "Message queue (RabbitMQ, Kafka)",
+      "category": "compétence technique",
+      "importance": "souhaitée",
+      "min_years": 1,
+      "search_queries": [
+        "RabbitMQ",
+        "Kafka",
+        "message queue"
+      ]
+    },
+    {
+      "id": "R7",
+      "label": "Observabilité (métriques, tableaux de bord, alertes)",
+      "category": "compétence technique",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "observabilité",
+        "métriques",
+        "tableaux de bord"
+      ]
+    },
+    {
+      "id": "R8",
+      "label": "API REST",
+      "category": "compétence technique",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "API REST",
+        "endpoints HTTP",
+        "services web"
+      ]
+    },
+    {
+      "id": "R9",
+      "label": "CI/CD",
+      "category": "compétence technique",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "CI/CD",
+        "intégration continue",
+        "pipelines de déploiement"
+      ]
+    },
+    {
+      "id": "R10",
+      "label": "Tests automatisés",
+      "category": "compétence technique",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "tests automatisés",
+        "tests unitaires",
+        "couverture de tests"
+      ]
+    },
+    {
+      "id": "R11",
+      "label": "Autonomie",
+      "category": "savoir-être",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "autonomie",
+        "travail autonome",
+        "indépendant"
+      ]
+    },
+    {
+      "id": "R12",
+      "label": "Communication claire avec interlocuteurs non techniques",
+      "category": "savoir-être",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "communication claire",
+        "communication non technique",
+        "communication avec interlocuteurs non techniques"
+      ]
+    }
+  ],
+  "review": {
+    "reviewed_on": "2026-11-16",
+    "reference": "logistique.expected.json",
+    "corrections": [
+      "Ajoutées : « API REST », « CI/CD » et « Tests automatisés » (souhaitées, compétences techniques), présentes dans le corrigé (tirées des missions seulement), manquantes à l'extraction ; requêtes de recherche écrites à la relecture ; placées à la fin des souhaitées techniques (ordre du LLM conservé pour les autres).",
+      "Importances, catégories et durées (2, 3 et 1 an) : toutes conformes au corrigé, aucune correction.",
+      "Libellés conservés tels qu'extraits (« Message queue (RabbitMQ, Kafka) », « Observabilité (métriques, tableaux de bord, alertes) », « Communication claire avec interlocuteurs non techniques »)."
+    ]
+  }
+}

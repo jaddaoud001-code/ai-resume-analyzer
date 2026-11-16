@@ -1,0 +1,110 @@
+{
+  "cv": "backend_cv.pdf",
+  "offer": "logistique",
+  "series": "difficile",
+  "requirements": [
+    {
+      "id": "R1",
+      "label": "Développement backend",
+      "levels": [
+        "solide",
+        "démontré"
+      ],
+      "justification": "Chunk 2 « Ingénieure logicielle · Ferlane Fret / Févr. 2025 – en cours » (endpoints FastAPI, mise en production) : 2025-02 → 2026-11 = 22 mois ; chunk 4 « Développeuse freelance … Janv. 2023 – Déc. 2023 » (applications web Django, bases PostgreSQL) : 12 mois ; sans chevauchement : 34 mois ≥ 24 (date de référence 2026-11-14 (« en cours » = 2026-11), mois inclus). Chacune seule < 24 : il faut citer les deux. Le poste ETL (chunk 5, 16 mois) n'est pas compté comme backend."
+    },
+    {
+      "id": "R2",
+      "label": "Python",
+      "levels": [
+        "solide",
+        "démontré"
+      ],
+      "justification": "Chunk 5 « Développeuse Python (données) … Sept. 2021 – Déc. 2022 » : 16 mois (Python nommé) ; chunk 4 Django → Python : 12 mois ; chunk 2 FastAPI → Python : 22 mois ; sans chevauchement : 50 mois ≥ 36 (date de référence 2026-11-14 (« en cours » = 2026-11), mois inclus). Paires : chunks 2 + 5 = 38 (suffit), 2 + 4 = 34 et 4 + 5 = 28 (insuffisantes)."
+    },
+    {
+      "id": "R3",
+      "label": "SQL et bases de données relationnelles",
+      "levels": [
+        "solide",
+        "démontré"
+      ],
+      "justification": "« Requêtes SQL d'agrégation pour les rapports mensuels » (chunk 5) + « Bases PostgreSQL » (chunk 4) + PostgreSQL dans la ligne de technologies (chunk 3) : plusieurs expériences."
+    },
+    {
+      "id": "R4",
+      "label": "Déploiement cloud",
+      "levels": [
+        "démontré",
+        "mentionné"
+      ],
+      "justification": "« Mise en production des services sur un cluster Kubernetes managé : images Docker, manifestes Helm, montée en charge automatique » (chunk 2) : déploiement décrit, mais le mot « cloud » et le fournisseur ne sont pas écrits ; un Kubernetes managé est un service cloud, d'où démontré, mentionné accepté."
+    },
+    {
+      "id": "R5",
+      "label": "Anglais professionnel",
+      "levels": [
+        "démontré"
+      ],
+      "justification": "« Points hebdomadaires en anglais avec l'équipe d'exploitation de Toronto ; documentation d'architecture rédigée en anglais » (chunk 3, second morceau de l'expérience) : usage professionnel décrit ; « Anglais : courant » (chunk 9) n'est qu'une déclaration, sans certificat (pas de plancher)."
+    },
+    {
+      "id": "R6",
+      "label": "Message queue (RabbitMQ, Kafka)",
+      "levels": [
+        "mentionné"
+      ],
+      "justification": "« RabbitMQ (mars – août 2025), puis migration vers Kafka (juin 2025 – janv. 2026) » (chunk 2) : 2025-03 → 2025-08 = 6 mois et 2025-06 → 2026-01 = 8 mois, chevauchement juin – août 2025 fusionné : 2025-03 → 2026-01 = 11 mois < 12 (somme naïve : 14) : usage démontré, plafonné à « mentionné » par la durée. Piège : prendre la période du poste (2025-02 → en cours, 22 mois) donnerait à tort « démontré »."
+    },
+    {
+      "id": "R7",
+      "label": "Observabilité (métriques, tableaux de bord, alertes)",
+      "levels": [
+        "démontré"
+      ],
+      "justification": "« Tableaux de bord Grafana et alertes Prometheus sur la latence et le taux d'erreurs des services » (chunk 2) : observabilité décrite sans être nommée."
+    },
+    {
+      "id": "R8",
+      "label": "API REST",
+      "levels": [
+        "démontré",
+        "mentionné"
+      ],
+      "justification": "« Développement des endpoints FastAPI consommés par l'application mobile des chauffeurs » (chunk 2) : API web décrite, le mot REST n'est pas écrit ; mentionné accepté (terme proche)."
+    },
+    {
+      "id": "R9",
+      "label": "CI/CD",
+      "levels": [
+        "démontré"
+      ],
+      "justification": "« Pipelines GitHub Actions : tests, analyse statique et déploiement à chaque fusion sur la branche principale » (chunk 2) : intégration et déploiement continus décrits, sans le sigle CI/CD."
+    },
+    {
+      "id": "R10",
+      "label": "Tests automatisés",
+      "levels": [
+        "démontré",
+        "solide"
+      ],
+      "justification": "« Tests pytest sur les endpoints critiques ; couverture portée de 45 % à 80 % » (chunk 2) + tests dans les pipelines : une expérience, avec un résultat chiffré (solide défendable)."
+    },
+    {
+      "id": "R11",
+      "label": "Autonomie",
+      "levels": [
+        "démontré",
+        "mentionné"
+      ],
+      "justification": "« Développeuse freelance … seule du recueil des besoins jusqu'à la livraison chez le client » (chunk 4) : travail seul décrit dans une expérience, sans le mot « autonomie »."
+    },
+    {
+      "id": "R12",
+      "label": "Communication claire avec interlocuteurs non techniques",
+      "levels": [
+        "mentionné"
+      ],
+      "justification": "« j'aime expliquer simplement des choix techniques aux équipes métier » (chunk 1, profil) : affirmation sans expérience qui l'illustre (règle v3) ; les points en anglais avec l'équipe d'exploitation s'adressent à des techniciens."
+    }
+  ]
+}

@@ -202,13 +202,22 @@ class TestCaseFiles:
         with pytest.raises(CaseMismatchError, match="niveaux invalides"):
             check_case(job, {"R1": ExpectedLevel("R1", "Python", ["expert"])}, "cas")
 
-    def test_reference_cases_match_their_frozen_lists(self) -> None:
-        cases = find_cases()
+    def test_all_cases_match_their_frozen_lists(self) -> None:
+        cases = find_cases(series="toutes")
 
-        assert {c.name for c in cases} == {"demo_cv__hager", "demo_cv__sii", "java_cv__hager", "java_cv__sii"}
+        assert len(cases) == len(list(CASES_DIR.glob("*.expected.json"))) == 6
         for case in cases:
             assert case.cv.exists() and case.offer.exists()
-        assert len(list(CASES_DIR.glob("*.expected.json"))) == 4
+
+    def test_series_are_kept_apart_by_default(self) -> None:
+        reference = {"demo_cv__hager", "demo_cv__sii", "java_cv__hager", "java_cv__sii"}
+        hard = {"backend_cv__logistique", "java_cv__logistique"}
+
+        assert {c.name for c in find_cases()} == reference
+        assert {c.name for c in find_cases(series="difficile")} == hard
+        assert {c.name for c in find_cases(series="toutes")} == reference | hard
+        # Un cas nommé est évalué quelle que soit sa série.
+        assert [c.name for c in find_cases(["java_cv__logistique"])] == ["java_cv__logistique"]
 
 
 def test_run_case_uses_the_frozen_requirements_through_the_real_pipeline(

@@ -13,6 +13,7 @@ from tests.conftest import make_settings
 DEMO_DIR = Path(__file__).resolve().parents[1] / "eval" / "cvs"
 DEMO_PDF = DEMO_DIR / "demo_cv.pdf"
 JAVA_PDF = DEMO_DIR / "java_cv.pdf"
+BACKEND_PDF = DEMO_DIR / "backend_cv.pdf"
 
 
 def _pdf(fill: object) -> bytes:
@@ -182,4 +183,57 @@ class TestJavaCV:
         for placeholder in ("[PHONE]", "[EMAIL]"):
             assert placeholder in chunks[0].text
         for personal in ("Bastien Corlay", "39 98 27 64", "example.com"):
+            assert personal not in everything
+
+
+class TestBackendCV:
+    """Troisième CV fictif (cas difficiles de l'évaluation du matching, offre logistique)."""
+
+    def test_pdf_is_up_to_date_with_its_script(self) -> None:
+        sys.path.insert(0, str(DEMO_DIR))
+        try:
+            from make_backend_cv import build
+        finally:
+            sys.path.remove(str(DEMO_DIR))
+
+        assert build() == BACKEND_PDF.read_bytes(), "régénérer : .venv/bin/python eval/cvs/make_backend_cv.py"
+
+    def test_sections_and_items(self) -> None:
+        chunks = chunk_cv(_text(BACKEND_PDF.read_bytes()))
+
+        sections = list(dict.fromkeys(c.section for c in chunks))
+        assert sections == [
+            HEADER_SECTION,
+            "PROFIL",
+            "EXPÉRIENCE PROFESSIONNELLE",
+            "FORMATION",
+            "COMPÉTENCES",
+            "LANGUES",
+            "CENTRES D'INTÉRÊT",
+        ]
+        experiences = [c for c in chunks if c.section == "EXPÉRIENCE PROFESSIONNELLE"]
+        assert [c.text.splitlines()[0] for c in experiences] == [
+            "Ingénieure logicielle · Ferlane Fret",
+            "Ingénieure logicielle · Ferlane Fret",
+            "Développeuse freelance · missions pour des PME",
+            "Développeuse Python (données) · Observatoire ligérien des mobilités",
+        ]
+
+    def test_long_item_repeats_its_title_but_not_its_dates(self) -> None:
+        """Comportement voulu par le cas : la première expérience dépasse CHUNK_MAX_CHARS ;
+        le second morceau répète l'intitulé, pas la ligne de dates (une durée qui ne
+        s'appuierait que sur lui ne serait pas validée)."""
+        first, second = [c for c in chunk_cv(_text(BACKEND_PDF.read_bytes())) if "Ferlane Fret" in c.text]
+
+        assert "Févr. 2025 – en cours" in first.text and "2025" not in second.text
+        assert "en anglais avec l'équipe d'exploitation" in second.text
+
+    def test_contact_details_are_masked(self) -> None:
+        chunks = chunk_cv(_text(BACKEND_PDF.read_bytes()))
+        everything = "\n".join(c.text for c in chunks)
+
+        assert chunks[0].text.startswith(NAME_PLACEHOLDER)
+        for placeholder in ("[PHONE]", "[EMAIL]"):
+            assert placeholder in chunks[0].text
+        for personal in ("Léna Morvan", "39 98 51 08", "example.com"):
             assert personal not in everything

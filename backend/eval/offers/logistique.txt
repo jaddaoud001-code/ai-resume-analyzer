@@ -1,0 +1,25 @@
+OFFRE FICTIVE, rédigée pour l'évaluation du projet AI Resume Analyzer : l'entreprise, le poste et les conditions sont inventés.
+
+Développeur·se backend confirmé·e – Plateforme de suivi logistique (CDI, Nantes)
+
+Nordaxe Logistique édite une plateforme de suivi de colis utilisée par 300 transporteurs partenaires, en France et au Canada.
+
+Ta mission
+Au sein d'une équipe de six personnes, tu fais évoluer les services backend de la plateforme :
+- concevoir et maintenir les API REST consommées par nos applications web et mobile ;
+- déployer nos services dans le cloud et suivre leur comportement en production ;
+- faire circuler les événements de suivi entre services au moyen d'une file de messages ;
+- améliorer nos pipelines CI/CD et la couverture de nos tests automatisés.
+
+Ton profil
+- Au moins 2 ans d'expérience en développement backend.
+- Python : 3 ans d'expérience minimum.
+- Maîtrise de SQL et des bases de données relationnelles.
+- Expérience du déploiement cloud.
+- Anglais professionnel : une partie de nos partenaires travaille au Canada anglophone.
+- Idéalement, 1 an d'expérience avec une file de messages (RabbitMQ, Kafka ou équivalent).
+- Une expérience de l'observabilité (métriques, tableaux de bord, alertes) serait un plus.
+- Tu sais travailler en autonomie et tu communiques clairement avec des interlocuteurs non techniques.
+
+Ce que nous offrons : rémunération selon profil, deux jours de télétravail par semaine, mutuelle prise en charge à 70 %.
+Processus de recrutement : un entretien avec les ressources humaines, un exercice technique, puis une rencontre avec l'équipe.

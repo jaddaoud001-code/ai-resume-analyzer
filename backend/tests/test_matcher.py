@@ -532,6 +532,23 @@ class TestSelectChunks:
         assert is_reserved_section("PROJETS IA", SECTIONS)
         assert not is_reserved_section("COMPÉTENCES", SECTIONS)
 
+    def test_unusual_experience_titles_get_no_reserved_place(self) -> None:
+        """Limite connue (README) : une section d'expériences intitulée autrement (« PARCOURS »,
+        « Parcours professionnel », « Missions ») n'est pas reconnue : ses chunks ne profitent
+        ni des places réservées ni de la règle du mot exact, et les listes de compétences,
+        mieux classées, peuvent occuper tout le top k."""
+        for title in ("PARCOURS", "Parcours professionnel", "MISSIONS"):
+            assert not is_reserved_section(title, SECTIONS), title
+        experience = "Développeuse · Globex\n- Services Kotlin en production"
+        usual = [*RANKING[:5], _hit(9, "EXPÉRIENCE PROFESSIONNELLE", experience, 0.70)]
+        unusual = [*RANKING[:5], _hit(9, "PARCOURS PROFESSIONNEL", experience, 0.70)]
+
+        kept = select_chunks(usual, "Kotlin", k=3, reserved=1, sections=SECTIONS)
+        missed = select_chunks(unusual, "Kotlin", k=3, reserved=1, sections=SECTIONS)
+
+        assert 9 in [r.chunk.index for r in kept]  # mot exact dans une expérience reconnue
+        assert [r.chunk.index for r in missed] == [0, 1, 2]  # l'expérience n'est pas envoyée au LLM
+
     def test_contains_term(self) -> None:
         assert contains_term("Code versionné sous Git flow", "git")
         assert contains_term("Développement en C# et .NET", "C#")

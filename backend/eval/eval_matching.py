@@ -13,7 +13,8 @@ non démontré / mentionné : la mesure la plus importante), faux négatifs (l'i
 entre le score obtenu et celui du corrigé, citations rejetées, secondes chances, durée.
 
 Usage (depuis backend/) :
-    .venv/bin/python eval/eval_matching.py                    # 4 cas, 1 exécution
+    .venv/bin/python eval/eval_matching.py                    # 4 cas de référence, 1 exécution
+    .venv/bin/python eval/eval_matching.py --series difficile # cas difficiles (auteur du projet)
     .venv/bin/python eval/eval_matching.py --case java_cv__sii --runs 2
     .venv/bin/python eval/eval_matching.py --json
 Budget : un cas fait un appel par exigence (et une seconde chance au besoin), soit ~30 000
@@ -79,6 +80,12 @@ class Case:
     offer: Path
     job: JobRequirements
     expected: dict[str, ExpectedLevel]
+    # « référence » : les 4 cas du run de référence ; « difficile » : cas conçus par l'auteur
+    # pour mettre le matching en difficulté (durées dispersées, compétences implicites).
+    series: str = "référence"
+
+
+SERIES = ("référence", "difficile")
 
 
 def load_case(path: Path, eval_dir: Path = EVAL_DIR) -> Case:
@@ -94,6 +101,7 @@ def load_case(path: Path, eval_dir: Path = EVAL_DIR) -> Case:
         offer=eval_dir / "offers" / f"{data['offer']}.txt",
         job=job,
         expected=expected,
+        series=data.get("series", "référence"),
     )
 
 
@@ -115,7 +123,10 @@ def check_case(job: JobRequirements, expected: dict[str, ExpectedLevel], name: s
             raise CaseMismatchError(f"{name} : {requirement_id} : niveaux invalides {item.levels}")
 
 
-def find_cases(names: list[str] | None = None, cases_dir: Path = CASES_DIR) -> list[Case]:
+def find_cases(names: list[str] | None = None, series: str = "référence", cases_dir: Path = CASES_DIR) -> list[Case]:
+    """Les cas nommés, sinon ceux de la série (« toutes » : les deux). Les séries ne se
+    mélangent pas par défaut : leurs mesures ne se comparent pas, et leur somme dépasserait
+    le budget d'une journée avec l'offre gratuite de Groq."""
     paths = sorted(cases_dir.glob("*.expected.json"))
     if names:
         wanted = set(names)
@@ -124,7 +135,10 @@ def find_cases(names: list[str] | None = None, cases_dir: Path = CASES_DIR) -> l
             raise SystemExit(
                 f"cas inconnu(s) : {sorted(wanted - {p.name.removesuffix('.expected.json') for p in paths})}"
             )
-    return [load_case(p) for p in paths]
+    cases = [load_case(p) for p in paths]
+    if names or series == "toutes":
+        return cases
+    return [case for case in cases if case.series == series]
 
 
 # --- Mesures (fonctions pures) -------------------------------------------------------
@@ -493,13 +507,19 @@ def main() -> None:
     parser.add_argument(
         "--case", action="append", help="cas à évaluer, par exemple java_cv__sii (répétable) ; défaut : tous"
     )
+    parser.add_argument(
+        "--series",
+        choices=[*SERIES, "toutes"],
+        default="référence",
+        help="série de cas (ignorée avec --case) : référence (défaut), difficile ou toutes",
+    )
     parser.add_argument("--runs", type=int, default=1, help="exécutions de chaque cas (agrégées)")
     parser.add_argument("--json", action="store_true", help="détail et synthèse au format JSON")
     args = parser.parse_args()
     if args.runs < 1:
         parser.error("--runs doit être au moins 1")
     settings = Settings()
-    cases = find_cases(args.case)
+    cases = find_cases(args.case, args.series)
     runs = asyncio.run(evaluate(cases, args.runs, settings))
     if args.json:
         print(

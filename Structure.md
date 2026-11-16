@@ -34,8 +34,8 @@ backend/
     eval_requirements.py   # extraction vs attendu : trouvées, manquantes, inventées, interdites, importance
     freeze_requirements.py # fige les exigences d'une offre (offers/<nom>.requirements.json) pour l'évaluation du matching
     eval_matching.py       # matching vs corrigé (matching/<cv>__<offre>.expected.json) : exactitude, faux positifs/négatifs par groupe (technique / savoir-être), écart de score
-    matching/          # corrigés des niveaux, 4 cas (2 CV fictifs × 2 offres), établis à l'aveugle
-    cvs/              # CV fictifs générés : make_demo_cv.py (deux colonnes), make_java_cv.py (une colonne)
+    matching/          # corrigés des niveaux : série « référence » (2 CV × offres Hager, SII) et « difficile » (backend_cv, java_cv × offre fictive logistique)
+    cvs/              # CV fictifs générés : make_demo_cv.py (deux colonnes), make_java_cv.py, make_backend_cv.py (une colonne)
     offers/            # cas de référence : <nom>.txt (offre publique) + <nom>.expected.json
 frontend/
   src/
@@ -164,7 +164,7 @@ Variables de `.env` (modèle complet dans `.env.example`) :
 ## Commandes
 - Backend : `cd backend && uvicorn app.main:app --reload`
 - Tests backend : `cd backend && pytest` (sans réseau) ; `pytest -m integration` appelle les vrais fournisseurs (clé requise)
-- Évaluation du matching : `cd backend && .venv/bin/python eval/eval_matching.py [--case X] [--runs N] [--json]` (vrai LLM, ~130 000 tokens pour les 4 cas : une exécution par jour avec l'offre gratuite de Groq)
+- Évaluation du matching : `cd backend && .venv/bin/python eval/eval_matching.py [--series référence|difficile|toutes] [--case X] [--runs N] [--json]` (vrai LLM, ~130 000 tokens pour les 4 cas : une exécution par jour avec l'offre gratuite de Groq)
 - Évaluation de l'extraction : `cd backend && .venv/bin/python eval/eval_requirements.py [--model X --model Y]` (vrai LLM, appels par le limiteur de l'application : `LLM_RPS` du `.env`)
 - Frontend : `cd frontend && npm run dev` (http://localhost:5173 ; backend : `VITE_API_URL`, défaut http://localhost:8000) ; `npm test`, `npm run build` (TypeScript strict), `npm run lint` (oxlint)
 - Qualité backend : `cd backend && .venv/bin/ruff check . && .venv/bin/ruff format --check .` (dépendances de développement : `requirements-dev.txt`)

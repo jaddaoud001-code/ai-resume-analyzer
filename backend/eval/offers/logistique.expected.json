@@ -1,0 +1,25 @@
+{
+  "offer": "logistique.txt",
+  "notes": "Offre FICTIVE écrite par l'auteur du projet pour l'évaluation du matching (cas difficiles : durées exigées, compétences prouvables sans être nommées). Importances selon les règles du prompt v2 : profil sans nuance -> obligatoire ; « Idéalement », « serait un plus » et missions seules -> souhaitée ; savoir-être souhaités.",
+  "requirements": [
+    {"label": "Expérience en développement backend", "category": "expérience", "importance": "obligatoire", "min_years": 2, "match": [["backend"]]},
+    {"label": "Python", "category": "compétence technique", "importance": "obligatoire", "min_years": 3, "match": [["python"]]},
+    {"label": "SQL et bases de données relationnelles", "category": "compétence technique", "importance": "obligatoire", "match": [["sql"], ["relationnelles"]]},
+    {"label": "Déploiement cloud", "category": "compétence technique", "importance": "obligatoire", "match": [["cloud"]]},
+    {"label": "Anglais professionnel", "category": "langue", "importance": "obligatoire", "match": [["anglais"]]},
+    {"label": "API REST", "category": "compétence technique", "importance": "souhaitée", "match": [["api"], ["rest"]]},
+    {"label": "CI/CD", "category": "compétence technique", "importance": "souhaitée", "match": [["ci"], ["cd"], ["integration", "continue"], ["pipelines"]]},
+    {"label": "Tests automatisés", "category": "compétence technique", "importance": "souhaitée", "match": [["tests"], ["test"]]},
+    {"label": "File de messages", "category": "compétence technique", "importance": "souhaitée", "min_years": 1, "match": [["messages"], ["rabbitmq"], ["kafka"]]},
+    {"label": "Observabilité", "category": "compétence technique", "importance": "souhaitée", "match": [["observabilite"], ["supervision"], ["monitoring"]]},
+    {"label": "Autonomie", "category": "savoir-être", "importance": "souhaitée", "match": [["autonomie"], ["autonome"]]},
+    {"label": "Communication avec des interlocuteurs non techniques", "category": "savoir-être", "importance": "souhaitée", "match": [["communication"], ["communiquer"], ["interlocuteurs"]]}
+  ],
+  "must_not_extract": [
+    {"label": "Contrat (CDI)", "match": [["cdi"]]},
+    {"label": "Lieu (Nantes)", "match": [["nantes"]]},
+    {"label": "Télétravail", "match": [["teletravail"]]},
+    {"label": "Rémunération", "match": [["remuneration"], ["salaire"]]},
+    {"label": "Mutuelle", "match": [["mutuelle"]]}
+  ]
+}

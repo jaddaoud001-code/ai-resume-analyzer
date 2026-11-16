@@ -1,0 +1,106 @@
+{
+  "cv": "java_cv.pdf",
+  "offer": "logistique",
+  "series": "difficile",
+  "requirements": [
+    {
+      "id": "R1",
+      "label": "Développement backend",
+      "levels": [
+        "solide",
+        "démontré"
+      ],
+      "justification": "« Alternance développeur backend Java … Sept. 2023 – Août 2025 » : 2023-09 → 2025-08 = 24 mois, exactement 2 ans (limite : 24 < 24 est faux, pas de plafond) ; avec « Stage développeur … Avr. 2023 – Juin 2023 » (Java EE) : + 3 mois, sans chevauchement (juillet – août 2023 non couverts) = 27 mois (date de référence 2026-11-14 (« en cours » = 2026-11), mois inclus) ; plus le projet d'IUT (2024, sans mois). Une alternance compte ici en mois calendaires, comme dans le code."
+    },
+    {
+      "id": "R2",
+      "label": "Python",
+      "levels": [
+        "mentionné"
+      ],
+      "justification": "« Langages : Java, SQL, XML, notions de Python » : liste de compétences seulement, aucune période."
+    },
+    {
+      "id": "R3",
+      "label": "SQL et bases de données relationnelles",
+      "levels": [
+        "solide",
+        "démontré"
+      ],
+      "justification": "« Requêtes SQL et index sur PostgreSQL » (alternance) + « base MySQL » (projet)."
+    },
+    {
+      "id": "R4",
+      "label": "Déploiement cloud",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucun déploiement cloud ; « Docker (notions) » dans la liste d'outils ne le prouve pas."
+    },
+    {
+      "id": "R5",
+      "label": "Anglais professionnel",
+      "levels": [
+        "démontré"
+      ],
+      "justification": "« Anglais : B1 (TOEIC 785) » : score officiel ; le plancher du code (certification_floor) le porte au moins à « démontré » si cette citation est retenue."
+    },
+    {
+      "id": "R6",
+      "label": "Message queue (RabbitMQ, Kafka)",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune file de messages."
+    },
+    {
+      "id": "R7",
+      "label": "Observabilité (métriques, tableaux de bord, alertes)",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune supervision, métrique ni alerte."
+    },
+    {
+      "id": "R8",
+      "label": "API REST",
+      "levels": [
+        "démontré"
+      ],
+      "justification": "« Développement d'une API REST de suivi des expéditions avec Spring Boot et JPA » (alternance) : cas témoin, nommé."
+    },
+    {
+      "id": "R9",
+      "label": "CI/CD",
+      "levels": [
+        "non démontré",
+        "mentionné"
+      ],
+      "justification": "« revues de merge requests sur GitLab » (stage) : revue de code, pas un pipeline d'intégration ou de déploiement continu."
+    },
+    {
+      "id": "R10",
+      "label": "Tests automatisés",
+      "levels": [
+        "démontré"
+      ],
+      "justification": "« Maintenance d'une application Java EE : correction d'anomalies et tests JUnit » (stage)."
+    },
+    {
+      "id": "R11",
+      "label": "Autonomie",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Autonomie ni nommée ni décrite."
+    },
+    {
+      "id": "R12",
+      "label": "Communication claire avec interlocuteurs non techniques",
+      "levels": [
+        "non démontré"
+      ],
+      "justification": "Aucune communication avec des interlocuteurs non techniques ; la documentation technique et le guide d'exploitation s'adressent à des techniciens."
+    }
+  ]
+}
