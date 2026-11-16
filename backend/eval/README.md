@@ -1,6 +1,8 @@
-# Évaluation de l'extraction des exigences
+# Évaluation : extraction des exigences et matching
 
-Hors pytest : ces scripts appellent le vrai LLM (clé dans `.env`), donc le réseau et le quota.
+Hors pytest : ces scripts appellent le vrai LLM (clé dans `.env`), donc le réseau et le quota. Deux évaluations : l'**extraction** des exigences d'une offre (`eval_requirements.py`, ci-dessous) et le **matching** CV / exigences (`eval_matching.py`, [plus bas](#évaluation-du-matching)). Leurs calculs sont testés hors ligne (`tests/test_eval_requirements.py`, `tests/test_eval_matching.py`).
+
+## Évaluation de l'extraction
 
 ```bash
 cd backend
@@ -14,11 +16,11 @@ Offres de référence (publiques, sans donnée personnelle) : `hager.txt` (stage
 
 Les modèles, et les exécutions d'un même modèle, sont évalués l'un après l'autre ; tous les appels passent par le même limiteur que l'application (`LLM_RPS`, `LLM_CONCURRENCY` du `.env`, nouvelles tentatives sur 429).
 
-## Limites connues
+### Limites connues
 
 - **« Compréhension des besoins utilisateurs » (SII)** : manquée 2/3 avec le prompt d'extraction v2 (règle d'importance élargie), contre trouvée 3/3 en v1. Savoir-être souhaité, de poids faible dans le score ; non tranché entre variance du modèle et effet de la nouvelle règle (trois exécutions ne suffisent pas à les distinguer).
 
-## Cas d'évaluation
+### Cas d'évaluation
 
 `offers/<nom>.txt` : texte de l'offre (uniquement des offres publiques, sans donnée personnelle).
 `offers/<nom>.expected.json` : exigences attendues.
@@ -43,7 +45,7 @@ Les modèles, et les exécutions d'un même modèle, sont évalués l'un après 
 
 `must_not_extract` liste ce qui ne doit jamais devenir une exigence (conditions logistiques : dates, durée, lieu, rémunération, télétravail) : une extraite qui y correspond est comptée comme **interdite**.
 
-## Méthode de rapprochement
+### Méthode de rapprochement
 
 Approximative et volontairement simple :
 
@@ -64,7 +66,7 @@ Le rapport distingue :
 
 Une extraite qui correspond à `must_not_extract` est interdite, même si elle correspond aussi à une acceptable.
 
-## Plusieurs exécutions (`--runs N`)
+### Plusieurs exécutions (`--runs N`)
 
 Le LLM ne répond pas toujours de la même façon, même à température 0 et avec une graine : une seule exécution peut être chanceuse ou malchanceuse. Avec `--runs N`, chaque modèle est exécuté N fois sur la même offre (appels successifs, au rythme de `LLM_RPS`), chaque exécution est comparée au corrigé comme ci-dessus et affichée, puis le rapport les agrège :
 
@@ -74,3 +76,60 @@ Le LLM ne répond pas toujours de la même façon, même à température 0 et av
 - **erreurs d'importance et de catégorie**, **fusions**, **découpages** et **acceptables trouvées** : chacun avec sa fréquence.
 
 Une exécution en erreur (quota, réseau) est signalée et exclue des taux et des fréquences, qui portent sur les exécutions réussies. `--json` donne la synthèse agrégée au format JSON.
+
+## Évaluation du matching
+
+Mesure, exigence par exigence, le niveau attribué par le pipeline complet (recherche, LLM d'évaluation, vérification des citations, seconde chance, plafonds) face à un corrigé établi à la main. Elle sert de **référence** : le prompt de matching n'est pas ajusté à ces cas, et un futur changement (agent, autre modèle) se compare à ces chiffres.
+
+```bash
+cd backend
+.venv/bin/python eval/eval_matching.py                        # 4 cas, une exécution
+.venv/bin/python eval/eval_matching.py --case java_cv__sii    # un cas (répétable)
+.venv/bin/python eval/eval_matching.py --runs 3 --json        # agrégation, sortie JSON
+```
+
+**Budget** : un appel au LLM par exigence (plus une seconde chance éventuelle), soit environ 30 000 tokens par cas et 130 000 pour les 4 cas, ~65 % du quota journalier gratuit de Groq (200 000 tokens) ; au rythme de `LLM_RPS=0.05`, ~20 minutes. D'où **une exécution par jour** avec l'offre gratuite.
+
+### Données
+
+- **Exigences figées** (`offers/<offre>.requirements.json`) : extraites une fois par `freeze_requirements.py` avec le modèle du `.env`, puis relues et corrigées à la main d'après `offers/<offre>.expected.json` (importances, exigences manquantes, découpées ou en trop). Chaque correction est listée dans le champ `review` du fichier. L'évaluation n'appelle jamais l'extraction (`analyze(requirements=…)`, `requirements_source="provided"`) : ses variations ne se mélangent pas à celles du matching.
+
+  ```bash
+  .venv/bin/python eval/freeze_requirements.py eval/offers/sii.txt [--model X] [--force]
+  ```
+
+- **CV fictifs** (`cvs/`) : `demo_cv.pdf` (deux colonnes, profil IA, `make_demo_cv.py`) et `java_cv.pdf` (une colonne, développeur backend Java junior sans IA, `make_java_cv.py`). Identités, établissements, entreprises et coordonnées inventés.
+- **Corrigé des niveaux** (`matching/<cv>__<offre>.expected.json`, 4 cas) :
+
+  ```json
+  {"cv": "demo_cv.pdf", "offer": "sii", "requirements": [
+    {"id": "R1", "label": "Diplôme d'ingénieur", "levels": ["démontré", "solide"],
+     "justification": "« Diplôme d'ingénieure, informatique et IA · École d'ingénieurs… » : diplôme exact"}]}
+  ```
+
+  `levels` liste les niveaux acceptés, le premier étant le niveau principal ; deux niveaux voisins seulement pour un cas vraiment ambigu, justifié. Le script refuse un corrigé dont les identifiants ou libellés ne correspondent plus à la liste figée.
+
+### Établissement du corrigé (à l'aveugle)
+
+Le corrigé a été écrit **avant tout run du matching**, en lisant uniquement le texte extrait des CV (tel que le pipeline le découpe) et les définitions des niveaux du prompt, puis validé par le développeur. Les niveaux suivent ce qui est **réellement écrit** dans le texte extrait, pas l'intention de l'auteur des CV fictifs ; quand le texte ne prouvait pas ce qui était voulu, c'est signalé plutôt que corrigé (Docker « (notions) » du CV Java n'est demandé par aucune offre ; « B1 (TOEIC 785) » rend « anglais professionnel » ambigu). Règles appliquées :
+
+- celles du prompt : liste de compétences = « mentionné », usage dans une expérience, un projet ou une formation = « démontré », usage répété ou significatif = « solide » ; diplôme, certification ou score officiel = au moins « démontré » ; implications directes seulement (framework -> langage, SGBD -> SQL) ;
+- celles du code : savoir-être plafonné à « démontré » (aucune durée minimale dans ces listes) ;
+- **une règle propre au corrigé** : un savoir-être doit être **nommé ou décrit** (« travail en équipe de quatre ») ; il ne se déduit pas d'une réalisation technique. Le prompt ne l'impose pas : l'écart est mesuré à part (voir ci-dessous).
+
+**Transparence** : pour le cas `demo_cv__sii`, des résultats de l'outil avaient été vus avant l'écriture du corrigé (niveaux d'« École d'ingénieurs » et de Python, scores de 60 à 65) ; ce cas est le moins aveugle des quatre.
+
+### Mesures
+
+Toutes les mesures sont données **séparément pour deux groupes** : exigences **techniques** (compétences, formation, langues) et **savoir-être**, puis au total. La séparation empêche que l'écart attendu sur les savoir-être (règle du corrigé absente du prompt) masque les erreurs techniques.
+
+- **exactitude** : le niveau obtenu fait partie des niveaux acceptés ;
+- **exactitude à un niveau près** : au plus un cran d'écart avec le niveau accepté le plus proche ;
+- **faux positifs**, la mesure la plus importante (un outil qui affirme une compétence absente est pire qu'un outil prudent) : niveau obtenu « démontré » ou « solide » alors que **tous** les niveaux acceptés sont « non démontré » ou « mentionné » ; chacun est listé avec ses citations ;
+- **faux négatifs** : l'inverse ; un corrigé ambigu entre « mentionné » et « démontré » ne produit ni l'un ni l'autre ;
+- **matrice de confusion** : niveau principal du corrigé × niveau obtenu (plus une colonne « erreur ») ;
+- **écart de score** : score obtenu moins score du corrigé (niveaux principaux, mêmes points et poids que l'application), avec la fourchette du corrigé (niveaux acceptés les plus bas et les plus hauts) ;
+- **citations rejetées**, **secondes chances** (et combien ont retrouvé une preuve exacte), **erreurs**, **durée** ;
+- avec `--runs N` : agrégation, et les exigences dont le niveau varie d'une exécution à l'autre.
+
+Une exigence en erreur n'est comptée ni exacte ni fausse (colonne « erreur »). Un refus durable du fournisseur (quota journalier, modèle refusé) arrête l'évaluation ; un autre échec marque le cas en échec et passe au suivant. La date est fixée (`EVAL_TODAY`) pour que les périodes « en cours » ne changent pas d'un jour à l'autre.
