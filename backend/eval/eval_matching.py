@@ -43,7 +43,7 @@ from app.config import Settings  # noqa: E402
 from app.embeddings import get_embeddings  # noqa: E402
 from app.llm import get_llm, match_llm_model, match_settings  # noqa: E402
 from app.llm_calls import ProviderBlockedError, RateLimiter  # noqa: E402
-from app.matcher import analyze, requirement_weight  # noqa: E402
+from app.matcher import MATCH_PROMPT_VERSION, analyze, requirement_weight  # noqa: E402
 from app.schemas import JobRequirements, MatchReport, ReportReady, RequirementMatch  # noqa: E402
 
 EVAL_DIR = BACKEND_DIR / "eval"
@@ -416,8 +416,10 @@ def _pct(value: float | None) -> str:
 
 
 def print_report(runs: list[CaseRun], settings: Settings) -> None:
+    effort = settings.match_llm_reasoning_effort or "défaut"
     print(
-        f"Modèle d'évaluation : {match_llm_model(settings)} (effort {settings.match_llm_reasoning_effort or 'défaut'})"
+        f"Modèle d'évaluation : {match_llm_model(settings)} (effort {effort}) ; "
+        f"prompt d'évaluation v{MATCH_PROMPT_VERSION}"
     )
     for run in runs:
         print(f"\n=== {run.case} (run {run.run}) — {run.seconds:.0f} s")
@@ -501,7 +503,15 @@ def main() -> None:
     runs = asyncio.run(evaluate(cases, args.runs, settings))
     if args.json:
         print(
-            json.dumps({"runs": [asdict(r) for r in runs], "synthèse": summarize(runs)}, ensure_ascii=False, indent=2)
+            json.dumps(
+                {
+                    "match_prompt_version": MATCH_PROMPT_VERSION,
+                    "runs": [asdict(r) for r in runs],
+                    "synthèse": summarize(runs),
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
         )
         return
     print_report(runs, settings)

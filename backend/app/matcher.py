@@ -80,6 +80,12 @@ class RequirementAssessment(BaseModel):
     justification: str = Field(default="", description="Une ou deux phrases.")
 
 
+# Version du prompt d'évaluation, rapportée par l'évaluation du matching (eval_matching.py)
+# pour comparer les runs : à incrémenter à chaque modification du prompt (un test compare
+# son empreinte à celle enregistrée pour la version courante). v1 : run de référence du
+# 2026-11-14 ; v2 : savoir-être nommés ou décrits explicitement, rappel des scores officiels.
+MATCH_PROMPT_VERSION = 2
+
 _SYSTEM_PROMPT = """Tu évalues si un CV démontre une exigence d'une offre d'emploi.
 
 Le message de l'utilisateur contient l'exigence, puis des extraits du CV entre <cv> et \
@@ -117,9 +123,25 @@ Ollama, etc.). Par exemple, « utilise l'API d'un fournisseur de bases de donné
 managées » ne prouve pas « administration de bases de données ». Sans preuve explicite, \
 une telle exigence est au plus « mentionné » si la technologie est seulement citée.
 Un diplôme, une certification ou un score officiel cité dans le CV (TOEIC, IELTS, TOEFL, \
-certification cloud, etc.) est une preuve : il vaut au moins « démontré » pour l'exigence \
-correspondante (par exemple « IELTS 7.5 » pour « Anglais courant », « certification AWS \
-Solutions Architect » pour « Cloud AWS »).
+DELF, Goethe-Zertifikat, certification cloud, etc.) est une preuve : il vaut au moins \
+« démontré » pour l'exigence correspondante (par exemple « IELTS 7.5 » pour « Anglais \
+courant », « certification AWS Solutions Architect » pour « Cloud AWS »). C'est vrai aussi \
+quand le niveau certifié paraît modeste au regard de l'exigence (par exemple « Allemand : \
+B1, Goethe-Zertifikat » pour « Allemand professionnel ») : le niveau reste au moins \
+« démontré », et l'écart avec le niveau demandé s'écrit dans gaps.
+Savoir-être (catégorie « savoir-être » : rigueur, autonomie, travail en équipe, capacité \
+d'analyse, résolution de problèmes, communication, etc.) : il n'est « démontré » que s'il \
+est nommé ou décrit explicitement dans une expérience, un projet ou une formation, par \
+exemple « projet mené en autonomie de la conception à la mise en service », « travail en \
+binôme avec un designer », « présentation hebdomadaire des avancées aux utilisateurs ». \
+Une réalisation technique ne prouve pas à elle seule un savoir-être : corriger des bugs, \
+écrire des tests ou de la documentation ne prouve pas la rigueur ; livrer un projet ne \
+prouve pas l'autonomie ; optimiser une application ne prouve pas la résolution de \
+problèmes ; produire des tableaux de bord ne prouve pas la capacité d'analyse et de \
+synthèse ; citer une équipe (« outil interne de l'équipe ») ne prouve pas le travail en \
+équipe. Sans description explicite, le savoir-être est au plus « mentionné » si le CV en \
+donne un indice explicite (le mot lui-même, dans le profil ou une liste de qualités), \
+sinon « non démontré ».
 
 evidence : pour chaque preuve, chunk_id (l'id du chunk) et quote, un extrait recopié \
 EXACTEMENT du texte de ce chunk, sans reformulation. Pour abréger, sépare des morceaux \

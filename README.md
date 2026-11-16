@@ -70,24 +70,28 @@ L'extraction des exigences est évaluée sur deux offres publiques, avec un corr
 
 Les 5 erreurs vont dans le même sens : des compétences que l'offre nuance (« curieux des LLM (RAG, embeddings, évaluation) ») ou tire du parcours du stage (anonymisation, outil ITSM) passent d'« souhaitée » à « obligatoire », alors que le prompt dit l'inverse. Une obligatoire comptant double dans le score, l'écart pèse sur le résultat. Le prompt n'a pas été ajusté à ce cas de test ; l'évaluation du matching utilise des listes d'exigences figées et relues (`backend/eval/offers/*.requirements.json`), pour que cette variation de l'extraction ne s'y mélange pas.
 
-**Matching CV / exigences** : le pipeline complet est évalué sur 4 cas (2 CV fictifs × 2 offres), avec des listes d'exigences figées et un corrigé des niveaux établi à l'aveugle, avant tout run (méthode : [backend/eval/README.md](backend/eval/README.md#évaluation-du-matching)). Référence mesurée le 2026-11-14 avec `openai/gpt-oss-120b` (Groq, effort de raisonnement `low`), **une exécution** (budget du quota gratuit) ; le prompt de matching n'est pas ajusté à ces cas :
+**Matching CV / exigences** : le pipeline complet est évalué sur 4 cas (2 CV fictifs × 2 offres), avec des listes d'exigences figées et un corrigé des niveaux établi à l'aveugle, avant tout run (méthode : [backend/eval/README.md](backend/eval/README.md#évaluation-du-matching)). Mesures avec `openai/gpt-oss-120b` (Groq, effort de raisonnement `low`), **une exécution par version** (budget du quota gratuit), avant et après une règle sur les savoir-être ajoutée au prompt d'évaluation :
 
-| Groupe | Exigences | Exactes | À un niveau près | Faux positifs | Faux négatifs |
+- **v1** (référence, 2026-11-14) : prompt sans règle propre aux savoir-être ;
+- **v2** (2026-11-16) : un savoir-être n'est « démontré » que s'il est nommé ou décrit explicitement ; une réalisation technique ne le prouve pas à elle seule (au plus « mentionné » sur un indice explicite) ; rappel qu'un score officiel vaut au moins « démontré ». Exemples génériques, aucun tiré des cas d'évaluation (vérifié par un test).
+
+| Groupe | Exigences | Exactes v1 → v2 | À un niveau près v1 → v2 | Faux positifs v1 → v2 | Faux négatifs v1 → v2 |
 |---|---|---|---|---|---|
-| Techniques (compétences, formation, langues) | 38 | **38 (100 %)** | 38 (100 %) | **0** | 0 |
-| Savoir-être | 16 | 9 (56 %) | 14 (88 %) | **7** | 0 |
-| Total | 54 | 47 (87 %) | 52 (96 %) | 7 | 0 |
+| Techniques (compétences, formation, langues) | 38 | **38 → 38 (100 %)** | 38 → 38 | **0 → 0** | 0 → 0 |
+| Savoir-être | 16 | 9 (56 %) → **15 (94 %)** | 14 → 16 | **7 → 0** | 0 → 0 |
+| Total | 54 | 47 (87 %) → **53 (98 %)** | 52 → 54 | 7 → 0 | 0 → 0 |
 
-| Cas | Score obtenu | Score du corrigé (fourchette) |
-|---|---|---|
-| CV de démo × Hager | 39 | 36 (33–42) |
-| CV de démo × SII | 74 | 62 (57–74) |
-| CV Java × Hager | 44 | 47 (41–53) |
-| CV Java × SII | 15 | 9 (9–11) |
+| Cas | Score du corrigé (fourchette) | v1 : score (écart) | v2 : score (écart) |
+|---|---|---|---|
+| CV de démo × Hager | 36 (33–42) | 39 (+3) | 37 (+1) |
+| CV de démo × SII | 62 (57–74) | 74 (+12) | 60 (−2) |
+| CV Java × Hager | 47 (41–53) | 44 (−3) | 44 (−3) |
+| CV Java × SII | 9 (9–11) | 15 (+6) | 9 (0) |
 
-- **Aucune compétence technique affirmée à tort** : les absences (Java, JSP, IA générative, ITSM…) sont toutes « non démontré », et les pièges du corrigé sont évités (Java EE ne prouve pas JSP, une liste de compétences reste « mentionné »).
-- **Les 7 faux positifs sont tous des savoir-être** : rigueur, travail en équipe, résolution de problèmes, capacités d'analyse sont déduits de réalisations techniques (« correction d'anomalies et tests JUnit » -> rigueur ; « serveur de l'équipe » -> travail en équipe). Le corrigé exige qu'un savoir-être soit nommé ou décrit, règle que le prompt n'impose pas : c'est l'écart principal, et la cause des scores au-dessus du corrigé (+12 sur démo × SII, +6 sur Java × SII ; un savoir-être pèse 0,5).
-- 9 citations rejetées, 2 secondes chances, toutes deux avec une preuve exacte retrouvée ; aucune erreur ; ~5 min par cas.
+- **Aucune compétence technique affirmée à tort, dans les deux versions** : les absences (Java, JSP, IA générative, ITSM…) sont toutes « non démontré », et les pièges du corrigé sont évités (Java EE ne prouve pas JSP, une liste de compétences reste « mentionné »). La règle n'a pas fait baisser l'exactitude technique.
+- **v1 : 7 faux positifs, tous des savoir-être**, déduits de réalisations techniques (« correction d'anomalies et tests JUnit » -> rigueur ; « serveur de l'équipe » -> travail en équipe). **v2 : aucun** ; l'écart absolu moyen de score passe de 6,0 à 1,5 point.
+- **Reste à surveiller** : en v2, « Orientation utilisateur » (CV de démo × SII) tombe à « non démontré » alors que le profil l'affirme (corrigé : mentionné / démontré), signe d'une règle peut-être trop stricte ; et « B1 (TOEIC 785) » reste « mentionné » malgré le rappel sur les scores officiels (cas accepté par le corrigé, qui admet aussi « mentionné » à cause du B1). Une exécution par version ne sépare pas complètement l'effet de la règle de la variance du modèle.
+- Citations rejetées : 9 (v1), 10 (v2) ; secondes chances : 2 avec preuve retrouvée (v1), 2 dont 1 avec preuve retrouvée (v2) ; aucune erreur ; ~5 min par cas.
 
 - **Variance du score** (mesurée avec `mistral-large-4-0`) : sur un même CV et une même offre (exigences fixées par le cache), 3 analyses ont donné **48, 48 et 51** ; 11 exigences sur 14 ont le même niveau dans les 3 analyses, dont toutes les compétences techniques obligatoires. Sur le CV de démonstration avec l'offre SII, les scores vont de **60 à 65**. Comptez sur environ ±5 points.
 - **Méthode** (corrigé, exigences « acceptables », rapprochement par mots-clés, agrégation de plusieurs exécutions) et limites connues : [backend/eval/README.md](backend/eval/README.md).
