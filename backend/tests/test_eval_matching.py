@@ -8,7 +8,15 @@ import pytest
 
 from app.llm_calls import RateLimiter
 from app.requirements import _finalize
-from app.schemas import Evidence, JobRequirements, MatchReport, MatchTimings, Requirement, RequirementMatch
+from app.schemas import (
+    Evidence,
+    JobRequirements,
+    MatchReport,
+    MatchTimings,
+    Requirement,
+    RequirementMatch,
+    TokenUsage,
+)
 from eval.eval_matching import (
     CASES_DIR,
     ERROR,
@@ -143,6 +151,24 @@ def test_certification_floor_is_reported_with_the_llm_level() -> None:
     outcome = assess(ExpectedLevel("R3", "Anglais professionnel", ["démontré"]), raised)
     assert (outcome.exact, outcome.certification_floor, outcome.llm_level) == (True, True, "mentionné")
     assert summary["planchers de certification"] == ["cv__offre R3 Anglais professionnel (LLM : mentionné)"]
+
+
+def test_tokens_are_reported_per_case_and_in_total() -> None:
+    case = _case((PYTHON, ["démontré"]), (RIGUEUR, ["non démontré"]))
+    usage = TokenUsage(calls=3, input_tokens=4000, output_tokens=800, reasoning_tokens=200)
+    report = _report(_result(PYTHON, "démontré"), _result(RIGUEUR, "non démontré"), score=75).model_copy(
+        update={"usage": usage}
+    )
+    runs = [
+        case_run(case, report, make_settings(), run=1, seconds=10.0),
+        case_run(case, report, make_settings(), run=2, seconds=10.0),
+    ]
+
+    tokens = summarize(runs)["tokens"]
+
+    assert runs[0].usage["total_tokens"] == 4800
+    assert (tokens["calls"], tokens["total_tokens"], tokens["reasoning_tokens"]) == (6, 9600, 400)
+    assert (tokens["exigences"], tokens["moyenne par exigence"]) == (4, 2400)
 
 
 class TestSummary:

@@ -221,6 +221,9 @@ class CaseRun:
     expected_range: tuple[int, int]
     seconds: float
     error: str | None = None
+    # Tokens du cas (TokenUsage.model_dump() du rapport : calls, input_tokens, output_tokens,
+    # reasoning_tokens, total_tokens) ; vide si le cas a échoué.
+    usage: dict[str, int] = field(default_factory=dict)
 
     @property
     def score_gap(self) -> int | None:
@@ -238,6 +241,31 @@ def case_run(case: Case, report: MatchReport, settings: Settings, run: int, seco
         expected_score=main,
         expected_range=(low, high),
         seconds=seconds,
+        usage=report.usage.model_dump(),
+    )
+
+
+USAGE_KEYS = ("calls", "input_tokens", "output_tokens", "reasoning_tokens", "total_tokens")
+
+
+def usage_metrics(runs: list[CaseRun]) -> dict[str, Any]:
+    """Tokens additionnés sur les cas réussis, et moyenne par exigence évaluée (mesure clé
+    pour comparer deux versions du matching, ou le futur agent)."""
+    done = [run for run in runs if run.usage]
+    totals = {key: sum(run.usage.get(key, 0) for run in done) for key in USAGE_KEYS}
+    requirements = sum(len(run.outcomes) for run in done)
+    return {
+        **totals,
+        "exigences": requirements,
+        "moyenne par exigence": round(totals["total_tokens"] / requirements) if requirements else None,
+    }
+
+
+def _usage_line(usage: dict[str, int], requirements: int) -> str:
+    average = f" ; {usage['total_tokens'] / requirements:.0f} par exigence" if requirements else ""
+    return (
+        f"tokens : {usage['total_tokens']} (entrée {usage['input_tokens']}, sortie {usage['output_tokens']} "
+        f"dont raisonnement {usage['reasoning_tokens']}) ; {usage['calls']} réponses{average}"
     )
 
 
@@ -336,6 +364,7 @@ def summarize(runs: list[CaseRun]) -> dict[str, Any]:
             if o.certification_floor
         ],
         "durée totale (s)": round(sum(run.seconds for run in runs), 1),
+        "tokens": usage_metrics(runs),
         "instables": unstable,
         "cas en échec": [f"{run.case} (run {run.run}) : {run.error}" for run in runs if run.error],
     }
@@ -446,7 +475,8 @@ def print_report(runs: list[CaseRun], settings: Settings) -> None:
         f"prompt d'évaluation v{MATCH_PROMPT_VERSION}"
     )
     for run in runs:
-        print(f"\n=== {run.case} (run {run.run}) — {run.seconds:.0f} s")
+        tokens = f" ; {_usage_line(run.usage, len(run.outcomes))}" if run.usage else ""
+        print(f"\n=== {run.case} (run {run.run}) — {run.seconds:.0f} s{tokens}")
         if run.error:
             print(f"  ÉCHEC : {run.error}")
             continue
@@ -506,6 +536,9 @@ def print_report(runs: list[CaseRun], settings: Settings) -> None:
     floors = summary["planchers de certification"]
     print(f"  Planchers de certification appliqués : {', '.join(floors) if floors else 'aucun'}")
     print(f"  Durée totale : {summary['durée totale (s)']} s")
+    tokens = summary["tokens"]
+    if tokens["exigences"]:
+        print(f"  Total : {_usage_line(tokens, tokens['exigences'])}")
     if summary["instables"]:
         print("  Niveaux qui varient d'une exécution à l'autre :")
         for name, items in summary["instables"].items():

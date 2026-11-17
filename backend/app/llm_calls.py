@@ -22,6 +22,7 @@ from langchain_core.runnables import RunnableLambda
 from pydantic import BaseModel
 
 from app.config import Settings
+from app.schemas import TokenUsage
 
 logger = logging.getLogger(__name__)
 
@@ -103,6 +104,23 @@ class AnalysisMonitor:
 
 
 current_monitor: ContextVar[AnalysisMonitor | None] = ContextVar("current_monitor", default=None)
+
+# Compteur de tokens de l'opération en cours (évaluation d'une exigence, extraction) : placé
+# dans le contexte de sa tâche par l'appelant, alimenté par invoke_structured à chaque réponse.
+current_usage: ContextVar[TokenUsage | None] = ContextVar("current_usage", default=None)
+
+
+def record_usage(message: Any) -> None:
+    """Ajoute l'usage d'une réponse (usage_metadata de LangChain) au compteur du contexte."""
+    usage = current_usage.get()
+    if usage is None or message is None:
+        return
+    usage.calls += 1
+    metadata = getattr(message, "usage_metadata", None) or {}
+    usage.input_tokens += int(metadata.get("input_tokens") or 0)
+    usage.output_tokens += int(metadata.get("output_tokens") or 0)
+    details = metadata.get("output_token_details") or {}
+    usage.reasoning_tokens += int(details.get("reasoning") or 0)
 
 
 class RateLimiter:
@@ -416,14 +434,21 @@ async def invoke_structured(
     settings: Settings,
 ) -> ModelT:
     """Sortie structurée (function calling) validée par `schema`, avec la politique de
-    nouvelles tentatives ci-dessus. Une réponse sans sortie structurée compte comme invalide."""
+    nouvelles tentatives ci-dessus. Une réponse sans sortie structurée compte comme invalide.
+    La réponse brute (include_raw) donne l'usage de tokens, ajouté au compteur du contexte
+    (`current_usage`) même quand la sortie est invalide : ces tokens sont consommés aussi."""
 
     def require_parsed(output: Any) -> ModelT:
-        if not isinstance(output, schema):
-            raise OutputParserException(f"Sortie structurée absente ou invalide : {type(output).__name__}")
-        return output
+        raw = output.get("raw") if isinstance(output, dict) else None
+        record_usage(raw)
+        parsed = output.get("parsed") if isinstance(output, dict) else output
+        if not isinstance(parsed, schema):
+            raise OutputParserException(f"Sortie structurée absente ou invalide : {type(parsed).__name__}")
+        return parsed
 
-    chain = llm.with_structured_output(schema, method="function_calling") | RunnableLambda(require_parsed)
+    chain = llm.with_structured_output(schema, method="function_calling", include_raw=True) | RunnableLambda(
+        require_parsed
+    )
     return await call_with_retry(
         lambda: chain.ainvoke(messages),
         limiter,

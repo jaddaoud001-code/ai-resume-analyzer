@@ -2,7 +2,7 @@
 
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 
 RequirementCategory = Literal["compétence technique", "expérience", "formation", "langue", "savoir-être", "autre"]
 RequirementImportance = Literal["obligatoire", "souhaitée"]
@@ -43,6 +43,31 @@ class Period(BaseModel):
     end: str = Field(description="Fin, au format AAAA-MM, ou « en cours ».")
 
 
+class TokenUsage(BaseModel):
+    """Tokens consommés par des appels au LLM, d'après l'usage renvoyé par le fournisseur à
+    chaque réponse (sortie structurée valide ou non ; un appel refusé, par exemple sur 429,
+    n'en consomme pas). Zéro si le fournisseur ne renvoie pas d'usage."""
+
+    calls: int = Field(default=0, description="Réponses reçues du fournisseur.")
+    input_tokens: int = 0
+    output_tokens: int = Field(default=0, description="Tokens de sortie, raisonnement compris.")
+    reasoning_tokens: int = Field(default=0, description="Part de output_tokens consacrée au raisonnement.")
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def total_tokens(self) -> int:
+        return self.input_tokens + self.output_tokens
+
+    @classmethod
+    def sum(cls, items: "list[TokenUsage]") -> "TokenUsage":
+        return cls(
+            calls=sum(u.calls for u in items),
+            input_tokens=sum(u.input_tokens for u in items),
+            output_tokens=sum(u.output_tokens for u in items),
+            reasoning_tokens=sum(u.reasoning_tokens for u in items),
+        )
+
+
 class RequirementMatch(BaseModel):
     requirement: Requirement
     status: Literal["ok", "error"]
@@ -76,6 +101,8 @@ class RequirementMatch(BaseModel):
     points: int | None = None
     weight: float = 0.0
     error: str | None = None
+    # Tokens de l'évaluation de cette exigence (seconde chance comprise).
+    usage: TokenUsage = Field(default_factory=TokenUsage)
 
 
 class MatchTimings(BaseModel):
@@ -103,6 +130,10 @@ class MatchReport(BaseModel):
     requirements_source: RequirementsSource = "extracted"
     chunk_count: int
     timings: MatchTimings
+    # Tokens de toute l'analyse (extraction comprise) et de la seule extraction (zéro si les
+    # exigences viennent du cache ou sont fournies).
+    usage: TokenUsage = Field(default_factory=TokenUsage)
+    extraction_usage: TokenUsage = Field(default_factory=TokenUsage)
 
 
 class RequirementsExtracted(BaseModel):

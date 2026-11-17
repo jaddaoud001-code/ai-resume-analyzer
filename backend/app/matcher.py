@@ -33,6 +33,7 @@ from app.llm_calls import (
     ProviderBlockedError,
     RateLimiter,
     current_monitor,
+    current_usage,
     describe_error,
     invoke_structured,
 )
@@ -58,6 +59,7 @@ from app.schemas import (
     RequirementsExtracted,
     RequirementsSource,
     SearchResult,
+    TokenUsage,
 )
 from app.vectorstore import CVIndex
 
@@ -259,6 +261,44 @@ def is_reserved_section(section: str, keywords: Iterable[str]) -> bool:
     return any(normalize_for_match(keyword) in title for keyword in keywords)
 
 
+# Section d'expériences reconnue par son contenu, quel que soit son titre (« PARCOURS »,
+# « Missions ») : un item avec une période datée au mois (« Févr. 2025 », « 03/2021 ») ou
+# « … – en cours », et des puces. Une année seule (« 2021 – 2026 ») ne suffit pas : c'est la
+# forme habituelle des formations et des projets d'école.
+_MONTH = r"(?:janv|fevr|mars|avr|mai|juin|juil|aout|sept|oct|nov|dec|jan|feb|mar|apr|may|jun|jul|aug|sep)[a-z]*\.?"
+_YEAR = r"(?:19|20)\d{2}"
+_DATED_PERIOD = re.compile(
+    rf"\b{_MONTH}\s+{_YEAR}\b"
+    rf"|\b(?:0?[1-9]|1[0-2])/{_YEAR}\b"
+    rf"|\b{_YEAR}\s*-?\s*(?:en cours|aujourd'hui|present|now|today)\b"
+)
+_BULLET = re.compile(r"^\s*[-•*▪◦]\s+\S", re.MULTILINE)
+# Jamais comptées comme expériences par leur contenu (une formation datée au mois avec des
+# puces décrivant des cours) : elles restent des sections ordinaires, comme avant.
+EDUCATION_TITLES = ("FORMATION", "EDUCATION", "ETUDES", "DIPLOME", "CURSUS", "SCOLARITE")
+
+
+def looks_like_experience(text: str) -> bool:
+    """Item daté au mois (ou « en cours ») et décrit par des puces."""
+    return bool(_DATED_PERIOD.search(normalize_for_match(text))) and bool(_BULLET.search(text))
+
+
+def experience_sections(chunks: Iterable[Chunk], keywords: Iterable[str]) -> set[str]:
+    """Titres des sections d'expériences et de projets : reconnus par mot-clé du titre
+    (MATCH_RESERVED_SECTIONS), ou par leur contenu (au moins un item daté au mois avec des
+    puces), sauf les sections de formation."""
+    keywords = list(keywords)
+    titles: set[str] = set()
+    for chunk in chunks:
+        if chunk.section in titles:
+            continue
+        if is_reserved_section(chunk.section, keywords) or (
+            not is_reserved_section(chunk.section, EDUCATION_TITLES) and looks_like_experience(chunk.text)
+        ):
+            titles.add(chunk.section)
+    return titles
+
+
 def contains_term(text: str, term: str) -> bool:
     """`term` figure dans `text` comme mot entier (casse, accents, typographie ignorés) :
     « Git » est trouvé dans « Git flow », pas dans « GitHub »."""
@@ -276,7 +316,8 @@ def select_chunks(
     sections: Iterable[str],
     profile_sections: Iterable[str] = (),
 ) -> list[SearchResult]:
-    """Choisit les chunks envoyés au LLM parmi `ranking` (tous les chunks, score décroissant) :
+    """Choisit les chunks envoyés au LLM parmi `ranking` (tous les chunks, score décroissant).
+    Sections d'expériences et de projets : voir `experience_sections` (titre ou contenu).
     1. tout chunk d'expérience ou de projet qui contient le label de l'exigence comme mot
        entier, quitte à dépasser k : une preuve explicite n'est jamais exclue ;
     2. si `profile_sections` est fourni (exigence de savoir-être) : le meilleur chunk de
@@ -285,8 +326,8 @@ def select_chunks(
     3. les meilleurs autres chunks d'expérience ou de projet, jusqu'à `reserved` places ;
     4. les meilleurs chunks restants, toutes sections confondues, jusqu'à k.
     Renvoyés par score décroissant."""
-    keywords = list(sections)
-    experience = [r for r in ranking if is_reserved_section(r.chunk.section, keywords)]
+    titles = experience_sections((r.chunk for r in ranking), sections)
+    experience = [r for r in ranking if r.chunk.section in titles]
     selected = [r for r in experience if contains_term(r.chunk.text, label)]
     chosen = {r.chunk.index for r in selected}
     profile_keywords = list(profile_sections)
@@ -302,7 +343,7 @@ def select_chunks(
         if profile is not None:
             selected.append(profile)
             chosen.add(profile.chunk.index)
-    experience_selected = sum(1 for r in selected if is_reserved_section(r.chunk.section, keywords))
+    experience_selected = sum(1 for r in selected if r.chunk.section in titles)
     for result in experience:
         if experience_selected >= reserved or len(selected) >= k:
             break
@@ -567,6 +608,9 @@ async def evaluate_requirement(
         "weight": requirement_weight(requirement, settings.match_weights),
     }
     shown = shown_chunk_texts(retrieved)
+    # Tokens de cette exigence (premier appel, nouvelles tentatives, seconde chance).
+    usage = TokenUsage()
+    usage_token = current_usage.set(usage)
     try:
         messages = build_match_messages(requirement, retrieved)
         assessment = await invoke_structured(llm, RequirementAssessment, messages, limiter, settings)
@@ -581,10 +625,13 @@ async def evaluate_requirement(
             requirement=requirement,
             status="error",
             error=f"Évaluation impossible ({describe_error(error)}).",
+            usage=usage,
             **common,  # type: ignore[arg-type]
         )
+    finally:
+        current_usage.reset(usage_token)
     assert result.level is not None
-    return result.model_copy(update={**common, "points": settings.match_level_points[result.level]})
+    return result.model_copy(update={**common, "points": settings.match_level_points[result.level], "usage": usage})
 
 
 def build_report(
@@ -594,7 +641,9 @@ def build_report(
     chunk_count: int,
     timings: MatchTimings,
     requirements_source: RequirementsSource = "extracted",
+    extraction_usage: TokenUsage | None = None,
 ) -> MatchReport:
+    extraction_usage = extraction_usage or TokenUsage()
     return MatchReport(
         job_title=job.job_title,
         score=weighted_score(results),
@@ -611,6 +660,8 @@ def build_report(
         requirements_source=requirements_source,
         chunk_count=chunk_count,
         timings=timings,
+        usage=TokenUsage.sum([extraction_usage, *(r.usage for r in results)]),
+        extraction_usage=extraction_usage,
     )
 
 
@@ -658,11 +709,17 @@ async def _requirements(
     settings: Settings,
     limiter: RateLimiter,
     cache: RequirementsCache | None,
-) -> tuple[JobRequirements, RequirementsSource]:
+) -> tuple[JobRequirements, RequirementsSource, TokenUsage]:
+    """Exigences, leur origine et les tokens de l'extraction (zéro si cache ou fournies)."""
+    usage = TokenUsage()
     if provided is not None:
-        return provided, "provided"
-    job, from_cache = await extract_requirements_cached(job_offer, llm, settings, limiter, cache)
-    return job, "cache" if from_cache else "extracted"
+        return provided, "provided", usage
+    usage_token = current_usage.set(usage)
+    try:
+        job, from_cache = await extract_requirements_cached(job_offer, llm, settings, limiter, cache)
+    finally:
+        current_usage.reset(usage_token)
+    return job, "cache" if from_cache else "extracted", usage
 
 
 async def analyze(
@@ -732,6 +789,7 @@ async def analyze(
     evaluations: list[asyncio.Task[RequirementMatch]] = []
     job: JobRequirements | None = None
     source: RequirementsSource = "extracted"
+    extraction_usage = TokenUsage()
     index: CVIndex | None = None
     try:
         while job is None or index is None:
@@ -742,7 +800,7 @@ async def analyze(
             kind, task = item  # type: ignore[misc]
             value, seconds = task.result()
             if kind == "extraction":
-                job, source = value
+                job, source, extraction_usage = value
                 timings.extraction_s = seconds
                 yield RequirementsExtracted(
                     job_title=job.job_title, requirements=job.requirements, seconds=seconds, requirements_source=source
@@ -776,7 +834,7 @@ async def analyze(
         timings.evaluation_s = time.perf_counter() - started
 
         ordered = [results[r.id] for r in to_evaluate]
-        yield ReportReady(report=build_report(job, ordered, settings, len(chunks), timings, source))
+        yield ReportReady(report=build_report(job, ordered, settings, len(chunks), timings, source, extraction_usage))
     finally:
         # Consommateur parti (client déconnecté), délai dépassé ou erreur : rien ne doit
         # continuer. Une tâche annulée avant son départ dans le limiteur n'appelle jamais le LLM.

@@ -33,6 +33,15 @@ export interface Period {
   end: string
 }
 
+/** Tokens consommés (usage renvoyé par le fournisseur) ; la sortie inclut le raisonnement. */
+export interface TokenUsage {
+  calls: number
+  input_tokens: number
+  output_tokens: number
+  reasoning_tokens: number
+  total_tokens: number
+}
+
 export interface RequirementMatch {
   requirement: Requirement
   status: 'ok' | 'error'
@@ -57,6 +66,7 @@ export interface RequirementMatch {
   points: number | null
   weight: number
   error: string | null
+  usage: TokenUsage
 }
 
 export interface MatchTimings {
@@ -78,6 +88,8 @@ export interface MatchReport {
   requirements_source: RequirementsSource
   chunk_count: number
   timings: MatchTimings
+  usage: TokenUsage
+  extraction_usage: TokenUsage
 }
 
 /** Origine des exigences : extraites par le LLM, servies par le cache, ou fournies (évaluation). */

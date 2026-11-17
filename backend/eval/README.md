@@ -134,6 +134,7 @@ Toutes les mesures sont données **séparément pour deux groupes** : exigences 
 - **matrice de confusion** : niveau principal du corrigé × niveau obtenu (plus une colonne « erreur ») ;
 - **écart de score** : score obtenu moins score du corrigé (niveaux principaux, mêmes points et poids que l'application), avec la fourchette du corrigé (niveaux acceptés les plus bas et les plus hauts) ;
 - **citations rejetées**, **secondes chances** (et combien ont retrouvé une preuve exacte), **erreurs**, **durée** ;
+- **coût en tokens** (depuis le 2026-11-17) : usage renvoyé par le fournisseur à chaque réponse (entrée, sortie, dont raisonnement), par cas et au total, avec la **moyenne par exigence** ; les runs antérieurs (v1 à v3) ne l'ont pas mesuré. Mesure clé pour comparer une autre version du matching ou un agent, qui ferait plus d'appels ;
 - avec `--runs N` : agrégation, et les exigences dont le niveau varie d'une exécution à l'autre.
 
 Le rapport indique la version du prompt d'évaluation (`MATCH_PROMPT_VERSION`) : deux runs ne se comparent qu'en sachant laquelle a servi (v1 : référence ; v2 : règle des savoir-être nommés ou décrits, rappel des scores officiels ; v3 : une affirmation du profil sans expérience qui l'illustre vaut « mentionné »). Le plancher des certifications de langue, appliqué par le code depuis la v3, n'a pas de numéro de version propre : il est daté dans `Structure.md`.

@@ -127,7 +127,14 @@
       ],
       "points": 40,
       "weight": 2.0,
-      "error": null
+      "error": null,
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "reasoning_tokens": 0,
+        "total_tokens": 0
+      }
     },
     "done": 1,
     "total": 4
@@ -178,7 +185,14 @@
       ],
       "points": 0,
       "weight": 2.0,
-      "error": null
+      "error": null,
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "reasoning_tokens": 0,
+        "total_tokens": 0
+      }
     },
     "done": 2,
     "total": 4
@@ -222,7 +236,14 @@
       ],
       "points": null,
       "weight": 1.0,
-      "error": "Évaluation impossible (HTTPStatusError 429)."
+      "error": "Évaluation impossible (HTTPStatusError 429).",
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "reasoning_tokens": 0,
+        "total_tokens": 0
+      }
     },
     "done": 3,
     "total": 4
@@ -271,7 +292,14 @@
       ],
       "points": 75,
       "weight": 0.5,
-      "error": null
+      "error": null,
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "reasoning_tokens": 0,
+        "total_tokens": 0
+      }
     },
     "done": 4,
     "total": 4
@@ -336,7 +364,14 @@
           ],
           "points": 40,
           "weight": 2.0,
-          "error": null
+          "error": null,
+          "usage": {
+            "calls": 0,
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "reasoning_tokens": 0,
+            "total_tokens": 0
+          }
         },
         {
           "requirement": {
@@ -382,7 +417,14 @@
           ],
           "points": 0,
           "weight": 2.0,
-          "error": null
+          "error": null,
+          "usage": {
+            "calls": 0,
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "reasoning_tokens": 0,
+            "total_tokens": 0
+          }
         },
         {
           "requirement": {
@@ -421,7 +463,14 @@
           ],
           "points": null,
           "weight": 1.0,
-          "error": "Évaluation impossible (HTTPStatusError 429)."
+          "error": "Évaluation impossible (HTTPStatusError 429).",
+          "usage": {
+            "calls": 0,
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "reasoning_tokens": 0,
+            "total_tokens": 0
+          }
         },
         {
           "requirement": {
@@ -465,7 +514,14 @@
           ],
           "points": 75,
           "weight": 0.5,
-          "error": null
+          "error": null,
+          "usage": {
+            "calls": 0,
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "reasoning_tokens": 0,
+            "total_tokens": 0
+          }
         }
       ],
       "missing_mandatory": [
@@ -494,6 +550,20 @@
         "indexing_s": 3.2,
         "retrieval_s": 0.4,
         "evaluation_s": 96.1
+      },
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "reasoning_tokens": 0,
+        "total_tokens": 0
+      },
+      "extraction_usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "reasoning_tokens": 0,
+        "total_tokens": 0
       }
     }
   },

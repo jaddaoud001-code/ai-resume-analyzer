@@ -13,7 +13,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from langchain_core.embeddings import Embeddings
 from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import BaseMessage
+from langchain_core.messages import AIMessage, BaseMessage
 from langchain_core.outputs import ChatResult
 from langchain_core.runnables import Runnable, RunnableLambda
 from pydantic import Field
@@ -67,9 +67,15 @@ def no_real_embeddings_model(request: pytest.FixtureRequest, monkeypatch: pytest
 class FakeStructuredChatModel(BaseChatModel):
     """Faux modèle de chat : with_structured_output renvoie, appel après appel, les
     réponses prévues (un objet, ou une exception à lever) et enregistre les messages reçus.
-    Avec `responder`, la réponse est calculée à partir des messages (appels concurrents)."""
+    Avec `responder`, la réponse est calculée à partir des messages (appels concurrents).
+    Avec include_raw (comme invoke_structured), la réponse est enveloppée comme chez
+    LangChain ({"raw", "parsed", "parsing_error"}), la réponse brute portant `usage` ; une
+    réponse `None` simule une sortie structurée invalide (tokens consommés quand même)."""
 
     responses: list[Any] = Field(default_factory=list)
+    # usage_metadata de chaque réponse brute (input_tokens, output_tokens, total_tokens,
+    # output_token_details) ; None : le fournisseur n'en renvoie pas.
+    usage: dict[str, Any] | None = None
     responder: Callable[[list[BaseMessage]], Any] | None = None
     calls: list[list[BaseMessage]] = Field(default_factory=list)
     structured_kwargs: dict[str, Any] = Field(default_factory=dict)
@@ -89,7 +95,10 @@ class FakeStructuredChatModel(BaseChatModel):
             response = self.responder(list(messages)) if self.responder else self.responses.pop(0)
             if isinstance(response, BaseException):
                 raise response
-            return response
+            if not kwargs.get("include_raw"):
+                return response
+            raw = AIMessage(content="", usage_metadata=self.usage) if self.usage else AIMessage(content="")
+            return {"raw": raw, "parsed": response, "parsing_error": None if response is not None else "invalide"}
 
         return RunnableLambda(respond)
 

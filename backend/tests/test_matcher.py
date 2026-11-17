@@ -15,7 +15,9 @@ from app.matcher import (
     build_match_messages,
     contains_term,
     evaluate_requirement,
+    experience_sections,
     is_reserved_section,
+    looks_like_experience,
     quote_in_chunk,
     requirement_weight,
     retrieve_for_requirement,
@@ -532,22 +534,64 @@ class TestSelectChunks:
         assert is_reserved_section("PROJETS IA", SECTIONS)
         assert not is_reserved_section("COMPÉTENCES", SECTIONS)
 
-    def test_unusual_experience_titles_get_no_reserved_place(self) -> None:
-        """Limite connue (README) : une section d'expériences intitulée autrement (« PARCOURS »,
-        « Parcours professionnel », « Missions ») n'est pas reconnue : ses chunks ne profitent
-        ni des places réservées ni de la règle du mot exact, et les listes de compétences,
-        mieux classées, peuvent occuper tout le top k."""
+    def test_unusual_experience_titles_are_recognized_by_their_content(self) -> None:
+        """Ancienne limite (README) corrigée : une section d'expériences intitulée autrement
+        (« PARCOURS PROFESSIONNEL », « Missions ») est reconnue à son contenu (item daté au mois
+        et puces) et profite des places réservées et de la règle du mot exact."""
         for title in ("PARCOURS", "Parcours professionnel", "MISSIONS"):
-            assert not is_reserved_section(title, SECTIONS), title
-        experience = "Développeuse · Globex\n- Services Kotlin en production"
-        usual = [*RANKING[:5], _hit(9, "EXPÉRIENCE PROFESSIONNELLE", experience, 0.70)]
-        unusual = [*RANKING[:5], _hit(9, "PARCOURS PROFESSIONNEL", experience, 0.70)]
+            assert not is_reserved_section(title, SECTIONS), title  # le titre seul ne suffit pas
+        experience = "Développeuse · Globex\nMars 2022 – en cours · Lyon\n- Services Kotlin en production"
+        ranking = [*RANKING[:5], _hit(9, "PARCOURS PROFESSIONNEL", experience, 0.70)]
 
-        kept = select_chunks(usual, "Kotlin", k=3, reserved=1, sections=SECTIONS)
-        missed = select_chunks(unusual, "Kotlin", k=3, reserved=1, sections=SECTIONS)
+        selected = select_chunks(ranking, "Kotlin", k=3, reserved=1, sections=SECTIONS)
 
-        assert 9 in [r.chunk.index for r in kept]  # mot exact dans une expérience reconnue
-        assert [r.chunk.index for r in missed] == [0, 1, 2]  # l'expérience n'est pas envoyée au LLM
+        assert 9 in [r.chunk.index for r in selected]
+        assert experience_sections([r.chunk for r in ranking], SECTIONS) == {"PARCOURS PROFESSIONNEL"}
+        # Les sections déjà reconnues par leur titre le restent, datées ou non.
+        full = [*RANKING, ranking[-1]]
+        assert experience_sections([r.chunk for r in full], SECTIONS) == {
+            "EXPÉRIENCE PROFESSIONNELLE",
+            "PROJETS",
+            "Expériences",
+            "PARCOURS PROFESSIONNEL",
+        }
+
+    def test_undated_unusual_section_is_still_not_recognized(self) -> None:
+        """Limite restante : sans période datée au mois ni « en cours », un titre inhabituel
+        n'est pas reconnu (les listes de compétences peuvent occuper le top k)."""
+        experience = "Développeuse · Globex\n2019 – 2022\n- Services Kotlin en production"
+        ranking = [*RANKING[:5], _hit(9, "PARCOURS PROFESSIONNEL", experience, 0.70)]
+
+        selected = select_chunks(ranking, "Kotlin", k=3, reserved=1, sections=SECTIONS)
+
+        assert [r.chunk.index for r in selected] == [0, 1, 2]
+
+    def test_content_detection_ignores_education_and_skill_lists(self) -> None:
+        chunks = [
+            Chunk(
+                section="FORMATION", index=0, text="Master · Université\nSept. 2019 – Juin 2021\n- Cours de compilation"
+            ),
+            Chunk(section="Études", index=1, text="Licence\nSept. 2016 – Juin 2019\n- Mathématiques"),
+            Chunk(section="COMPÉTENCES", index=2, text="Langages : Python, SQL\nOutils : Docker"),
+            Chunk(section="CENTRES D'INTÉRÊT", index=3, text="Voile, depuis 2015"),
+            Chunk(section="EXPÉRIENCE", index=4, text="Poste sans date\n- Tâches"),  # titre reconnu
+        ]
+
+        assert experience_sections(chunks, SECTIONS) == {"EXPÉRIENCE"}
+
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        [
+            ("Poste\nFévr. 2025 – en cours · Nantes\n- API", True),
+            ("Poste\nSept. 2023 – Août 2025\n- API", True),
+            ("Poste\n03/2021 - 06/2022\n- API", True),
+            ("Poste\n2023 – aujourd'hui\n- API", True),
+            ("Poste\n2021 – 2026\n- API", False),  # années seules
+            ("Poste\nFévr. 2025 – en cours", False),  # sans puces
+        ],
+    )
+    def test_looks_like_experience(self, text: str, expected: bool) -> None:
+        assert looks_like_experience(text) is expected
 
     def test_contains_term(self) -> None:
         assert contains_term("Code versionné sous Git flow", "git")
