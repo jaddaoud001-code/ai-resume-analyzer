@@ -800,3 +800,113 @@ def test_extracted_requirements_are_reported_as_extracted(settings: Settings, se
     [extracted] = [e for e in events if isinstance(e, RequirementsExtracted)]
     assert extracted.requirements_source == "extracted"
     assert events[-1].report.requirements_source == "extracted"  # type: ignore[union-attr]
+
+
+# --- Savoir-être : chunk de profil toujours envoyé ---------------------------------------
+
+PROFILE_SECTIONS = ["PROFIL", "RESUME", "SUMMARY", "A PROPOS"]
+PROFILE = _hit(10, "PROFIL", "Développeuse attentive aux besoins des personnes qui utilisent ses outils.", 0.60)
+
+
+class TestProfileForSoftSkills:
+    def test_profile_is_sent_for_a_soft_skill_even_when_badly_ranked(self) -> None:
+        ranking = [*RANKING, PROFILE]
+
+        selected = select_chunks(
+            ranking, "Écoute", k=5, reserved=3, sections=SECTIONS, profile_sections=PROFILE_SECTIONS
+        )
+
+        ids = [r.chunk.index for r in selected]
+        assert 10 in ids and len(ids) == 5
+        assert {5, 6} <= set(ids)  # les places réservées aux expériences restent (une de moins)
+
+    def test_no_profile_without_profile_sections(self) -> None:
+        # Exigence technique : retrieve_for_requirement ne passe pas les sections de profil.
+        selected = select_chunks([*RANKING, PROFILE], "Écoute", k=5, reserved=3, sections=SECTIONS)
+
+        assert 10 not in [r.chunk.index for r in selected]
+
+    def test_never_exceeds_k(self) -> None:
+        ranking = [
+            _hit(0, "EXPÉRIENCE", "Poste A\n- Rigueur dans les recettes", 0.9),
+            _hit(1, "EXPÉRIENCE", "Poste B\n- Revue de code", 0.8),
+            _hit(2, "COMPÉTENCES", "Qualités : rigueur", 0.7),
+            PROFILE,
+        ]
+
+        selected = select_chunks(
+            ranking, "Rigueur", k=2, reserved=2, sections=SECTIONS, profile_sections=PROFILE_SECTIONS
+        )
+
+        assert [r.chunk.index for r in selected] == [0, 10]  # preuve exacte, puis profil ; k respecté
+
+    def test_exact_proofs_are_never_removed_for_the_profile(self) -> None:
+        ranking = [_hit(i, "EXPÉRIENCE", f"Poste {i}\n- Autonomie sur le projet", 0.9 - i / 100) for i in range(3)]
+
+        selected = select_chunks(
+            [*ranking, PROFILE], "Autonomie", k=3, reserved=1, sections=SECTIONS, profile_sections=PROFILE_SECTIONS
+        )
+
+        assert [r.chunk.index for r in selected] == [0, 1, 2]  # k atteint par les preuves exactes : pas de profil
+
+    def test_profile_already_selected_is_not_duplicated(self) -> None:
+        ranking = [_hit(10, "PROFIL", "Profil : sens du service", 0.95), *RANKING]
+
+        selected = select_chunks(
+            ranking, "Écoute", k=5, reserved=3, sections=SECTIONS, profile_sections=PROFILE_SECTIONS
+        )
+
+        ids = [r.chunk.index for r in selected]
+        assert ids.count(10) == 1 and len(ids) == 5
+
+    def test_default_profile_titles(self) -> None:
+        keywords = make_settings().match_profile_sections
+
+        for title in ("PROFIL", "Profil professionnel", "RÉSUMÉ", "Summary", "À propos"):
+            assert is_reserved_section(title, keywords), title
+        assert not is_reserved_section("EXPÉRIENCE PROFESSIONNELLE", keywords)
+
+
+def test_demo_cv_sii_user_orientation_gets_the_profile_chunk() -> None:
+    """Rejoue démo × SII « Orientation utilisateur » (run v3 : PROFIL jamais envoyé, la
+    règle v3 ne pouvait pas s'appliquer), avec les embeddings factices et la liste figée."""
+    import json
+    from pathlib import Path
+
+    from app.pdf_parser import extract_text
+    from app.schemas import JobRequirements
+
+    eval_dir = Path(__file__).resolve().parents[1] / "eval"
+    settings = make_settings()
+    chunks = chunk_cv(extract_text((eval_dir / "cvs" / "demo_cv.pdf").read_bytes(), settings).text)
+    index = CVIndex(chunks, KeywordEmbeddings())
+    job = JobRequirements.model_validate(json.loads((eval_dir / "offers" / "sii.requirements.json").read_text()))
+    requirement = next(r for r in job.requirements if r.label == "Orientation utilisateur")
+    assert requirement.category == "savoir-être"
+
+    sent = retrieve_for_requirement(index, requirement, settings)
+
+    profile = [r for r in sent if r.chunk.section == "PROFIL"]
+    assert len(profile) == 1 and "entre les mains de" in profile[0].chunk.text
+    assert len(sent) <= settings.match_k
+
+    # Les embeddings factices classent déjà bien le profil (mot « utilisateurs ») : ils ne
+    # reproduisent pas l'échec réel. Rejeu du classement observé avec les embeddings E5 au
+    # run v3 (chunks 1, 3, 13, 12, 11 en tête, profil en dernier).
+    class ObservedRanking:
+        size = len(chunks)
+
+        def search_many(self, queries: list[str], k: int) -> list[SearchResult]:
+            head = [1, 3, 13, 12, 11]
+            order = head + [c.index for c in chunks if c.index not in head and c.section != "PROFIL"]
+            order += [c.index for c in chunks if c.section == "PROFIL"]
+            by_index = {c.index: c for c in chunks}
+            return [SearchResult(chunk=by_index[i], score=0.9 - n / 100) for n, i in enumerate(order)][:k]
+
+    observed = ObservedRanking()
+    technical = requirement.model_copy(update={"category": "compétence technique"})
+    before = retrieve_for_requirement(observed, technical, settings)  # type: ignore[arg-type]
+    after = retrieve_for_requirement(observed, requirement, settings)  # type: ignore[arg-type]
+
+    assert [r.chunk.index for r in before] == [1, 3, 13, 12, 11]  # run v3 : PROFIL absent
+    assert any(r.chunk.section == "PROFIL" for r in after) and len(after) == settings.match_k

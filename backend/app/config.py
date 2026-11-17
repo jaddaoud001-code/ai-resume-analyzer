@@ -71,6 +71,10 @@ class Settings(BaseSettings):
     match_reserved_k: int = 3
     # Mots-clés (majuscules, sans accents) qui identifient ces sections dans leur titre.
     match_reserved_sections: list[str] = ["EXPERIENCE", "PROJET", "STAGE"]
+    # Savoir-être : le meilleur chunk de profil ou de résumé est toujours envoyé au LLM (une
+    # affirmation du profil vaut « mentionné »), dans la limite de MATCH_K ; sections
+    # reconnues par mot-clé du titre (majuscules, sans accents), comme ci-dessus.
+    match_profile_sections: list[str] = ["PROFIL", "RESUME", "SUMMARY", "A PROPOS"]
     match_level_points: dict[str, int] = {
         "non démontré": 0,
         "mentionné": 40,

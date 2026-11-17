@@ -269,24 +269,47 @@ def contains_term(text: str, term: str) -> bool:
 
 
 def select_chunks(
-    ranking: list[SearchResult], label: str, k: int, reserved: int, sections: Iterable[str]
+    ranking: list[SearchResult],
+    label: str,
+    k: int,
+    reserved: int,
+    sections: Iterable[str],
+    profile_sections: Iterable[str] = (),
 ) -> list[SearchResult]:
     """Choisit les chunks envoyés au LLM parmi `ranking` (tous les chunks, score décroissant) :
     1. tout chunk d'expérience ou de projet qui contient le label de l'exigence comme mot
        entier, quitte à dépasser k : une preuve explicite n'est jamais exclue ;
-    2. les meilleurs autres chunks d'expérience ou de projet, jusqu'à `reserved` places ;
-    3. les meilleurs chunks restants, toutes sections confondues, jusqu'à k.
+    2. si `profile_sections` est fourni (exigence de savoir-être) : le meilleur chunk de
+       profil ou de résumé, s'il reste une place sous k (une affirmation du profil vaut
+       « mentionné », encore faut-il que le LLM la voie) ;
+    3. les meilleurs autres chunks d'expérience ou de projet, jusqu'à `reserved` places ;
+    4. les meilleurs chunks restants, toutes sections confondues, jusqu'à k.
     Renvoyés par score décroissant."""
     keywords = list(sections)
     experience = [r for r in ranking if is_reserved_section(r.chunk.section, keywords)]
     selected = [r for r in experience if contains_term(r.chunk.text, label)]
     chosen = {r.chunk.index for r in selected}
+    profile_keywords = list(profile_sections)
+    if profile_keywords and len(selected) < k:
+        profile = next(
+            (
+                r
+                for r in ranking
+                if r.chunk.index not in chosen and is_reserved_section(r.chunk.section, profile_keywords)
+            ),
+            None,
+        )
+        if profile is not None:
+            selected.append(profile)
+            chosen.add(profile.chunk.index)
+    experience_selected = sum(1 for r in selected if is_reserved_section(r.chunk.section, keywords))
     for result in experience:
-        if len(selected) >= reserved:
+        if experience_selected >= reserved or len(selected) >= k:
             break
         if result.chunk.index not in chosen:
             selected.append(result)
             chosen.add(result.chunk.index)
+            experience_selected += 1
     for result in ranking:
         if len(selected) >= k:
             break
@@ -298,7 +321,8 @@ def select_chunks(
 
 def retrieve_for_requirement(index: CVIndex, requirement: Requirement, settings: Settings) -> list[SearchResult]:
     """Recherche avec le label et chaque search_query (meilleur score par chunk), puis
-    sélection sensible aux sections (voir `select_chunks`)."""
+    sélection sensible aux sections (voir `select_chunks`) ; pour un savoir-être, le chunk de
+    profil ou de résumé est toujours inclus (dans la limite de MATCH_K)."""
     ranking = index.search_many([requirement.label, *requirement.search_queries], index.size)
     return select_chunks(
         ranking,
@@ -306,6 +330,7 @@ def retrieve_for_requirement(index: CVIndex, requirement: Requirement, settings:
         settings.match_k,
         min(settings.match_reserved_k, settings.match_k),
         settings.match_reserved_sections,
+        settings.match_profile_sections if requirement.category == "savoir-être" else (),
     )
 
 

@@ -78,11 +78,11 @@ Les 5 erreurs vont dans le même sens : des compétences que l'offre nuance (« 
 
 Exemples des prompts génériques, aucun tiré des cas d'évaluation (vérifié par un test).
 
-| Groupe | Exigences | Exactes v1 → v2 → v3 | À un niveau près | Faux positifs v1 → v2 → v3 | Faux négatifs |
+| Groupe | Exigences | Exactes (v1 / v2 / v3) | À un niveau près (v1 / v2 / v3) | Faux positifs (v1 / v2 / v3) | Faux négatifs (v1 / v2 / v3) |
 |---|---|---|---|---|---|
-| Techniques (compétences, formation, langues) | 38 | **38 → 38 → 38 (100 %)** | 38 → 38 → 38 | **0 → 0 → 0** | 0 → 0 → 0 |
-| Savoir-être | 16 | 9 (56 %) → 15 (94 %) → 13 (81 %) | 14 → 16 → 16 | **7 → 0 → 2** | 0 → 0 → 0 |
-| Total | 54 | 47 (87 %) → 53 (98 %) → 51 (94 %) | 52 → 54 → 54 | 7 → 0 → 2 | 0 → 0 → 0 |
+| Techniques (compétences, formation, langues) | 38 | **38 / 38 / 38 (100 %)** | 38 / 38 / 38 | **0 / 0 / 0** | 0 / 0 / 0 |
+| Savoir-être | 16 | 9 (56 %) / 15 (94 %) / 13 (81 %) | 14 / 16 / 16 | **7 / 0 / 2** | 0 / 0 / 0 |
+| Total | 54 | 47 (87 %) / 53 (98 %) / 51 (94 %) | 52 / 54 / 54 | 7 / 0 / 2 | 0 / 0 / 0 |
 
 | Cas | Score du corrigé (fourchette) | v1 : score (écart) | v2 : score (écart) | v3 : score (écart) |
 |---|---|---|---|---|
@@ -93,8 +93,9 @@ Exemples des prompts génériques, aucun tiré des cas d'évaluation (vérifié 
 
 - **Corrigé modifié entre v2 et v3** : pour le CV Java × Hager, « Anglais professionnel » (« B1 (TOEIC 785) ») n'accepte plus que « démontré », aligné sur le plancher des certifications ajouté après v2. Les chiffres v1 et v2 sont publiés tels qu'ils ont été mesurés, avec l'ancien corrigé (« mentionné » accepté) ; **avec le corrigé aligné, v2 compterait un faux négatif technique** (37/38 exactes : « mentionné » obtenu). En v3, le LLM a donné « démontré » de lui-même : le plancher du code ne s'est pas déclenché (aucun drapeau `certification_floor`), il n'est donc pas encore vérifié en conditions réelles.
 - **Aucune compétence technique affirmée à tort, dans les trois versions** : les absences (Java, JSP, IA générative, ITSM…) sont toutes « non démontré », et les pièges du corrigé sont évités (Java EE ne prouve pas JSP, une liste de compétences reste « mentionné »).
-- **Savoir-être** : v1 déduisait 7 savoir-être de réalisations techniques ; v2 n'en déduisait aucun ; v3 en déduit 2, tous deux « Résolution de problèmes concrets » (déjà fautifs en v1), sur des preuves techniques (« accélérer les recherches de colis », « comparaison de trois LLM »). Avec une exécution par version, l'écart entre v2 et v3 ne se distingue pas de la variance du modèle ; c'est le savoir-être le plus fragile.
+- **Faux positifs, sur les seuls savoir-être** (aucun faux positif technique dans les trois runs) : **7 en v1, 0 en v2, 2 en v3**. La règle sur les savoir-être (v2) les a fortement réduits, sans les supprimer de façon stable : une exécution par version ne permet pas de dire si v2 était un bon tirage ou v3 un mauvais. En v1, le modèle déduisait 7 savoir-être de réalisations techniques ; en v3, il en déduit 2, tous deux « Résolution de problèmes concrets » (déjà fautifs en v1), sur des preuves techniques (« accélérer les recherches de colis », « comparaison de trois LLM »). Avec une exécution par version, l'écart entre v2 et v3 ne se distingue pas de la variance du modèle ; c'est le savoir-être le plus fragile.
 - **« Orientation utilisateur » (CV de démo × SII) reste « non démontré » en v3, pour une raison de recherche, pas de prompt** : le chunk PROFIL, qui contient l'affirmation (« je les mets entre les mains de leurs utilisateurs »), n'est pas envoyé au LLM ; les 5 places vont à deux listes de compétences et à trois expériences (places réservées). Vérifié hors LLM, avec les embeddings locaux. La règle v3 n'a donc pas pu s'appliquer.
+- **Modifications pas encore mesurées** (2026-11-17) : pour une exigence de savoir-être, la recherche envoie désormais toujours au LLM le chunk de profil ou de résumé (titre reconnu par mot-clé : `MATCH_PROFILE_SECTIONS`), dans la limite de `MATCH_K` et sans retirer les preuves exactes déjà garanties ; c'est la cause trouvée pour « Orientation utilisateur ». Le prochain run (série difficile) se fera avec cette version.
 - Citations rejetées : 9 (v1), 10 (v2), 10 (v3) ; secondes chances : 2 avec preuve retrouvée (v1), 2 dont 1 (v2), 1 avec preuve retrouvée (v3) ; aucune erreur ; ~5 min par cas.
 
 **Cas difficiles, conçus par l'auteur du projet** (série distincte des 4 cas de référence, **pas encore mesurée**). Les 4 cas de référence sont saturés sur les exigences techniques (38/38) : deux cas supplémentaires visent les points faibles connus du matching, pour qu'un futur changement (agent, autre modèle) ait quelque chose à prouver. L'offre (`backend/eval/offers/logistique.txt`, marquée **fictive**) exige des durées (2 ans de backend, 3 ans de Python, 1 an de file de messages) et des compétences qu'un CV peut prouver sans les nommer (déploiement cloud, CI/CD, observabilité) ; le CV `backend_cv.pdf` (fictif) disperse ses preuves sur trois expériences (durées à additionner, deux périodes qui se chevauchent, une expérience découpée en deux chunks dont le second n'a pas de dates), et le CV Java sert de second cas (2 ans de backend tout juste atteints, certification de langue soumise au plancher du code).
@@ -190,6 +191,7 @@ Variables du `.env` (modèle commenté : [.env.example](.env.example)). Seule la
 | `EMBEDDINGS_CACHE_DIR` | dossier du modèle local | `~/.cache/ai-resume-analyzer/fastembed` (`/models` en Docker) |
 | `MATCH_K` | passages du CV par exigence | `5` |
 | `MATCH_RESERVED_K`, `MATCH_RESERVED_SECTIONS` | places réservées aux expériences et projets ; mots-clés de leurs titres | `3`, `["EXPERIENCE", "PROJET", "STAGE"]` |
+| `MATCH_PROFILE_SECTIONS` | mots-clés des titres de profil ou de résumé, toujours envoyés pour un savoir-être | `["PROFIL", "RESUME", "SUMMARY", "A PROPOS"]` |
 | `MATCH_LEVEL_POINTS`, `MATCH_WEIGHTS` | points par niveau, poids par importance (JSON) | 0 / 40 / 75 / 100 ; 2 / 1 / 0,5 |
 | `MAX_JOB_OFFER_CHARS`, `MAX_REQUIREMENTS` | taille maximale de l'offre, nombre maximal d'exigences | `15000`, `15` |
 | `MAX_PDF_SIZE_BYTES`, `MAX_PDF_PAGES` | limites du PDF | 5 Mo, `10` |
