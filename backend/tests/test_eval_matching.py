@@ -133,6 +133,18 @@ def _report(*results: RequirementMatch, score: int | None) -> MatchReport:
     )
 
 
+def test_certification_floor_is_reported_with_the_llm_level() -> None:
+    english = _requirement("R3", "Anglais professionnel", category="langue")
+    raised = _result(english, "démontré", llm_level="mentionné", certification_floor=True)
+    case = _case((english, ["démontré"]))
+
+    summary = summarize([case_run(case, _report(raised, score=75), make_settings(), run=1, seconds=1.0)])
+
+    outcome = assess(ExpectedLevel("R3", "Anglais professionnel", ["démontré"]), raised)
+    assert (outcome.exact, outcome.certification_floor, outcome.llm_level) == (True, True, "mentionné")
+    assert summary["planchers de certification"] == ["cv__offre R3 Anglais professionnel (LLM : mentionné)"]
+
+
 class TestSummary:
     def test_soft_skill_false_positives_are_reported_apart(self) -> None:
         case = _case((PYTHON, ["non démontré"]), (RIGUEUR, ["non démontré"]))
