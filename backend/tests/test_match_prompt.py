@@ -24,7 +24,7 @@ PROMPT = _flat(_SYSTEM_PROMPT)
 def test_prompt_change_requires_a_new_version() -> None:
     """Les runs de l'évaluation du matching se comparent par version du prompt. Après une
     modification voulue : incrémenter MATCH_PROMPT_VERSION et mettre à jour l'empreinte."""
-    fingerprints = {3: "770bb98e42e52f3104fc3636090f1ffc0ae1312c197217badf422780b54d2162"}
+    fingerprints = {4: "fd13839a18cef0f43ca9537f33670e81e46dc9dab065ed68b3066aa038f7018d"}
 
     assert hashlib.sha256(_SYSTEM_PROMPT.encode()).hexdigest() == fingerprints.get(MATCH_PROMPT_VERSION), (
         "prompt d'évaluation modifié : incrémenter MATCH_PROMPT_VERSION et mettre à jour l'empreinte"
@@ -98,3 +98,18 @@ class TestOfficialScoreRule:
         assert "il vaut au moins « démontré » pour l'exigence correspondante" in PROMPT
         assert "C'est vrai aussi quand le niveau certifié paraît modeste" in PROMPT
         assert "le niveau reste au moins « démontré », et l'écart avec le niveau demandé s'écrit dans gaps" in PROMPT
+
+
+class TestSolidCitationRule:
+    """v4 : pour « solide », une citation par expérience ou projet distinct (le code exige au
+    moins deux items ; sinon le niveau dépendrait du choix de la seule meilleure citation)."""
+
+    def test_solid_asks_for_one_quote_per_distinct_experience_or_project(self) -> None:
+        assert (
+            "Si le niveau est « solide », cite une preuve dans chaque expérience ou projet distinct qui "
+            "l'atteste, pas seulement la meilleure"
+        ) in PROMPT
+        assert "« solide » demande au moins deux expériences ou projets distincts" in PROMPT
+
+    def test_generic_example(self) -> None:
+        assert "deux postes successifs et un projet personnel appelle trois citations" in PROMPT

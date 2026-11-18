@@ -88,8 +88,9 @@ class RequirementAssessment(BaseModel):
 # son empreinte à celle enregistrée pour la version courante). v1 : run de référence du
 # 2026-11-14 ; v2 : savoir-être nommés ou décrits explicitement, rappel des scores officiels ;
 # v3 : une affirmation explicite du profil ou du résumé, sans expérience qui l'illustre, vaut
-# « mentionné » (savoir-être compris).
-MATCH_PROMPT_VERSION = 3
+# « mentionné » (savoir-être compris) ; v4 : pour « solide », une citation par expérience ou
+# projet distinct (le code exige au moins deux items).
+MATCH_PROMPT_VERSION = 4
 
 _SYSTEM_PROMPT = """Tu évalues si un CV démontre une exigence d'une offre d'emploi.
 
@@ -154,7 +155,11 @@ profil, le résumé ou une liste de qualités), sinon « non démontré ».
 
 evidence : pour chaque preuve, chunk_id (l'id du chunk) et quote, un extrait recopié \
 EXACTEMENT du texte de ce chunk, sans reformulation. Pour abréger, sépare des morceaux \
-exacts par « … », chacun d'au moins 3 mots. Aucune preuve si le niveau est « non démontré ».
+exacts par « … », chacun d'au moins 3 mots. Aucune preuve si le niveau est « non démontré ». \
+Si le niveau est « solide », cite une preuve dans chaque expérience ou projet distinct qui \
+l'atteste, pas seulement la meilleure : « solide » demande au moins deux expériences ou \
+projets distincts. Par exemple, une compétence pratiquée dans deux postes successifs et un \
+projet personnel appelle trois citations, une par poste et une pour le projet.
 
 periods : seulement si l'exigence indique une durée minimale : les périodes pendant \
 lesquelles la compétence a été pratiquée, relevées dans les preuves, au format \
@@ -591,12 +596,24 @@ def needs_second_chance(result: RequirementMatch, requirement: Requirement, item
     - le niveau a été rétrogradé faute de toute preuve valide (cas d'origine) ;
     - ou l'exigence demande une durée et une citation rejetée vient d'un chunk d'expérience ou
       de projet : sans preuve valide dans ce chunk, ses périodes seraient perdues, même s'il
-      reste une preuve valide ailleurs (par exemple dans une liste de compétences)."""
+      reste une preuve valide ailleurs (par exemple dans une liste de compétences) ;
+    - ou « solide » a été plafonné faute de deux items distincts, alors qu'une citation rejetée
+      venait d'un autre item d'expérience ou de projet."""
     if not result.rejected_evidence_items:
         return False
     if result.downgraded:
         return True
-    return requirement.min_years is not None and any(items.get(e.chunk_id) for e in result.rejected_evidence_items)
+    if requirement.min_years is not None and any(items.get(e.chunk_id) for e in result.rejected_evidence_items):
+        return True
+    # « solide » plafonné faute de deux items, alors qu'une citation rejetée venait d'un autre
+    # item d'expérience ou de projet : recopiée, elle pourrait atteindre les deux items.
+    if result.capped_single_item:
+        valid_items = {items.get(e.chunk_id) for e in result.evidence} - {None}
+        return any(
+            item is not None and item not in valid_items
+            for item in (items.get(e.chunk_id) for e in result.rejected_evidence_items)
+        )
+    return False
 
 
 async def _second_chance(

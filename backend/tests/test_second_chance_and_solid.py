@@ -172,3 +172,72 @@ class TestSolidCap:
         )
 
         assert (result.level, result.capped_single_item) == ("solide", False)
+
+
+JAVA_PDF = Path(__file__).resolve().parents[1] / "eval" / "cvs" / "java_cv.pdf"
+
+
+def _java_sql(responses: list[object]) -> tuple[RequirementMatch, int]:
+    text = extract_text(JAVA_PDF.read_bytes(), make_settings()).text
+    chunks = {c.index: c for c in chunk_cv(text)}
+    retrieved = [SearchResult(chunk=chunks[i], score=0.9 - n / 100) for n, i in enumerate([7, 8, 4, 2, 3])]
+    requirement = Requirement(
+        id="R3",
+        label="SQL et bases de données relationnelles",
+        category="compétence technique",
+        importance="obligatoire",
+        search_queries=["SQL", "bases de données relationnelles"],
+    )
+    settings = make_settings()
+    model = FakeStructuredChatModel(responses=list(responses))
+    result = asyncio.run(
+        evaluate_requirement(requirement, retrieved, model, RateLimiter.from_settings(settings), settings, EVAL_TODAY)
+    )
+    return result, len(model.calls)
+
+
+# Première réponse du run du 2026-11-18 (CV Java × logistique, R3) : seule la citation du projet
+# est valide ; celle de l'alternance (autre item) est rejetée (morceaux de moins de 3 mots).
+FIRST_JAVA_SQL = _assess(
+    "solide",
+    (4, "base MySQL …"),
+    (7, "Langages … SQL …"),
+    (2, "Requêtes SQL … PostgreSQL …"),
+)
+
+
+class TestSolidSecondChance:
+    def test_replays_the_java_cv_sql_case(self) -> None:
+        corrected = _assess(
+            "solide",
+            (4, "Application web Spring Boot et Thymeleaf, base MySQL"),
+            (2, "Requêtes SQL et index sur PostgreSQL pour accélérer les recherches de colis."),
+        )
+
+        result, calls = _java_sql([FIRST_JAVA_SQL, corrected])
+
+        assert calls == 2 and result.second_chance
+        assert (result.level, result.capped_single_item) == ("solide", False)  # projet + alternance
+
+    def test_without_it_solid_was_capped(self) -> None:
+        result, calls = _java_sql([FIRST_JAVA_SQL, FIRST_JAVA_SQL])
+
+        # Même réponse : toujours un seul item valide, plafond maintenu ; un seul appel en plus.
+        assert calls == 2 and result.second_chance
+        assert (result.level, result.capped_single_item) == ("démontré", True)
+
+    def test_no_second_chance_when_rejected_quotes_are_outside_experiences(self) -> None:
+        # Seule la liste de compétences (hors expérience) a une citation rejetée.
+        first = _assess("solide", (4, "base MySQL …"), (7, "Langages … SQL …"))
+
+        result, calls = _java_sql([first])
+
+        assert calls == 1 and not result.second_chance
+        assert (result.level, result.capped_single_item) == ("démontré", True)
+
+    def test_no_second_chance_when_the_rejected_quote_is_from_the_same_item(self) -> None:
+        first = _assess("solide", (4, "base MySQL …"), (4, "projet MySQL de prêts"))
+
+        result, calls = _java_sql([first])
+
+        assert calls == 1 and not result.second_chance
