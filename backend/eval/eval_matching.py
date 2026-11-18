@@ -224,6 +224,9 @@ class CaseRun:
     # Tokens du cas (TokenUsage.model_dump() du rapport : calls, input_tokens, output_tokens,
     # reasoning_tokens, total_tokens) ; vide si le cas a échoué.
     usage: dict[str, int] = field(default_factory=dict)
+    # Rapport brut du pipeline (MatchReport en JSON : chunks envoyés, preuves, périodes,
+    # drapeaux, justifications) : permet de rejouer hors ligne une nouvelle règle du code.
+    report: dict[str, Any] = field(default_factory=dict, repr=False)
 
     @property
     def score_gap(self) -> int | None:
@@ -242,6 +245,7 @@ def case_run(case: Case, report: MatchReport, settings: Settings, run: int, seco
         expected_range=(low, high),
         seconds=seconds,
         usage=report.usage.model_dump(),
+        report=report.model_dump(mode="json"),
     )
 
 
@@ -561,12 +565,21 @@ def main() -> None:
     )
     parser.add_argument("--runs", type=int, default=1, help="exécutions de chaque cas (agrégées)")
     parser.add_argument("--json", action="store_true", help="détail et synthèse au format JSON")
+    parser.add_argument(
+        "--reports",
+        type=Path,
+        help="fichier JSON où garder les rapports bruts de chaque cas (vérifications hors ligne ultérieures)",
+    )
     args = parser.parse_args()
     if args.runs < 1:
         parser.error("--runs doit être au moins 1")
     settings = Settings()
     cases = find_cases(args.case, args.series)
     runs = asyncio.run(evaluate(cases, args.runs, settings))
+    if args.reports:
+        reports = {f"{run.case} (run {run.run})": run.report for run in runs if run.report}
+        args.reports.write_text(json.dumps(reports, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        print(f"Rapports bruts : {args.reports}", file=sys.stderr)
     if args.json:
         print(
             json.dumps(

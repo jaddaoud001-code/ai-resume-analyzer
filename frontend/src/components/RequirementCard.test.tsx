@@ -94,6 +94,23 @@ describe('RequirementCard', () => {
     expect(screen.getByText('Démontré')).toBeInTheDocument()
   })
 
+  it('explique le plafond de « solide » (une seule expérience)', () => {
+    const python = result('Python')
+    const single = {
+      ...python,
+      requirement: { ...python.requirement, min_years: null },
+      level: 'démontré' as const,
+      llm_level: 'solide' as const,
+      rejected_evidence: 0,
+      rejected_evidence_items: [],
+      capped_for_duration: false,
+      capped_single_item: true,
+    }
+    render(<RequirementCard entry={{ requirement: single.requirement, result: single }} />)
+
+    expect(screen.getByText(/« solide » demande des preuves dans au moins deux expériences ou projets distincts/)).toBeInTheDocument()
+  })
+
   it('affiche « Non évaluée » quand l’analyse s’est arrêtée avant', () => {
     const go = result('Go')
     render(<RequirementCard entry={{ requirement: go.requirement, result: null }} interrupted />)

@@ -436,14 +436,32 @@ def total_months(periods: list[Period], today: date) -> int:
 # --- Vérification d'une évaluation et score ----------------------------------------
 
 
+def experience_items(retrieved: list[SearchResult], keywords: Iterable[str]) -> dict[int, str | None]:
+    """Pour chaque chunk envoyé : l'item d'expérience ou de projet auquel il appartient
+    (section + intitulé, première ligne du chunk, répétée dans les morceaux d'un item découpé :
+    deux morceaux d'une même expérience donnent le même item), ou None hors de ces sections."""
+    titles = experience_sections((r.chunk for r in retrieved), keywords)
+    return {
+        r.chunk.index: (
+            f"{r.chunk.section}\n{normalize_for_match(r.chunk.text.splitlines()[0])}"
+            if r.chunk.section in titles and r.chunk.text.strip()
+            else None
+        )
+        for r in retrieved
+    }
+
+
 def verify_assessment(
     assessment: RequirementAssessment,
     requirement: Requirement,
     shown: dict[int, str],
     today: date,
+    items: dict[int, str | None] | None = None,
 ) -> RequirementMatch:
     """Applique les règles du code à la réponse du LLM : citations, rétrogradation, plancher des
-    certifications de langue, durées, plafond des savoir-être."""
+    certifications de langue, durées, plafond des savoir-être, plafond de « solide ».
+    `items` (voir `experience_items`) : sans lui, le plafond de « solide » n'est pas appliqué
+    (appelant qui ne connaît pas les sections)."""
     evidence: list[Evidence] = []
     rejected: list[Evidence] = []
     seen: set[tuple[int, str]] = set()
@@ -489,6 +507,14 @@ def verify_assessment(
     if requirement.category == "savoir-être" and level == "solide":
         level, capped_soft_skill = "démontré", True
 
+    # « solide » = usage répété : des preuves valides dans au moins deux expériences ou projets
+    # distincts (items, pas chunks). Le LLM notait « solide » une seule expérience détaillée.
+    capped_single_item = False
+    if items is not None and level == "solide":
+        distinct = {items.get(e.chunk_id) for e in evidence} - {None}
+        if len(distinct) < 2:
+            level, capped_single_item = "démontré", True
+
     return RequirementMatch(
         requirement=requirement,
         status="ok",
@@ -504,6 +530,7 @@ def verify_assessment(
         capped_for_duration=capped,
         capped_soft_skill=capped_soft_skill,
         certification_floor=certification_floor,
+        capped_single_item=capped_single_item,
         gaps=[g for g in assessment.gaps if g.strip()],
         justification=assessment.justification.strip(),
     )
@@ -544,8 +571,9 @@ def build_second_chance_messages(
         f"pour mot dans les extraits :\n{rejected}\n\nTexte exact des chunks cités :\n<cv>\n{cited}\n</cv>\n\n"
         "Recopie chaque preuve EXACTEMENT depuis ce texte, caractère par caractère (un retour à la "
         "ligne peut être remplacé par une espace ; « … » sert seulement à sauter un passage, avec au "
-        "moins 3 mots de chaque côté). S'il n'existe aucune preuve exacte, baisse le niveau "
-        "(« non démontré » si rien ne correspond)."
+        "moins 3 mots de chaque côté). Donne une réponse complète : garde aussi les preuves déjà "
+        "exactes et, si une durée est demandée, les périodes relevées dans les preuves. S'il "
+        "n'existe aucune preuve exacte, baisse le niveau (« non démontré » si rien ne correspond)."
     )
     return [system, HumanMessage(f"{user.content}{correction}")]
 
@@ -558,6 +586,19 @@ def _merge_rejected(*groups: list[Evidence]) -> list[Evidence]:
     return list(merged.values())
 
 
+def needs_second_chance(result: RequirementMatch, requirement: Requirement, items: dict[int, str | None]) -> bool:
+    """Seconde chance (un seul appel supplémentaire) quand des citations ont été rejetées et :
+    - le niveau a été rétrogradé faute de toute preuve valide (cas d'origine) ;
+    - ou l'exigence demande une durée et une citation rejetée vient d'un chunk d'expérience ou
+      de projet : sans preuve valide dans ce chunk, ses périodes seraient perdues, même s'il
+      reste une preuve valide ailleurs (par exemple dans une liste de compétences)."""
+    if not result.rejected_evidence_items:
+        return False
+    if result.downgraded:
+        return True
+    return requirement.min_years is not None and any(items.get(e.chunk_id) for e in result.rejected_evidence_items)
+
+
 async def _second_chance(
     first: RequirementMatch,
     messages: list[BaseMessage],
@@ -567,10 +608,12 @@ async def _second_chance(
     limiter: RateLimiter,
     settings: Settings,
     today: date,
+    items: dict[int, str | None] | None = None,
 ) -> RequirementMatch:
-    """Toutes les citations rejetées et le niveau rétrogradé : un seul appel supplémentaire
-    (par le limiteur), revérifié avec les mêmes règles. En cas d'échec de cet appel, le
-    premier résultat (rétrogradé) est conservé."""
+    """Un seul appel supplémentaire (par le limiteur), revérifié avec les mêmes règles (voir
+    `needs_second_chance` pour les cas). En cas d'échec de cet appel, ou si la seconde réponse
+    n'a plus aucune preuve valide alors que la première en avait, le premier résultat est
+    conservé (l'appel supplémentaire ne dégrade jamais un résultat)."""
     try:
         retry = await invoke_structured(
             llm, RequirementAssessment, build_second_chance_messages(messages, first, shown), limiter, settings
@@ -580,8 +623,13 @@ async def _second_chance(
     except Exception as error:
         logger.warning("Seconde chance pour %s : échec (%s)", requirement.id, describe_error(error))
         return first.model_copy(update={"second_chance": True})
-    second = verify_assessment(retry, requirement, shown, today)
+    second = verify_assessment(retry, requirement, shown, today, items)
     rejected = _merge_rejected(first.rejected_evidence_items, second.rejected_evidence_items)
+    if first.evidence and not second.evidence:
+        logger.info("Seconde chance pour %s : réponse sans preuve exacte, première réponse conservée", requirement.id)
+        return first.model_copy(
+            update={"second_chance": True, "rejected_evidence_items": rejected, "rejected_evidence": len(rejected)}
+        )
     logger.info(
         "Seconde chance pour %s : %s",
         requirement.id,
@@ -614,9 +662,10 @@ async def evaluate_requirement(
     try:
         messages = build_match_messages(requirement, retrieved)
         assessment = await invoke_structured(llm, RequirementAssessment, messages, limiter, settings)
-        result = verify_assessment(assessment, requirement, shown, today)
-        if result.downgraded and result.rejected_evidence_items:
-            result = await _second_chance(result, messages, requirement, shown, llm, limiter, settings, today)
+        items = experience_items(retrieved, settings.match_reserved_sections)
+        result = verify_assessment(assessment, requirement, shown, today, items)
+        if needs_second_chance(result, requirement, items):
+            result = await _second_chance(result, messages, requirement, shown, llm, limiter, settings, today, items)
     except ProviderBlockedError:
         raise
     except Exception as error:

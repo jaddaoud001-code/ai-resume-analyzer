@@ -64,6 +64,9 @@ export function flagExplanations(result: RequirementMatch): string[] {
   if (result.certification_floor) {
     flags.push('Niveau relevé à « démontré » : le CV cite une certification ou un score officiel dans cette langue.')
   }
+  if (result.capped_single_item) {
+    flags.push('Niveau limité à « démontré » : « solide » demande des preuves dans au moins deux expériences ou projets distincts.')
+  }
   if (result.capped_soft_skill) {
     flags.push('Savoir-être limité à « démontré » : un CV ne peut pas le prouver davantage.')
   }

@@ -722,7 +722,10 @@ class TestAnalyze:
             "React",
             "Rigueur",
         ]
-        assert (by_label["Python"].level, by_label["Python"].total_months) == ("solide", 42)
+        # « solide » proposé par le LLM, preuve dans une seule expérience : plafonné à « démontré ».
+        python = by_label["Python"]
+        assert (python.level, python.llm_level, python.total_months) == ("démontré", "solide", 42)
+        assert python.capped_single_item
         assert (by_label["Kubernetes"].level, by_label["Kubernetes"].downgraded) == ("non démontré", True)
         assert by_label["Kubernetes"].rejected_evidence == 1
         assert by_label["React"].level == "démontré"
@@ -731,8 +734,8 @@ class TestAnalyze:
         assert report.errors == [by_label["Rust"].requirement.id]
         assert [r.label for r in report.missing_mandatory] == ["Go"]
         assert report.rejected_evidence_count == 1
-        # (Python 100×2 + Go 0×2 + Kubernetes 0×1 + React 75×1 + Rigueur 0×0,5) / 6,5 = 42,3
-        assert report.score == 42
+        # (Python 75×2 + Go 0×2 + Kubernetes 0×1 + React 75×1 + Rigueur 0×0,5) / 6,5 = 34,6
+        assert report.score == 35
         assert report.match_model == "openai/gpt-oss-120b"  # défaut du fournisseur (groq)
 
     def test_failure_on_one_requirement_does_not_block_others(

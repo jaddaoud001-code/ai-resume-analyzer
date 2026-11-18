@@ -167,6 +167,8 @@ def test_tokens_are_reported_per_case_and_in_total() -> None:
     tokens = summarize(runs)["tokens"]
 
     assert runs[0].usage["total_tokens"] == 4800
+    # Rapport brut gardé pour les vérifications hors ligne (--reports).
+    assert runs[0].report["score"] == 75 and runs[0].report["usage"]["total_tokens"] == 4800
     assert (tokens["calls"], tokens["total_tokens"], tokens["reasoning_tokens"]) == (6, 9600, 400)
     assert (tokens["exigences"], tokens["moyenne par exigence"]) == (4, 2400)
 
@@ -265,7 +267,7 @@ def test_run_case_uses_the_frozen_requirements_through_the_real_pipeline(
     cv, offer = tmp_path / "cv.pdf", tmp_path / "offre.txt"
     cv.write_bytes(sectioned_cv_pdf)
     offer.write_text("Offre : Python 3 ans, Kubernetes, rigueur.", encoding="utf-8")
-    levels = {"Python": ["solide"], "Kubernetes": ["non démontré"], "Rigueur": ["non démontré", "mentionné"]}
+    levels = {"Python": ["démontré"], "Kubernetes": ["non démontré"], "Rigueur": ["non démontré", "mentionné"]}
     case = Case(
         "cv__offre",
         cv,

@@ -113,6 +113,7 @@
       "capped_for_duration": true,
       "capped_soft_skill": false,
       "certification_floor": false,
+      "capped_single_item": false,
       "second_chance": false,
       "gaps": [
         "Durée prouvée inférieure aux 3 ans demandés"
@@ -171,6 +172,7 @@
       "capped_for_duration": false,
       "capped_soft_skill": false,
       "certification_floor": false,
+      "capped_single_item": false,
       "second_chance": true,
       "gaps": [
         "Go n'apparaît dans aucun extrait"
@@ -224,6 +226,7 @@
       "capped_for_duration": false,
       "capped_soft_skill": false,
       "certification_floor": false,
+      "capped_single_item": false,
       "second_chance": false,
       "gaps": [],
       "justification": "",
@@ -280,6 +283,7 @@
       "capped_for_duration": false,
       "capped_soft_skill": true,
       "certification_floor": false,
+      "capped_single_item": false,
       "second_chance": false,
       "gaps": [],
       "justification": "Projet personnel conduit en autonomie.",
@@ -350,6 +354,7 @@
           "capped_for_duration": true,
           "capped_soft_skill": false,
           "certification_floor": false,
+          "capped_single_item": false,
           "second_chance": false,
           "gaps": [
             "Durée prouvée inférieure aux 3 ans demandés"
@@ -403,6 +408,7 @@
           "capped_for_duration": false,
           "capped_soft_skill": false,
           "certification_floor": false,
+          "capped_single_item": false,
           "second_chance": true,
           "gaps": [
             "Go n'apparaît dans aucun extrait"
@@ -451,6 +457,7 @@
           "capped_for_duration": false,
           "capped_soft_skill": false,
           "certification_floor": false,
+          "capped_single_item": false,
           "second_chance": false,
           "gaps": [],
           "justification": "",
@@ -502,6 +509,7 @@
           "capped_for_duration": false,
           "capped_soft_skill": true,
           "certification_floor": false,
+          "capped_single_item": false,
           "second_chance": false,
           "gaps": [],
           "justification": "Projet personnel conduit en autonomie.",

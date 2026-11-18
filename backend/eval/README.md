@@ -134,6 +134,7 @@ Toutes les mesures sont données **séparément pour deux groupes** : exigences 
 - **matrice de confusion** : niveau principal du corrigé × niveau obtenu (plus une colonne « erreur ») ;
 - **écart de score** : score obtenu moins score du corrigé (niveaux principaux, mêmes points et poids que l'application), avec la fourchette du corrigé (niveaux acceptés les plus bas et les plus hauts) ;
 - **citations rejetées**, **secondes chances** (et combien ont retrouvé une preuve exacte), **erreurs**, **durée** ;
+- **rapports bruts** (`--reports fichier.json`, depuis le 2026-11-19) : le rapport complet de chaque cas (chunks envoyés, preuves, périodes, drapeaux, justifications), pour rejouer hors ligne une nouvelle règle du code sans nouveau run ; les runs v1 à v3 de la série de référence ne l'ont pas gardé ;
 - **coût en tokens** (depuis le 2026-11-17) : usage renvoyé par le fournisseur à chaque réponse (entrée, sortie, dont raisonnement), par cas et au total, avec la **moyenne par exigence** ; les runs antérieurs (v1 à v3) ne l'ont pas mesuré. Mesure clé pour comparer une autre version du matching ou un agent, qui ferait plus d'appels ;
 - avec `--runs N` : agrégation, et les exigences dont le niveau varie d'une exécution à l'autre.
 

@@ -42,12 +42,14 @@ def test_returns_report_events_and_total_time(client: TestClient, sectioned_cv_p
     assert body["events"][0]["type"] == "started"
     assert body["total_seconds"] >= body["events"][-1]["t_s"] >= 0
     report = body["report"]
-    assert report["score"] == 42
+    assert report["score"] == 35
     assert [r["label"] for r in report["missing_mandatory"]] == ["Go"]
     assert report["rejected_evidence_count"] == 1
     assert set(report["timings"]) == {"extraction_s", "indexing_s", "retrieval_s", "evaluation_s"}
     python = next(r for r in report["requirements"] if r["requirement"]["label"] == "Python")
-    assert python["level"] == "solide" and python["evidence"][0]["quote"].startswith("Conception d'API")
+    # « solide » du LLM, une seule expérience citée : plafonné à « démontré » (capped_single_item).
+    assert python["level"] == "démontré" and python["capped_single_item"]
+    assert python["evidence"][0]["quote"].startswith("Conception d'API")
 
 
 def test_invalid_pdf_returns_400(client: TestClient, invalid_bytes: bytes) -> None:

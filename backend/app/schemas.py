@@ -92,6 +92,9 @@ class RequirementMatch(BaseModel):
     # Langue : niveau relevé à « démontré » car une preuve valide cite une certification ou un
     # score officiel dans la langue demandée (règle du code, voir app.certifications).
     certification_floor: bool = False
+    # « solide » ramené à « démontré » : preuves valides dans moins de deux expériences ou
+    # projets distincts (règle du code).
+    capped_single_item: bool = False
     # Toutes les citations rejetées : un second appel au LLM a demandé de les recopier mot
     # pour mot (ou de baisser le niveau) ; le résultat est celui de ce second appel.
     second_chance: bool = False
