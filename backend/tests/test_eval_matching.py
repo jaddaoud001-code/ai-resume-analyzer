@@ -303,9 +303,9 @@ class TestResultsFolder:
     portent que les CV d'évaluation, anonymisés. Le CV réel n'est jamais lu par les tests."""
 
     RESULTS = Path(__file__).resolve().parents[1] / "eval" / "results"
-    EVAL_CVS = {"demo_cv", "java_cv", "backend_cv"}
+    EVAL_CVS = {"demo_cv", "java_cv", "backend_cv", "gain_cv"}
     # Noms des personnes fictives des CV d'évaluation : remplacés par [NAME] avant l'analyse.
-    FICTIVE_NAMES = ("Camille Lefèvre", "Bastien Corlay", "Léna Morvan")
+    FICTIVE_NAMES = ("Camille Lefèvre", "Bastien Corlay", "Léna Morvan", "Inès Caradec")
 
     def test_default_path(self) -> None:
         from datetime import date

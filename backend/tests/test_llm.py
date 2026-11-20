@@ -114,3 +114,31 @@ def test_key_of_other_provider_is_not_required() -> None:
     llm = get_llm(make_settings(llm_provider="openai", openai_api_key="sk-test", groq_api_key=None))
 
     assert isinstance(llm, ChatOpenAI)
+
+
+def test_suggest_llm_defaults_to_the_extraction_llm() -> None:
+    from app.llm import suggest_settings
+
+    settings = make_settings(groq_api_key="sk-test", llm_model="extraction-model", llm_reasoning_effort="medium")
+
+    agent = get_llm(suggest_settings(settings))
+
+    assert (agent.model_name, agent.reasoning_effort) == ("extraction-model", "medium")  # type: ignore[attr-defined]
+
+
+def test_suggest_llm_is_configurable() -> None:
+    from app.llm import suggest_settings
+
+    settings = make_settings(
+        groq_api_key="sk-test",
+        llm_model="extraction-model",
+        suggest_llm_model="agent-model",
+        suggest_llm_reasoning_effort="high",
+        match_llm_reasoning_effort="low",
+    )
+
+    agent = get_llm(suggest_settings(settings))
+
+    assert (agent.model_name, agent.reasoning_effort) == ("agent-model", "high")  # type: ignore[attr-defined]
+    # La réévaluation garde le LLM du matching.
+    assert get_llm(match_settings(settings)).reasoning_effort == "low"  # type: ignore[attr-defined]

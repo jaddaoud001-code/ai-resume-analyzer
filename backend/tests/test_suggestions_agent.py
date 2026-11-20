@@ -341,3 +341,31 @@ def test_events_are_typed_and_serializable() -> None:
     for event in events:
         assert json.loads(event.model_dump_json())["type"] == event.type
     assert isinstance(events[-1].usage, TokenUsage)
+
+
+def test_reevaluation_failure_is_its_own_reason() -> None:
+    # Le LLM d'évaluation échoue (deux fois : nouvelle tentative comprise) : le matcher rend
+    # un résultat en erreur. Raison distincte, montrée, jamais « sans effet », pas de nouvelle
+    # proposition (la reformulation n'est pas en cause).
+    agent = FakeStructuredChatModel(responses=[CANDIDATE_CI_CD, HONEST, JudgeVerdict(faithful=True)])
+    matcher = FakeStructuredChatModel(responses=[ConnectionError("réseau"), ConnectionError("réseau")])
+
+    events = _run(_report({"R9": "mentionné"}), agent, matcher)
+
+    [refusal] = [e for e in events if isinstance(e, Refusal)]
+    assert (refusal.reason, refusal.shown) == ("reevaluation_impossible", True)
+    assert refusal.message.startswith("Réévaluation impossible")
+    done = events[-1]
+    assert isinstance(done, AgentDone)
+    assert (done.reevaluation_failed, done.hidden, done.refusals, done.suggestions) == (1, 0, 0, 0)
+    assert len(agent.calls) == 3
+
+
+def test_agent_prompt_change_requires_a_new_version() -> None:
+    import hashlib
+
+    from app.suggestions import JUDGE_PROMPT, PROPOSE_PROMPT, SEARCH_PROMPT, SUGGEST_PROMPT_VERSION
+
+    fingerprints = {1: "c4ee68813cf76cf255f45e675f586c75412e984c2f81a61dd35f1dd8793f23c5"}
+    digest = hashlib.sha256((SEARCH_PROMPT + PROPOSE_PROMPT + JUDGE_PROMPT).encode()).hexdigest()
+    assert digest == fingerprints.get(SUGGEST_PROMPT_VERSION), "prompts de l'agent modifiés : incrémenter la version"

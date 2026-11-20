@@ -167,3 +167,23 @@ Les 27 lacunes techniques des 6 cas (validées le 2026-11-21) sont toutes de vra
 Termes de pratique : « CI/CD », « intégration continue », « déploiement continu », « observabilité », « supervision », « monitoring » nomment une pratique ; absents de l'item, ils ne sont acceptés que si la puce d'origine décrit cette pratique (tests et déploiement déclenchés à chaque fusion ; alertes ou suivi de la latence, des erreurs…). Aucune exception pour « cloud », « REST », « DevOps » ou « file de messages ». Sans cette table, « CI/CD » était rejeté sur une puce qui le décrit exactement, et « observabilité », absent de la liste des termes contrôlés, passait partout (« guide d'exploitation » -> « supervision »).
 
 Le contrôle d'ancrage (`app/grounding.py`) est testé hors ligne sur les vrais chunks de ces CV, dont des tentatives de triche (`tests/test_grounding.py`) : bourrage de mots-clés, technologie tirée de la liste de compétences, durée allongée, fait déplacé d'une expérience à une autre, implication non autorisée ou inversée, « déploiement cloud » tiré de « Docker (notions) », nombre inventé, puce ajoutée, éléments anonymisés modifiés.
+
+### Lancer l'évaluation de l'agent (`eval_suggestions.py`)
+
+```bash
+cd backend
+.venv/bin/python eval/eval_suggestions.py                                    # cas qui ont un rapport de matching
+.venv/bin/python eval/eval_suggestions.py --case gain_cv__logistique --analyze-gain --save
+```
+
+- **Entrées** : le rapport de matching **le plus récent** de chaque cas dans `eval/results/` (aucune nouvelle analyse) et les annotations `eval/suggestions/`. Le cas de gain n'a pas de rapport : `--analyze-gain` lance d'abord son analyse (vrai LLM, exigences figées de l'offre logistique) et conserve le rapport dans `eval/results/<date>_gain_v<prompt du matching>.json`.
+- **Classement de chaque exigence ciblée** d'après son annotation :
+  - suggestion sur une lacune annotée impossible, ou au-delà du niveau maximal honnête : **affirmation inventée** (objectif 0) ;
+  - suggestion sur une lacune possible : **gain**, avec les niveaux avant et après, et si la source est celle annotée ;
+  - refus sur une lacune impossible : **refus juste** ; sur une lacune possible : **faux refus** ;
+  - exigence **déjà prouvée** (faux négatif du matching) : tout refus ou reformulation fidèle est acceptable ;
+  - « non traitée » ou erreur du LLM : non concluant ; **réévaluation impossible** compté à part ; exigence non annotée signalée.
+- **Mesures, par cas puis au total** : rejets par le contrôle d'ancrage et par le juge (avec leurs motifs), refus « sans effet » (non montrés à l'utilisateur), tokens (et par cible), durée. **Toutes les suggestions** sont listées pour un audit humain (avant / après, item, puce, faits et citations, implications, niveaux) : l'annotation ne voit pas tout, et une invention peut passer l'ancrage (une reformulation fidèle présentée pour une autre exigence, par exemple).
+- **Sorties** : `--save` écrit les événements bruts et les mesures dans `eval/results/<date>_suggestions_v<version des prompts de l'agent>.json` (même contrôle de publiabilité que les rapports du matching) ; `--json` pour la sortie complète.
+- **Budget** : jusqu'à `SUGGEST_MAX_TOKENS_PER_RUN` (45 000) par cas, plus l'analyse du cas de gain (~30 000) : un ou deux cas par jour avec l'offre gratuite de Groq.
+- Tests hors ligne : `tests/test_eval_suggestions.py` (faux LLM ; dont une invention ancrée attrapée par l'annotation).

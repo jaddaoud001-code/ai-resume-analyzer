@@ -36,6 +36,18 @@ def match_settings(settings: Settings) -> Settings:
     )
 
 
+def suggest_settings(settings: Settings) -> Settings:
+    """Settings dont LLM_MODEL et LLM_REASONING_EFFORT sont ceux de l'agent de suggestions :
+    SUGGEST_LLM_MODEL / SUGGEST_LLM_REASONING_EFFORT s'ils sont définis, sinon ceux de
+    l'extraction. À passer à get_llm."""
+    return settings.model_copy(
+        update={
+            "llm_model": settings.suggest_llm_model or llm_model(settings),
+            "llm_reasoning_effort": settings.suggest_llm_reasoning_effort or settings.llm_reasoning_effort,
+        }
+    )
+
+
 def get_llm(settings: Settings) -> BaseChatModel:
     """Température 0 et aucune nouvelle tentative interne : l'appelant décide seul des
     nouvelles tentatives (une au maximum, voir app.requirements)."""

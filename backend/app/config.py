@@ -83,6 +83,10 @@ class Settings(BaseSettings):
     # Agent de suggestions (v1) : exigences traitées au plus (les plus lourdes d'abord),
     # propositions par exigence, budgets de tokens par exigence et par run, longueur maximale
     # d'une puce reformulée (rapport à l'originale).
+    # LLM de l'agent (recherche, proposition, juge) : par défaut celui de l'extraction
+    # (LLM_MODEL, LLM_REASONING_EFFORT) ; la réévaluation garde le LLM du matching.
+    suggest_llm_model: str | None = None
+    suggest_llm_reasoning_effort: ReasoningEffort | None = None
     suggest_max_requirements: int = 3
     suggest_max_attempts: int = 2
     suggest_max_tokens_per_requirement: int = 15_000
