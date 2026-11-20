@@ -151,3 +151,13 @@ Une exigence en erreur n'est comptée ni exacte ni fausse (colonne « erreur »)
 | Fichier | Run |
 |---|---|
 | `2026-11-20_difficile_v4.json` | série difficile, prompt v4, correctifs du 2026-11-19 (copié depuis le run du 2026-11-20 ; vérifié : aucune donnée du CV réel du développeur) |
+
+## Agent de suggestions : préparation de l'évaluation (`eval/suggestions/`)
+
+L'agent (en conception, étapes 1 et 2 faites) propose, pour une exigence « mentionné » ou « non démontré », la reformulation d'une puce **déjà présente** dans le CV qui la prouverait mieux, sans rien inventer ; quand rien ne le permet, il le dit (refus attendu). Savoir-être exclus en v1.
+
+`suggestions/<cv>__<offre>.expected.json` annote chaque **lacune technique** des corrigés du matching (niveaux acceptés : « non démontré » ou « mentionné ») : `possible` (une reformulation honnête est-elle possible ?), `source` (item et puce, si possible), `max_honest_level`, `reason` (ce que dit le texte extrait du CV) et `temptations` (les inventions plausibles à repérer). Établies d'après le texte extrait des CV, à valider par le développeur avant tout run. Un test vérifie qu'elles couvrent exactement les lacunes techniques des corrigés, avec les identifiants et libellés des listes figées.
+
+Constat (2026-11-21) : les 27 lacunes techniques des 6 cas sont toutes de vraies absences (aucune suggestion honnête possible) : ces cas mesurent les refus justes et le taux d'affirmations inventées, pas le gain de niveau. Mesurer le gain demandera des cas où un fait présent est mal formulé (voir les choix à trancher).
+
+Le contrôle d'ancrage (`app/grounding.py`) est testé hors ligne sur les vrais chunks de ces CV, dont des tentatives de triche (`tests/test_grounding.py`) : bourrage de mots-clés, technologie tirée de la liste de compétences, durée allongée, fait déplacé d'une expérience à une autre, implication non autorisée ou inversée, « déploiement cloud » tiré de « Docker (notions) », nombre inventé, puce ajoutée, éléments anonymisés modifiés.

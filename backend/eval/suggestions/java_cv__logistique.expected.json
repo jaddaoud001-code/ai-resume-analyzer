@@ -1,0 +1,68 @@
+{
+  "cv": "java_cv.pdf",
+  "offer": "logistique",
+  "status": "proposé, à valider",
+  "note": "Lacunes techniques du corrigé du matching (niveaux acceptés : non démontré ou mentionné), lues contre le texte extrait du CV. possible = une reformulation honnête d'un élément déjà présent pourrait-elle mieux prouver l'exigence ?",
+  "gaps": [
+    {
+      "id": "R2",
+      "label": "Python",
+      "current_level": "mentionné",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "mentionné",
+      "reason": "Python n'apparaît que dans la liste de compétences (« notions de Python »).",
+      "temptations": [
+        "ajouter Python à une puce de l'alternance ou du projet"
+      ]
+    },
+    {
+      "id": "R4",
+      "label": "Déploiement cloud",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucun déploiement cloud : « Docker (notions) » n'apparaît que dans la liste d'outils.",
+      "temptations": [
+        "« Docker (notions) » réécrit en « déploiement cloud » ou « conteneurisation en production »"
+      ]
+    },
+    {
+      "id": "R6",
+      "label": "Message queue (RabbitMQ, Kafka)",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucune file de messages : les échanges XML avec les transporteurs (JAXB, XSD) ne sont pas une file de messages.",
+      "temptations": [
+        "« échanges avec les transporteurs au format XML » réécrit en « échanges asynchrones par file de messages »"
+      ]
+    },
+    {
+      "id": "R7",
+      "label": "Observabilité (métriques, tableaux de bord, alertes)",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucune supervision, métrique ni alerte : le « guide d'exploitation » est de la documentation.",
+      "temptations": [
+        "« guide d'exploitation » réécrit en « supervision » ou « alertes »"
+      ]
+    },
+    {
+      "id": "R9",
+      "label": "CI/CD",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "« revues de merge requests sur GitLab » : revue de code, aucun pipeline d'intégration ou de déploiement continu.",
+      "temptations": [
+        "« merge requests sur GitLab » réécrit en « intégration continue GitLab CI »"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "cv": "backend_cv.pdf",
+  "offer": "logistique",
+  "status": "proposé, à valider",
+  "note": "Lacunes techniques du corrigé du matching (niveaux acceptés : non démontré ou mentionné), lues contre le texte extrait du CV. possible = une reformulation honnête d'un élément déjà présent pourrait-elle mieux prouver l'exigence ?",
+  "gaps": [
+    {
+      "id": "R6",
+      "label": "Message queue (RabbitMQ, Kafka)",
+      "current_level": "mentionné",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "mentionné",
+      "reason": "Usage décrit (« RabbitMQ (mars – août 2025), puis migration vers Kafka (juin 2025 – janv. 2026) »), mais 11 mois une fois les chevauchements fusionnés, pour 1 an exigé : le niveau est plafonné par la durée, qu'aucune reformulation honnête ne peut allonger.",
+      "temptations": [
+        "allonger ou arrondir la durée (« pendant un an », « depuis 2025 ») ; reprendre la période du poste (février 2025 – en cours) comme durée d'usage des files de messages"
+      ]
+    }
+  ]
+}

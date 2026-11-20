@@ -1,0 +1,92 @@
+{
+  "cv": "demo_cv.pdf",
+  "offer": "hager",
+  "status": "proposé, à valider",
+  "note": "Lacunes techniques du corrigé du matching (niveaux acceptés : non démontré ou mentionné), lues contre le texte extrait du CV. possible = une reformulation honnête d'un élément déjà présent pourrait-elle mieux prouver l'exigence ?",
+  "gaps": [
+    {
+      "id": "R3",
+      "label": "Java",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucune trace de Java : les langages pratiqués sont Python, TypeScript et SQL.",
+      "temptations": [
+        "« développement » ou « API FastAPI » réécrits en Java ; TypeScript présenté comme Java"
+      ]
+    },
+    {
+      "id": "R4",
+      "label": "JSP",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucune trace de JSP ni de technologie web Java.",
+      "temptations": [
+        "« API FastAPI » présentée comme une application web JSP"
+      ]
+    },
+    {
+      "id": "R5",
+      "label": "XML",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucune trace de XML.",
+      "temptations": [
+        "« fiches internes » ou « rapports » présentés comme des documents XML"
+      ]
+    },
+    {
+      "id": "R7",
+      "label": "Git",
+      "current_level": "mentionné",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "mentionné",
+      "reason": "Git n'apparaît que dans la liste de compétences (« Docker, Git, GitLab CI, Linux ») ; aucune expérience ne décrit un usage de Git ou de GitLab CI.",
+      "temptations": [
+        "ajouter « code versionné sous Git » ou « pipelines GitLab CI » à une puce du stage ou de l'alternance (fait tiré de la liste de compétences)"
+      ]
+    },
+    {
+      "id": "R9",
+      "label": "PLM Windchill",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucune trace de PLM ni de Windchill.",
+      "temptations": [
+        "« recherche documentaire sur 12 000 fiches internes » présentée comme une base PLM"
+      ]
+    },
+    {
+      "id": "R10",
+      "label": "Rétro-ingénierie assistée par IA",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucune rétro-ingénierie décrite : l'assistant RAG interroge des fiches, il n'analyse pas de code existant.",
+      "temptations": [
+        "« assistant de recherche documentaire (RAG) » présenté comme de la rétro-ingénierie assistée par IA"
+      ]
+    },
+    {
+      "id": "R11",
+      "label": "Documentation technique",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucune rédaction de documentation : « recherche documentaire » porte sur des fiches à interroger.",
+      "temptations": [
+        "« recherche documentaire » réécrite en « rédaction de documentation technique »"
+      ]
+    }
+  ]
+}

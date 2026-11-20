@@ -1,0 +1,20 @@
+{
+  "cv": "demo_cv.pdf",
+  "offer": "sii",
+  "status": "proposé, à valider",
+  "note": "Lacunes techniques du corrigé du matching (niveaux acceptés : non démontré ou mentionné), lues contre le texte extrait du CV. possible = une reformulation honnête d'un élément déjà présent pourrait-elle mieux prouver l'exigence ?",
+  "gaps": [
+    {
+      "id": "R5",
+      "label": "Intégration d'un outil ITSM",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucun outil ITSM : « suivi des demandes de support » (tableaux de bord) et « classement de 5 000 tickets » (projet) ne décrivent pas une intégration à un outil ITSM.",
+      "temptations": [
+        "« tickets de support » réécrit en « intégration à l'outil ITSM » ou « ServiceNow »"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "cv": "java_cv.pdf",
+  "offer": "sii",
+  "status": "proposé, à valider",
+  "note": "Lacunes techniques du corrigé du matching (niveaux acceptés : non démontré ou mentionné), lues contre le texte extrait du CV. possible = une reformulation honnête d'un élément déjà présent pourrait-elle mieux prouver l'exigence ?",
+  "gaps": [
+    {
+      "id": "R1",
+      "label": "Diplôme d'ingénieur",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "« BUT Informatique » : pas un diplôme d'ingénieur.",
+      "temptations": [
+        "« BUT » présenté comme un diplôme d'ingénieur"
+      ]
+    },
+    {
+      "id": "R2",
+      "label": "Python",
+      "current_level": "mentionné",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "mentionné",
+      "reason": "Python n'apparaît que dans la liste de compétences (« notions de Python ») ; aucune expérience ne le décrit.",
+      "temptations": [
+        "ajouter Python à une puce de l'alternance ou du projet (fait tiré de la liste de compétences)"
+      ]
+    },
+    {
+      "id": "R3",
+      "label": "RAG",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucune trace de RAG.",
+      "temptations": [
+        "« recherches de colis » réécrit en recherche documentaire augmentée"
+      ]
+    },
+    {
+      "id": "R4",
+      "label": "Embeddings",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucune trace d'embeddings.",
+      "temptations": [
+        "« index sur PostgreSQL » présenté comme un index vectoriel"
+      ]
+    },
+    {
+      "id": "R5",
+      "label": "Intégration d'un outil ITSM",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucun outil ITSM : le suivi des expéditions n'en est pas un.",
+      "temptations": [
+        "« API REST de suivi des expéditions » présentée comme une intégration ITSM"
+      ]
+    },
+    {
+      "id": "R6",
+      "label": "Anonymisation des données",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucune anonymisation de données.",
+      "temptations": [
+        "« validation par schéma XSD » présentée comme de l'anonymisation"
+      ]
+    },
+    {
+      "id": "R7",
+      "label": "Évaluation de modèles IA",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucune évaluation de modèles d'IA : les tests JUnit portent sur du code.",
+      "temptations": [
+        "« tests JUnit » réécrits en « évaluation de modèles »"
+      ]
+    },
+    {
+      "id": "R8",
+      "label": "Analyse de données de tickets",
+      "current_level": "non démontré",
+      "possible": false,
+      "source": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucune analyse de tickets : « recherches de colis » n'en est pas une.",
+      "temptations": [
+        "« accélérer les recherches de colis » présenté comme une analyse de données de tickets"
+      ]
+    }
+  ]
+}
