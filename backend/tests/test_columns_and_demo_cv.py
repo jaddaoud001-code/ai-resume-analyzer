@@ -14,6 +14,7 @@ DEMO_DIR = Path(__file__).resolve().parents[1] / "eval" / "cvs"
 DEMO_PDF = DEMO_DIR / "demo_cv.pdf"
 JAVA_PDF = DEMO_DIR / "java_cv.pdf"
 BACKEND_PDF = DEMO_DIR / "backend_cv.pdf"
+GAIN_PDF = DEMO_DIR / "gain_cv.pdf"
 
 
 def _pdf(fill: object) -> bytes:
@@ -236,4 +237,35 @@ class TestBackendCV:
         for placeholder in ("[PHONE]", "[EMAIL]"):
             assert placeholder in chunks[0].text
         for personal in ("Léna Morvan", "39 98 51 08", "example.com"):
+            assert personal not in everything
+
+
+class TestGainCV:
+    """Quatrième CV fictif (évaluation de l'agent de suggestions, offre logistique)."""
+
+    def test_pdf_is_up_to_date_with_its_script(self) -> None:
+        sys.path.insert(0, str(DEMO_DIR))
+        try:
+            from make_gain_cv import build
+        finally:
+            sys.path.remove(str(DEMO_DIR))
+
+        assert build() == GAIN_PDF.read_bytes(), "régénérer : .venv/bin/python eval/cvs/make_gain_cv.py"
+
+    def test_sections_and_items(self) -> None:
+        chunks = chunk_cv(_text(GAIN_PDF.read_bytes()))
+
+        experiences = [c for c in chunks if c.section == "EXPÉRIENCE PROFESSIONNELLE"]
+        assert [c.text.splitlines()[0] for c in experiences] == [
+            "Développeuse backend · Transports Velmaris",
+            "Développeuse · Atelier Brumelle",
+        ]
+        assert experiences[0].text.endswith("Python · FastAPI · PostgreSQL · Docker")
+
+    def test_contact_details_are_masked(self) -> None:
+        chunks = chunk_cv(_text(GAIN_PDF.read_bytes()))
+        everything = "\n".join(c.text for c in chunks)
+
+        assert chunks[0].text.startswith(NAME_PLACEHOLDER)
+        for personal in ("Inès Caradec", "39 98 63 25", "example.com"):
             assert personal not in everything

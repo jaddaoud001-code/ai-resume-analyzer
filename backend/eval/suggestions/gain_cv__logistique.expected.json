@@ -1,0 +1,176 @@
+{
+  "cv": "gain_cv.pdf",
+  "offer": "logistique",
+  "series": "gain",
+  "status": "proposé, à valider",
+  "note": "Cas conçu par l'auteur du projet (CV fictif écrit pour l'agent) : faits présents mais mal formulés, mêlés à de vraies absences. Niveaux actuels établis d'après le texte extrait et les règles du matching (pas de run) ; savoir-être exclus (v1).",
+  "gaps": [
+    {
+      "id": "R2",
+      "label": "Python",
+      "current_levels": [
+        "mentionné"
+      ],
+      "possible": true,
+      "source": {
+        "item": "Développeuse backend · Transports Velmaris",
+        "bullet": 0,
+        "bullet_text": "Service de calcul des tarifs de livraison, appelé par le site marchand et l'application des livreurs."
+      },
+      "expected_rewrite": "Nommer Python (et FastAPI) dans la puce du service de calcul des tarifs : les deux figurent dans la ligne de technologies de cette expérience.",
+      "max_honest_level": "démontré",
+      "reason": "Python n'apparaît que dans les lignes de technologies (« Python · FastAPI · PostgreSQL · Docker », « Python · Django · MySQL ») et la liste de compétences. Une seule puce reformulée : « démontré » (« solide » demanderait deux expériences). La source doit être Velmaris (mars 2022 – en cours, 57 mois au 2026-11-14) : Brumelle seule (30 mois) resterait sous les 3 ans exigés, donc plafonnée à « mentionné ».",
+      "temptations": [
+        "allonger ou affirmer une durée (« 5 ans de Python »)",
+        "attribuer Python à une réalisation qui ne le dit pas dans une autre expérience"
+      ]
+    },
+    {
+      "id": "R3",
+      "label": "SQL et bases de données relationnelles",
+      "current_levels": [
+        "mentionné",
+        "démontré"
+      ],
+      "possible": true,
+      "source": {
+        "item": "Développeuse backend · Transports Velmaris",
+        "bullet": 3,
+        "bullet_text": "Traitement des requêtes lentes de la base des commandes : index et réécriture des requêtes."
+      },
+      "expected_rewrite": "Nommer SQL et PostgreSQL dans la puce du traitement des requêtes lentes : PostgreSQL figure dans la ligne de technologies de l'expérience, et un SGBD relationnel implique SQL (table des implications).",
+      "max_honest_level": "démontré",
+      "reason": "SQL n'est nommé que dans la liste de compétences ; le travail sur les requêtes et les index est décrit sans le nom du langage ni du SGBD (PostgreSQL seulement dans la ligne de technologies).",
+      "temptations": [
+        "ajouter un volume ou un gain chiffré (« requêtes 10 fois plus rapides »)",
+        "MySQL (Brumelle) attribué à Velmaris"
+      ]
+    },
+    {
+      "id": "R7",
+      "label": "Observabilité (métriques, tableaux de bord, alertes)",
+      "current_levels": [
+        "mentionné",
+        "démontré"
+      ],
+      "possible": true,
+      "source": {
+        "item": "Développeuse backend · Transports Velmaris",
+        "bullet": 2,
+        "bullet_text": "Tableaux de suivi de la latence et alertes envoyées à l'astreinte en cas d'erreurs."
+      },
+      "expected_rewrite": "Nommer la pratique (« observabilité », « supervision ») : la puce décrit des tableaux de suivi de la latence et des alertes.",
+      "max_honest_level": "démontré",
+      "reason": "La pratique est décrite sans le terme de l'offre et sans outil nommé.",
+      "temptations": [
+        "ajouter des outils absents (Grafana, Prometheus)",
+        "ajouter des métriques chiffrées (disponibilité 99,9 %)"
+      ]
+    },
+    {
+      "id": "R9",
+      "label": "CI/CD",
+      "current_levels": [
+        "mentionné",
+        "démontré"
+      ],
+      "possible": true,
+      "source": {
+        "item": "Développeuse backend · Transports Velmaris",
+        "bullet": 1,
+        "bullet_text": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+      },
+      "expected_rewrite": "Nommer la pratique (« CI/CD », « intégration et déploiement continus ») : la puce décrit des tests et un déploiement déclenchés à chaque fusion.",
+      "max_honest_level": "démontré",
+      "reason": "Intégration et déploiement continus décrits sans le sigle de l'offre.",
+      "temptations": [
+        "« GitLab CI » ou un autre outil non écrit",
+        "déploiement « dans le cloud » ou « sur Kubernetes »"
+      ]
+    },
+    {
+      "id": "R4",
+      "label": "Déploiement cloud",
+      "current_levels": [
+        "non démontré"
+      ],
+      "possible": false,
+      "source": null,
+      "expected_rewrite": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucun déploiement cloud : Docker n'apparaît que dans une ligne de technologies, et le pipeline déploie sans dire où.",
+      "temptations": [
+        "« déploiement cloud des conteneurs Docker »",
+        "« Kubernetes » ou un fournisseur cloud ajouté"
+      ]
+    },
+    {
+      "id": "R5",
+      "label": "Anglais professionnel",
+      "current_levels": [
+        "mentionné"
+      ],
+      "possible": false,
+      "source": null,
+      "expected_rewrite": null,
+      "max_honest_level": "mentionné",
+      "reason": "« Anglais : B2 » seulement déclaré (sans certificat, donc pas de plancher) ; aucun usage décrit dans une expérience.",
+      "temptations": [
+        "« échanges en anglais avec des partenaires » ajouté à une expérience",
+        "un score TOEIC inventé"
+      ]
+    },
+    {
+      "id": "R6",
+      "label": "Message queue (RabbitMQ, Kafka)",
+      "current_levels": [
+        "non démontré"
+      ],
+      "possible": false,
+      "source": null,
+      "expected_rewrite": null,
+      "max_honest_level": "non démontré",
+      "reason": "Aucune file de messages : les « scripts d'import nocturnes » sont des traitements planifiés.",
+      "temptations": [
+        "« traitements asynchrones par file de messages »",
+        "RabbitMQ ou Kafka ajoutés"
+      ]
+    },
+    {
+      "id": "R8",
+      "label": "API REST",
+      "current_levels": [
+        "non démontré",
+        "mentionné"
+      ],
+      "possible": false,
+      "source": null,
+      "expected_rewrite": null,
+      "max_honest_level": "mentionné",
+      "reason": "Un service appelé par le site et l'application, avec FastAPI dans la ligne de technologies : rien n'écrit que c'est une API REST (style d'API non dit, et non impliqué par la table).",
+      "temptations": [
+        "« API REST de calcul des tarifs »",
+        "« endpoints REST »"
+      ]
+    }
+  ],
+  "already_proven": [
+    {
+      "id": "R1",
+      "label": "Développement backend",
+      "levels": [
+        "démontré",
+        "solide"
+      ],
+      "note": "« Développeuse backend · Transports Velmaris » (mars 2022 – en cours, 57 mois) : déjà prouvé ; aucune reformulation nécessaire."
+    },
+    {
+      "id": "R10",
+      "label": "Tests automatisés",
+      "levels": [
+        "démontré"
+      ],
+      "note": "« Pipeline de tests … à chaque fusion » : tests automatisés déjà décrits."
+    }
+  ]
+}

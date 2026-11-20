@@ -30,7 +30,7 @@ backend/
     matcher.py         # matching exigence <-> passages du CV, vérifications, score ; analyze() = générateur d'événements
     schemas.py         # modèles Pydantic (Requirement, JobRequirements, MatchResult, Report)
     implications.py    # table des implications directes (framework -> langage, SGBD -> SQL, CI sur forge Git -> Git) : source unique dans le code ; le prompt du matching garde ses exemples (test : tous dans la table)
-    grounding.py       # agent de suggestions (étape 1) : contrôle d'ancrage d'une puce reformulée, application en mémoire (apply_rewrite)
+    grounding.py       # agent de suggestions (étape 1) : contrôle d'ancrage d'une puce reformulée (sources du même item, aucun élément nouveau hors implications et termes de pratique décrits par la puce), application en mémoire (apply_rewrite)
   tests/
   eval/                # évaluation avec le vrai LLM, hors pytest (voir eval/README.md)
     eval_requirements.py   # extraction vs attendu : trouvées, manquantes, inventées, interdites, importance
@@ -39,7 +39,7 @@ backend/
     results/           # rapports bruts des runs (<date>_<série>_v<prompt>.json), versionnés : CV fictifs anonymisés seulement (test)
     suggestions/       # annotations des lacunes techniques des 6 cas pour l'agent de suggestions (suggestion honnête possible ?)
     matching/          # corrigés des niveaux : série « référence » (2 CV × offres Hager, SII) et « difficile » (backend_cv, java_cv × offre fictive logistique)
-    cvs/              # CV fictifs générés : make_demo_cv.py (deux colonnes), make_java_cv.py, make_backend_cv.py (une colonne)
+    cvs/              # CV fictifs générés : make_demo_cv.py (deux colonnes), make_java_cv.py, make_backend_cv.py, make_gain_cv.py (une colonne)
     offers/            # cas de référence : <nom>.txt (offre publique) + <nom>.expected.json
 frontend/
   src/

@@ -302,3 +302,124 @@ def test_apply_rewrite_replaces_one_bullet_in_a_copy() -> None:
     assert new_bullets[0] == rewrite.new_text  # la puce repliée sur deux lignes est remplacée par une ligne
     assert new_bullets[1:] == [b.text for b in bullets(BACKEND[2].text)][1:]
     assert patched[2].text.splitlines()[:2] == BACKEND[2].text.splitlines()[:2]  # intitulé et dates intacts
+
+
+# --- Cas de gain (gain_cv.pdf) : reformulations honnêtes attendues -------------------------
+
+GAIN = _chunks("gain_cv.pdf")  # 2 : Velmaris, 3 : Brumelle, 5-6 : compétences
+
+
+class TestGainCaseRewrites:
+    """Esprit des reformulations attendues (eval/suggestions/gain_cv__logistique) : toutes
+    doivent passer le contrôle d'ancrage."""
+
+    def test_python_named_from_the_technology_line(self) -> None:
+        rewrite = _rewrite(
+            2,
+            0,
+            "Service de calcul des tarifs de livraison développé en Python (FastAPI), appelé par le site marchand et "
+            "l'application des livreurs.",
+            [
+                (
+                    2,
+                    "Service de calcul des tarifs de livraison, appelé par le site marchand et "
+                    "l'application des livreurs.",
+                )
+            ],
+        )
+
+        assert _check(GAIN, rewrite) == []
+
+    def test_sql_named_through_the_implication_table(self) -> None:
+        rewrite = _rewrite(
+            2,
+            3,
+            "Traitement des requêtes SQL lentes de la base PostgreSQL des commandes : "
+            "index et réécriture des requêtes.",
+            [(2, "Traitement des requêtes lentes de la base des commandes : index et réécriture des requêtes.")],
+            [("SQL", 2, "Python · FastAPI · PostgreSQL · Docker")],
+        )
+
+        assert _check(GAIN, rewrite) == []
+
+    def test_ci_cd_names_the_described_practice(self) -> None:
+        rewrite = _rewrite(
+            2,
+            1,
+            "Pipeline CI/CD sur GitLab : tests et déploiement lancés à chaque fusion sur la branche principale.",
+            [(2, "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.")],
+        )
+
+        assert _check(GAIN, rewrite) == []
+
+    def test_observability_names_the_described_practice(self) -> None:
+        rewrite = _rewrite(
+            2,
+            2,
+            "Observabilité des services : tableaux de suivi de la latence et alertes envoyées à l'astreinte en cas "
+            "d'erreurs.",
+            [(2, "Tableaux de suivi de la latence et alertes envoyées à l'astreinte en cas d'erreurs.")],
+        )
+
+        assert _check(GAIN, rewrite) == []
+
+    def test_brumelle_python_rewrite_is_grounded_too(self) -> None:
+        # Ancrée, mais insuffisante pour 3 ans (30 mois) : c'est la réévaluation qui le dira.
+        rewrite = _rewrite(
+            3,
+            0,
+            "Développement en Python (Django) des outils internes de gestion des stocks pour les entrepôts du groupe.",
+            [(3, "Outils internes de gestion des stocks pour les entrepôts du groupe.")],
+        )
+
+        assert _check(GAIN, rewrite) == []
+
+
+class TestPracticeTermsNeedTheDescribedPractice:
+    """Un terme de pratique (CI/CD, observabilité…) n'est accepté que si la puce d'origine
+    décrit cette pratique ; « cloud », « REST » ou « file de messages » jamais."""
+
+    def test_merge_request_reviews_are_not_ci_cd(self) -> None:
+        # Tentation annotée (CV Java × logistique, R9).
+        rewrite = _rewrite(
+            3,
+            1,
+            "Travail en équipe de quatre avec Git et CI/CD : branches, revues de merge requests sur GitLab.",
+            [(3, "Travail en équipe de quatre avec Git : branches, revues de merge requests sur GitLab.")],
+        )
+
+        assert _check(JAVA, rewrite) == ["element_nouveau"]
+
+    def test_an_operations_guide_is_not_monitoring(self) -> None:
+        # Tentation annotée (CV Java × logistique, R7).
+        rewrite = _rewrite(
+            2,
+            3,
+            "Rédaction de la documentation technique de l'API (OpenAPI) et supervision de l'exploitation.",
+            [(2, "Rédaction de la documentation technique de l'API (OpenAPI) et d'un guide d'exploitation.")],
+        )
+
+        assert _check(JAVA, rewrite) == ["element_nouveau"]
+
+    def test_tests_without_trigger_are_not_ci_cd(self) -> None:
+        rewrite = _rewrite(
+            3,
+            0,
+            "Maintenance d'une application Java EE en CI/CD : correction d'anomalies et tests JUnit.",
+            [(3, "Maintenance d'une application Java EE : correction d'anomalies et tests JUnit.")],
+        )
+
+        assert _check(JAVA, rewrite) == ["element_nouveau"]
+
+    @pytest.mark.parametrize("term", ["déployé dans le cloud", "API REST", "via une file de messages"])
+    def test_no_exception_for_cloud_rest_or_message_queue(self, term: str) -> None:
+        # Le pipeline décrit un déploiement à chaque fusion : ni hébergement cloud, ni style
+        # d'API, ni file de messages pour autant.
+        rewrite = _rewrite(
+            2,
+            1,
+            f"Pipeline de tests et de déploiement lancé à chaque fusion sur GitLab, {term}.",
+            [(2, "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.")],
+        )
+
+        assert "element_nouveau" in _check(GAIN, rewrite)

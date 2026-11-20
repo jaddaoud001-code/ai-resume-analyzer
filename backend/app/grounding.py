@@ -13,7 +13,7 @@ le CV n'est jamais conservé), pour la réévaluation par le vrai matcher."""
 
 import re
 from collections import Counter
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 
 from pydantic import BaseModel, Field
@@ -42,8 +42,32 @@ TECH_TERMS: frozenset[str] = frozenset(
         "jsp", "xml", "json", "rest", "graphql", "soap", "ci/cd", "devops", "mlops", "llm", "rag",
         "embeddings", "faiss", "pytorch", "tensorflow", "scikit-learn", "pandas", "itsm", "servicenow", "jira",
         "windchill", "plm", "sap", "openapi", "junit", "pytest", "maven", "jpa", "hibernate", "thymeleaf",
+        "file de messages", "message queue", "observabilite", "supervision", "monitoring",
+        "integration continue", "deploiement continu",
     )
 )  # fmt: skip
+
+# Termes génériques qui NOMMENT une pratique : acceptés, même absents de l'item, seulement si la
+# puce d'origine décrit déjà cette pratique (« Pipeline de tests et de déploiement lancé à
+# chaque fusion » -> « CI/CD »). Aucune exception pour « cloud », « REST », « DevOps » ou
+# « file de messages » : décrire une pratique ne prouve ni un hébergement, ni un style d'API,
+# ni une technologie.
+_TRIGGER = r"(?:a chaque (?:fusion|commit|push|merge)|automatique)"
+_CI = re.compile(rf"\b(?:tests?|build|verifications?)\b.*{_TRIGGER}|{_TRIGGER}.*\b(?:tests?|build|verifications?)\b")
+_DEPLOY = r"\b(?:deploiements?|mise en production|livraison)\b"
+_CD = re.compile(rf"{_DEPLOY}.*{_TRIGGER}|{_TRIGGER}.*{_DEPLOY}")
+_OBSERVABILITY = re.compile(
+    r"\balertes?\b|\b(?:tableaux? de (?:bord|suivi)|metriques)\b.*\b(?:latence|erreurs?|disponibilite|performances?)\b"
+)
+PRACTICE_TERMS: dict[str, tuple[str, Callable[[str], bool]]] = {
+    "ci/cd": ("tests et déploiement déclenchés à chaque fusion", lambda b: bool(_CI.search(b) and _CD.search(b))),
+    "integration continue": ("tests déclenchés à chaque fusion", lambda b: bool(_CI.search(b))),
+    "deploiement continu": ("déploiement déclenché à chaque fusion", lambda b: bool(_CD.search(b))),
+    **{
+        term: ("alertes ou tableaux de suivi de la latence, des erreurs…", lambda b: bool(_OBSERVABILITY.search(b)))
+        for term in ("observabilite", "supervision", "monitoring")
+    },
+}
 _WORD = re.compile(r"[\wÀ-ÿ][\wÀ-ÿ+#./-]*")
 _NUMBER = re.compile(r"\d+(?:[.,]\d+)?")
 
@@ -202,10 +226,14 @@ def check_grounding(
         else:
             allowed_skills.add(normalize(implied.skill))
 
-    for entity in dict.fromkeys(_entities(new_text)):
-        key = normalize(entity)
+    described = normalize(original)
+    entities = {normalize(e): e for e in reversed(_entities(new_text))}  # un seul signalement par terme
+    for key, entity in entities.items():
         if key in allowed_skills or contains_term(item_text, entity):
             continue
+        practice = PRACTICE_TERMS.get(key)
+        if practice is not None and practice[1](described):
+            continue  # la puce d'origine décrit exactement la pratique que le terme nomme
         issue("element_nouveau", f"« {entity} » n'apparaît pas dans cette expérience.")
 
     if set(_PLACEHOLDER.findall(original)) != set(_PLACEHOLDER.findall(new_text)):

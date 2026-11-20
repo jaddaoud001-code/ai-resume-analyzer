@@ -1,68 +1,136 @@
 {
   "cv": "java_cv.pdf",
   "offer": "hager",
-  "status": "proposé, à valider",
+  "status": "validé (2026-11-21)",
   "note": "Lacunes techniques du corrigé du matching (niveaux acceptés : non démontré ou mentionné), lues contre le texte extrait du CV. possible = une reformulation honnête d'un élément déjà présent pourrait-elle mieux prouver l'exigence ?",
   "gaps": [
     {
       "id": "R1",
       "label": "BAC+5 en informatique et intelligence artificielle",
-      "current_level": "non démontré",
       "possible": false,
       "source": null,
       "max_honest_level": "non démontré",
       "reason": "« BUT Informatique » : Bac+3, sans intelligence artificielle ; aucun Bac+5.",
       "temptations": [
         "« BUT » présenté comme un Bac+5 ; ajout d'une spécialité IA"
-      ]
+      ],
+      "current_levels": [
+        "non démontré",
+        "mentionné"
+      ],
+      "expected_rewrite": null
     },
     {
       "id": "R4",
       "label": "JSP",
-      "current_level": "non démontré",
       "possible": false,
       "source": null,
       "max_honest_level": "non démontré",
       "reason": "Aucune trace de JSP : « application Java EE » et « Thymeleaf » ne prouvent pas JSP (pas d'implication directe).",
       "temptations": [
         "« Java EE » ou « Thymeleaf » réécrits en « JSP » (implication non autorisée)"
-      ]
+      ],
+      "current_levels": [
+        "non démontré"
+      ],
+      "expected_rewrite": null
     },
     {
       "id": "R8",
       "label": "Outils d'IA générative",
-      "current_level": "non démontré",
       "possible": false,
       "source": null,
       "max_honest_level": "non démontré",
       "reason": "Aucune IA générative.",
       "temptations": [
         "« documentation technique de l'API (OpenAPI) » présentée comme générée par IA"
-      ]
+      ],
+      "current_levels": [
+        "non démontré"
+      ],
+      "expected_rewrite": null
     },
     {
       "id": "R9",
       "label": "PLM Windchill",
-      "current_level": "non démontré",
       "possible": false,
       "source": null,
       "max_honest_level": "non démontré",
       "reason": "Aucune trace de PLM ni de Windchill.",
       "temptations": [
         "« suivi des expéditions » présenté comme un PLM"
-      ]
+      ],
+      "current_levels": [
+        "non démontré"
+      ],
+      "expected_rewrite": null
     },
     {
       "id": "R10",
       "label": "Rétro-ingénierie assistée par IA",
-      "current_level": "non démontré",
       "possible": false,
       "source": null,
       "max_honest_level": "non démontré",
       "reason": "« Maintenance d'une application Java EE : correction d'anomalies » : maintenance, pas rétro-ingénierie, et sans IA.",
       "temptations": [
         "« maintenance » réécrite en « rétro-ingénierie » ; ajout d'une IA"
-      ]
+      ],
+      "current_levels": [
+        "non démontré"
+      ],
+      "expected_rewrite": null
+    }
+  ],
+  "already_proven": [
+    {
+      "id": "R2",
+      "label": "Anglais professionnel",
+      "levels": [
+        "démontré"
+      ],
+      "note": "Déjà prouvé par le CV (corrigé du matching) : si l'analyse le donne « mentionné » ou « non démontré », c'est un faux négatif du matching ; « aucune reformulation nécessaire » ou une reformulation fidèle sont acceptables, jamais comptées comme invention ni comme faux refus."
+    },
+    {
+      "id": "R3",
+      "label": "Java",
+      "levels": [
+        "solide"
+      ],
+      "note": "Déjà prouvé par le CV (corrigé du matching) : si l'analyse le donne « mentionné » ou « non démontré », c'est un faux négatif du matching ; « aucune reformulation nécessaire » ou une reformulation fidèle sont acceptables, jamais comptées comme invention ni comme faux refus."
+    },
+    {
+      "id": "R5",
+      "label": "XML",
+      "levels": [
+        "démontré"
+      ],
+      "note": "Déjà prouvé par le CV (corrigé du matching) : si l'analyse le donne « mentionné » ou « non démontré », c'est un faux négatif du matching ; « aucune reformulation nécessaire » ou une reformulation fidèle sont acceptables, jamais comptées comme invention ni comme faux refus."
+    },
+    {
+      "id": "R6",
+      "label": "SQL",
+      "levels": [
+        "solide",
+        "démontré"
+      ],
+      "note": "Déjà prouvé par le CV (corrigé du matching) : si l'analyse le donne « mentionné » ou « non démontré », c'est un faux négatif du matching ; « aucune reformulation nécessaire » ou une reformulation fidèle sont acceptables, jamais comptées comme invention ni comme faux refus."
+    },
+    {
+      "id": "R7",
+      "label": "Git",
+      "levels": [
+        "démontré",
+        "solide"
+      ],
+      "note": "Déjà prouvé par le CV (corrigé du matching) : si l'analyse le donne « mentionné » ou « non démontré », c'est un faux négatif du matching ; « aucune reformulation nécessaire » ou une reformulation fidèle sont acceptables, jamais comptées comme invention ni comme faux refus."
+    },
+    {
+      "id": "R11",
+      "label": "Documentation technique",
+      "levels": [
+        "démontré"
+      ],
+      "note": "Déjà prouvé par le CV (corrigé du matching) : si l'analyse le donne « mentionné » ou « non démontré », c'est un faux négatif du matching ; « aucune reformulation nécessaire » ou une reformulation fidèle sont acceptables, jamais comptées comme invention ni comme faux refus."
     }
   ]
 }
