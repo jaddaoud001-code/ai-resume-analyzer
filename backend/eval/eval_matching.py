@@ -160,6 +160,7 @@ class Outcome:
     evidence: list[str] = field(default_factory=list)
     rejected: int = 0
     second_chance: bool = False
+    second_chance_reason: str | None = None  # sans_preuve | durée | solide
     recovered: bool = False  # seconde chance qui a retrouvé une preuve exacte
     certification_floor: bool = False  # niveau relevé par le plancher des certifications (code)
     llm_level: str | None = None  # niveau proposé par le LLM, avant les règles du code
@@ -183,6 +184,7 @@ def assess(expected: ExpectedLevel, result: RequirementMatch) -> Outcome:
         evidence=[e.quote for e in result.evidence],
         rejected=result.rejected_evidence,
         second_chance=result.second_chance,
+        second_chance_reason=result.second_chance_reason,
         recovered=result.second_chance and bool(result.evidence) and not result.downgraded,
         certification_floor=result.certification_floor,
         llm_level=result.llm_level,
@@ -361,6 +363,9 @@ def summarize(runs: list[CaseRun]) -> dict[str, Any]:
         "citations rejetées": sum(o.rejected for o in outcomes),
         "secondes chances": sum(o.second_chance for o in outcomes),
         "secondes chances avec preuve retrouvée": sum(o.recovered for o in outcomes),
+        "secondes chances par déclencheur": dict(
+            Counter(o.second_chance_reason or "inconnu" for o in outcomes if o.second_chance)
+        ),
         "planchers de certification": [
             f"{run.case} {o.id} {o.label} (LLM : {o.llm_level})"
             for run in runs
@@ -490,7 +495,9 @@ def print_report(runs: list[CaseRun], settings: Settings) -> None:
         )
         for o in run.outcomes:
             extra = f" ; {o.rejected} citation(s) rejetée(s)" if o.rejected else ""
-            extra += " ; seconde chance" + (" (preuve retrouvée)" if o.recovered else "") if o.second_chance else ""
+            if o.second_chance:
+                extra += f" ; seconde chance ({o.second_chance_reason or 'déclencheur inconnu'}"
+                extra += ", preuve retrouvée)" if o.recovered else ")"
             extra += f" ; plancher de certification (LLM : {o.llm_level})" if o.certification_floor else ""
             print(
                 f"  {o.id:>3} [{o.group[:4]}] {o.label[:44]:<44} attendu {' / '.join(o.expected):<28} "
@@ -535,7 +542,8 @@ def print_report(runs: list[CaseRun], settings: Settings) -> None:
     )
     print(
         f"  Citations rejetées : {summary['citations rejetées']} ; secondes chances : {summary['secondes chances']} "
-        f"(preuve retrouvée : {summary['secondes chances avec preuve retrouvée']})"
+        f"(preuve retrouvée : {summary['secondes chances avec preuve retrouvée']} ; "
+        f"par déclencheur : {summary['secondes chances par déclencheur'] or 'aucune'})"
     )
     floors = summary["planchers de certification"]
     print(f"  Planchers de certification appliqués : {', '.join(floors) if floors else 'aucun'}")

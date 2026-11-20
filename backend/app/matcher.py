@@ -59,6 +59,7 @@ from app.schemas import (
     RequirementsExtracted,
     RequirementsSource,
     SearchResult,
+    SecondChanceReason,
     TokenUsage,
 )
 from app.vectorstore import CVIndex
@@ -591,29 +592,33 @@ def _merge_rejected(*groups: list[Evidence]) -> list[Evidence]:
     return list(merged.values())
 
 
-def needs_second_chance(result: RequirementMatch, requirement: Requirement, items: dict[int, str | None]) -> bool:
+def needs_second_chance(
+    result: RequirementMatch, requirement: Requirement, items: dict[int, str | None]
+) -> SecondChanceReason | None:
     """Seconde chance (un seul appel supplémentaire) quand des citations ont été rejetées et :
     - le niveau a été rétrogradé faute de toute preuve valide (cas d'origine) ;
     - ou l'exigence demande une durée et une citation rejetée vient d'un chunk d'expérience ou
       de projet : sans preuve valide dans ce chunk, ses périodes seraient perdues, même s'il
       reste une preuve valide ailleurs (par exemple dans une liste de compétences) ;
     - ou « solide » a été plafonné faute de deux items distincts, alors qu'une citation rejetée
-      venait d'un autre item d'expérience ou de projet."""
+      venait d'un autre item d'expérience ou de projet.
+    Renvoie le déclencheur (« sans_preuve », « durée », « solide »), ou None."""
     if not result.rejected_evidence_items:
-        return False
+        return None
     if result.downgraded:
-        return True
+        return "sans_preuve"
     if requirement.min_years is not None and any(items.get(e.chunk_id) for e in result.rejected_evidence_items):
-        return True
+        return "durée"
     # « solide » plafonné faute de deux items, alors qu'une citation rejetée venait d'un autre
     # item d'expérience ou de projet : recopiée, elle pourrait atteindre les deux items.
     if result.capped_single_item:
         valid_items = {items.get(e.chunk_id) for e in result.evidence} - {None}
-        return any(
+        if any(
             item is not None and item not in valid_items
             for item in (items.get(e.chunk_id) for e in result.rejected_evidence_items)
-        )
-    return False
+        ):
+            return "solide"
+    return None
 
 
 async def _second_chance(
@@ -626,6 +631,7 @@ async def _second_chance(
     settings: Settings,
     today: date,
     items: dict[int, str | None] | None = None,
+    reason: SecondChanceReason | None = None,
 ) -> RequirementMatch:
     """Un seul appel supplémentaire (par le limiteur), revérifié avec les mêmes règles (voir
     `needs_second_chance` pour les cas). En cas d'échec de cet appel, ou si la seconde réponse
@@ -639,13 +645,18 @@ async def _second_chance(
         raise
     except Exception as error:
         logger.warning("Seconde chance pour %s : échec (%s)", requirement.id, describe_error(error))
-        return first.model_copy(update={"second_chance": True})
+        return first.model_copy(update={"second_chance": True, "second_chance_reason": reason})
     second = verify_assessment(retry, requirement, shown, today, items)
     rejected = _merge_rejected(first.rejected_evidence_items, second.rejected_evidence_items)
     if first.evidence and not second.evidence:
         logger.info("Seconde chance pour %s : réponse sans preuve exacte, première réponse conservée", requirement.id)
         return first.model_copy(
-            update={"second_chance": True, "rejected_evidence_items": rejected, "rejected_evidence": len(rejected)}
+            update={
+                "second_chance": True,
+                "second_chance_reason": reason,
+                "rejected_evidence_items": rejected,
+                "rejected_evidence": len(rejected),
+            }
         )
     logger.info(
         "Seconde chance pour %s : %s",
@@ -653,7 +664,12 @@ async def _second_chance(
         "preuve exacte retrouvée" if not second.downgraded and second.evidence else "toujours sans preuve exacte",
     )
     return second.model_copy(
-        update={"second_chance": True, "rejected_evidence_items": rejected, "rejected_evidence": len(rejected)}
+        update={
+            "second_chance": True,
+            "second_chance_reason": reason,
+            "rejected_evidence_items": rejected,
+            "rejected_evidence": len(rejected),
+        }
     )
 
 
@@ -681,8 +697,10 @@ async def evaluate_requirement(
         assessment = await invoke_structured(llm, RequirementAssessment, messages, limiter, settings)
         items = experience_items(retrieved, settings.match_reserved_sections)
         result = verify_assessment(assessment, requirement, shown, today, items)
-        if needs_second_chance(result, requirement, items):
-            result = await _second_chance(result, messages, requirement, shown, llm, limiter, settings, today, items)
+        if reason := needs_second_chance(result, requirement, items):
+            result = await _second_chance(
+                result, messages, requirement, shown, llm, limiter, settings, today, items, reason
+            )
     except ProviderBlockedError:
         raise
     except Exception as error:

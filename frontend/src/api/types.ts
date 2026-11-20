@@ -62,6 +62,8 @@ export interface RequirementMatch {
   capped_single_item: boolean
   /** Toutes les citations rejetées : le LLM a été invité une fois à les recopier mot pour mot. */
   second_chance: boolean
+  /** Déclencheur de la seconde chance ; null sans seconde chance. */
+  second_chance_reason: 'sans_preuve' | 'durée' | 'solide' | null
   gaps: string[]
   justification: string
   retrieved_chunk_ids: number[]

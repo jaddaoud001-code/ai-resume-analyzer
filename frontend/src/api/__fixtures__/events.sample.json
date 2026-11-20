@@ -115,6 +115,7 @@
       "certification_floor": false,
       "capped_single_item": false,
       "second_chance": false,
+      "second_chance_reason": null,
       "gaps": [
         "Durée prouvée inférieure aux 3 ans demandés"
       ],
@@ -174,6 +175,7 @@
       "certification_floor": false,
       "capped_single_item": false,
       "second_chance": true,
+      "second_chance_reason": null,
       "gaps": [
         "Go n'apparaît dans aucun extrait"
       ],
@@ -228,6 +230,7 @@
       "certification_floor": false,
       "capped_single_item": false,
       "second_chance": false,
+      "second_chance_reason": null,
       "gaps": [],
       "justification": "",
       "retrieved_chunk_ids": [
@@ -285,6 +288,7 @@
       "certification_floor": false,
       "capped_single_item": false,
       "second_chance": false,
+      "second_chance_reason": null,
       "gaps": [],
       "justification": "Projet personnel conduit en autonomie.",
       "retrieved_chunk_ids": [
@@ -356,6 +360,7 @@
           "certification_floor": false,
           "capped_single_item": false,
           "second_chance": false,
+          "second_chance_reason": null,
           "gaps": [
             "Durée prouvée inférieure aux 3 ans demandés"
           ],
@@ -410,6 +415,7 @@
           "certification_floor": false,
           "capped_single_item": false,
           "second_chance": true,
+          "second_chance_reason": null,
           "gaps": [
             "Go n'apparaît dans aucun extrait"
           ],
@@ -459,6 +465,7 @@
           "certification_floor": false,
           "capped_single_item": false,
           "second_chance": false,
+          "second_chance_reason": null,
           "gaps": [],
           "justification": "",
           "retrieved_chunk_ids": [
@@ -511,6 +518,7 @@
           "certification_floor": false,
           "capped_single_item": false,
           "second_chance": false,
+          "second_chance_reason": null,
           "gaps": [],
           "justification": "Projet personnel conduit en autonomie.",
           "retrieved_chunk_ids": [

@@ -43,6 +43,9 @@ class Period(BaseModel):
     end: str = Field(description="Fin, au format AAAA-MM, ou « en cours ».")
 
 
+SecondChanceReason = Literal["sans_preuve", "durée", "solide"]
+
+
 class TokenUsage(BaseModel):
     """Tokens consommés par des appels au LLM, d'après l'usage renvoyé par le fournisseur à
     chaque réponse (sortie structurée valide ou non ; un appel refusé, par exemple sur 429,
@@ -98,6 +101,10 @@ class RequirementMatch(BaseModel):
     # Toutes les citations rejetées : un second appel au LLM a demandé de les recopier mot
     # pour mot (ou de baisser le niveau) ; le résultat est celui de ce second appel.
     second_chance: bool = False
+    # Déclencheur de la seconde chance : « sans_preuve » (toutes les citations rejetées),
+    # « durée » (citation d'expérience rejetée pour une exigence avec durée), « solide »
+    # (« solide » plafonné, citation rejetée dans un autre item) ; None sans seconde chance.
+    second_chance_reason: SecondChanceReason | None = None
     gaps: list[str] = []
     justification: str = ""
     retrieved_chunk_ids: list[int] = []

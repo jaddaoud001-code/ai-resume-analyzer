@@ -241,3 +241,18 @@ class TestSolidSecondChance:
         result, calls = _java_sql([first])
 
         assert calls == 1 and not result.second_chance
+
+
+def test_second_chance_reason_is_recorded() -> None:
+    """Le déclencheur est gardé dans le résultat (rapports bruts de l'évaluation)."""
+    python, _ = _evaluate(_python(), [5, 0, 4, 7, 2], [FIRST_PYTHON, CORRECTED_PYTHON])
+    sql, _ = _java_sql([FIRST_JAVA_SQL, FIRST_JAVA_SQL])
+    invented = _assess("démontré", (2, "Expert Python depuis dix ans"))
+    downgraded, _ = _evaluate(_python(min_years=None), [2], [invented, invented])
+    untouched, _ = _evaluate(
+        _python(min_years=None), [2], [_assess("démontré", (2, "Tests pytest sur les endpoints critiques"))]
+    )
+
+    assert (python.second_chance_reason, sql.second_chance_reason) == ("durée", "solide")
+    assert downgraded.second_chance_reason == "sans_preuve"
+    assert untouched.second_chance_reason is None
