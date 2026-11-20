@@ -48,12 +48,22 @@ def _evaluate(requirement: Requirement, chunk_ids: list[int], responses: list[ob
 # Première réponse du run du 2026-11-18 (CV backend × logistique, R2 Python) : les trois
 # citations d'expérience commencent par un intitulé abrégé à 2 mots, donc rejetées ; seule la
 # liste de compétences reste valide, et les trois périodes sont perdues.
-FIRST_PYTHON = _assess(
+PYTHON_RUN_18 = _assess(
     "démontré",
     (7, "Langages : Python, SQL, Go"),
     (5, "Développeuse Python … Sept. 2021 – Déc. 2022 … Scripts Python d'import et de nettoyage"),
     (4, "Développeuse freelance … Janv. 2023 – Déc. 2023 … Applications web Django"),
     (2, "Ingénieure logicielle … Févr. 2025 – en cours … Développement des endpoints FastAPI"),
+    periods=[("2021-09", "2022-12"), ("2023-01", "2023-12"), ("2025-02", "en cours")],
+)
+# Pour exercer le déclencheur « durée » : citations d'expérience vraiment fausses (rejetées
+# même avec les morceaux courts ancrés, depuis le 2026-11-21), liste de compétences valide.
+FIRST_PYTHON = _assess(
+    "démontré",
+    (7, "Langages : Python, SQL, Go"),
+    (5, "Développeuse Python … Sept. 2021 – Déc. 2022 … Scripts Python de calcul météo"),
+    (4, "Développeuse freelance … Janv. 2023 – Déc. 2023 … Applications mobiles en Flutter"),
+    (2, "Ingénieure logicielle … Févr. 2025 – en cours … Développement des pilotes embarqués"),
     periods=[("2021-09", "2022-12"), ("2023-01", "2023-12"), ("2025-02", "en cours")],
 )
 CORRECTED_PYTHON = _assess(
@@ -75,13 +85,20 @@ class TestExtendedSecondChance:
         assert result.rejected_evidence == 3  # citations de la première réponse, conservées
 
     def test_without_the_second_chance_the_periods_were_lost(self) -> None:
-        # Ce que le run du 2026-11-18 a donné (seconde chance seulement si tout est rejeté).
         chunks = _backend_chunks()
         shown = {i: chunks[i].text for i in (5, 0, 4, 7, 2)}
 
         first = verify_assessment(FIRST_PYTHON, _python(), shown, EVAL_TODAY)
 
         assert (first.level, first.total_months, first.capped_for_duration) == ("mentionné", 0, True)
+
+    def test_run_18_python_quotes_are_now_accepted_directly(self) -> None:
+        """Le 2026-11-18, ces citations (intitulés abrégés à 2 mots) étaient rejetées et les
+        périodes perdues ; leurs morceaux courts commencent une ligne du chunk : acceptées."""
+        result, calls = _evaluate(_python(), [5, 0, 4, 7, 2], [PYTHON_RUN_18])
+
+        assert calls == 1 and not result.second_chance and result.rejected_evidence == 0
+        assert (result.total_months, result.level) == (50, "démontré")
 
     def test_no_second_chance_without_a_duration(self) -> None:
         first = FIRST_PYTHON.model_copy(update={"periods": []})

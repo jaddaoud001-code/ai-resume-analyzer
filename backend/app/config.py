@@ -75,6 +75,10 @@ class Settings(BaseSettings):
     # affirmation du profil vaut « mentionné »), dans la limite de MATCH_K ; sections
     # reconnues par mot-clé du titre (majuscules, sans accents), comme ci-dessus.
     match_profile_sections: list[str] = ["PROFIL", "RESUME", "SUMMARY", "A PROPOS"]
+    # Citations avec « … » : un morceau de moins de 3 mots n'est accepté que s'il commence une
+    # ligne ou une puce du chunk, ou s'il commence au plus à cette distance (caractères du texte
+    # normalisé) après la fin du morceau précédent.
+    match_quote_short_gap: int = 80
     match_level_points: dict[str, int] = {
         "non démontré": 0,
         "mentionné": 40,

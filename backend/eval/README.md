@@ -134,10 +134,20 @@ Toutes les mesures sont données **séparément pour deux groupes** : exigences 
 - **matrice de confusion** : niveau principal du corrigé × niveau obtenu (plus une colonne « erreur ») ;
 - **écart de score** : score obtenu moins score du corrigé (niveaux principaux, mêmes points et poids que l'application), avec la fourchette du corrigé (niveaux acceptés les plus bas et les plus hauts) ;
 - **citations rejetées**, **secondes chances** (et combien ont retrouvé une preuve exacte), **erreurs**, **durée** ;
-- **rapports bruts** (`--reports fichier.json`, depuis le 2026-11-19) : le rapport complet de chaque cas (chunks envoyés, preuves, périodes, drapeaux, justifications), pour rejouer hors ligne une nouvelle règle du code sans nouveau run ; les runs v1 à v3 de la série de référence ne l'ont pas gardé ;
+- **rapports bruts** (`--reports`, depuis le 2026-11-19) : le rapport complet de chaque cas (chunks envoyés, preuves, citations rejetées, périodes, drapeaux, déclencheur de seconde chance, tokens, justifications), pour rejouer hors ligne une nouvelle règle du code sans nouveau run. Sans chemin, `--reports` écrit dans `eval/results/` (voir ci-dessous) ; les runs v1 à v3 de la série de référence ne l'ont pas gardé ;
 - **coût en tokens** (depuis le 2026-11-17) : usage renvoyé par le fournisseur à chaque réponse (entrée, sortie, dont raisonnement), par cas et au total, avec la **moyenne par exigence** ; les runs antérieurs (v1 à v3) ne l'ont pas mesuré. Mesure clé pour comparer une autre version du matching ou un agent, qui ferait plus d'appels ;
 - avec `--runs N` : agrégation, et les exigences dont le niveau varie d'une exécution à l'autre.
 
 Le rapport indique la version du prompt d'évaluation (`MATCH_PROMPT_VERSION`) : deux runs ne se comparent qu'en sachant laquelle a servi (v1 : référence ; v2 : règle des savoir-être nommés ou décrits, rappel des scores officiels ; v3 : une affirmation du profil sans expérience qui l'illustre vaut « mentionné » ; v4 : pour « solide », une citation par expérience ou projet distinct). Le plancher des certifications de langue, appliqué par le code depuis la v3, n'a pas de numéro de version propre : il est daté dans `Structure.md`.
 
 Une exigence en erreur n'est comptée ni exacte ni fausse (colonne « erreur »). Un refus durable du fournisseur (quota journalier, modèle refusé) arrête l'évaluation ; un autre échec marque le cas en échec et passe au suivant. La date est fixée (`EVAL_TODAY`) pour que les périodes « en cours » ne changent pas d'un jour à l'autre.
+
+## Rapports bruts conservés (`eval/results/`)
+
+`eval_matching.py --reports` (sans chemin) écrit les rapports bruts du run dans `eval/results/<date>_<série>_v<version du prompt>.json` (série `référence`, `difficile`, `toutes`, ou `cas` avec `--case`). Une clé par cas et par exécution (`java_cv__logistique (run 1)`), une valeur = le `MatchReport` complet. Ces fichiers sont **versionnés** : ils servent de référence pour comparer une nouvelle règle du code ou un futur agent, et permettent de rejouer une règle hors ligne (par exemple, rejouer la vérification des citations sur les citations rejetées d'un run).
+
+**Publiables** : ils ne portent que les CV d'évaluation (entièrement fictifs) et des offres publiques ou fictives, et le texte des CV y est déjà anonymisé (`[NAME]`, `[EMAIL]`, `[PHONE]`, `[URL]`). Un test hors ligne (`tests/test_eval_matching.py::TestResultsFolder`) vérifie chaque fichier : seuls les CV d'évaluation, aucun email, URL ou numéro de téléphone, aucun nom des personnes fictives. Ne jamais y écrire le rapport d'un CV réel.
+
+| Fichier | Run |
+|---|---|
+| `2026-11-20_difficile_v4.json` | série difficile, prompt v4, correctifs du 2026-11-19 (copié depuis le run du 2026-11-20 ; vérifié : aucune donnée du CV réel du développeur) |

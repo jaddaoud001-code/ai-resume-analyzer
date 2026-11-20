@@ -231,9 +231,36 @@ def normalize_for_match(text: str) -> str:
     return re.sub(r"\s+", " ", plain.lower()).strip()
 
 
-def quote_in_chunk(quote: str, chunk_text: str) -> bool:
-    """La citation est un extrait exact du chunk (après normalisation). Avec « … », chaque
-    morceau doit faire au moins 3 mots et apparaître dans le chunk, dans l'ordre.
+_BULLET_PREFIX = re.compile(r"^[-•*▪◦]\s+")
+
+
+def _haystack_with_line_starts(chunk_text: str) -> tuple[str, set[int]]:
+    """Texte du chunk normalisé (comme normalize_for_match) et positions, dans ce texte, des
+    débuts de ligne et des débuts de puce (après « - », « • »…)."""
+    pieces: list[str] = []
+    starts: set[int] = set()
+    length = 0
+    for line in chunk_text.splitlines():
+        normalized = normalize_for_match(line)
+        if not normalized:
+            continue
+        if pieces:
+            length += 1  # espace qui remplace le retour à la ligne
+        starts.add(length)
+        if bullet := _BULLET_PREFIX.match(normalized):
+            starts.add(length + bullet.end())
+        pieces.append(normalized)
+        length += len(normalized)
+    return " ".join(pieces), starts
+
+
+def quote_in_chunk(quote: str, chunk_text: str, max_short_gap: int = 80) -> bool:
+    """La citation est un extrait exact du chunk (après normalisation). Avec « … », les
+    morceaux doivent apparaître dans le chunk, dans l'ordre, et au moins un doit faire 3 mots
+    ou plus. Un morceau court (moins de 3 mots) n'est accepté que s'il est ancré : il commence
+    une ligne ou une puce du chunk, ou il commence au plus `max_short_gap` caractères après la
+    fin du morceau précédent (pour un premier morceau : le suivant commence au plus à cette
+    distance après lui). Une citation qui assemble des mots éloignés reste rejetée.
 
     Exception : un « … » entre deux passages contigus du chunk (séparés seulement par un
     blanc ou un retour à la ligne) remplace ce retour à la ligne : si la citation, « … »
@@ -243,18 +270,31 @@ def quote_in_chunk(quote: str, chunk_text: str) -> bool:
     parts = [p for p in parts if p]
     if not parts:
         return False
-    haystack = normalize_for_match(chunk_text)
+    haystack, line_starts = _haystack_with_line_starts(chunk_text)
     if len(parts) > 1 and normalize_for_match(" ".join(parts)) in haystack:
         return True
-    if len(parts) > 1 and any(len(p.split()) < _MIN_QUOTE_PART_WORDS for p in parts):
+    if len(parts) > 1 and all(len(p.split()) < _MIN_QUOTE_PART_WORDS for p in parts):
         return False
+    spans: list[tuple[int, int]] = []
     position = 0
     for part in parts:
         needle = normalize_for_match(part)
         found = haystack.find(needle, position)
         if not needle or found < 0:
             return False
+        spans.append((found, found + len(needle)))
         position = found + len(needle)
+    if len(parts) == 1:
+        return True
+    for i, part in enumerate(parts):
+        if len(part.split()) >= _MIN_QUOTE_PART_WORDS or spans[i][0] in line_starts:
+            continue
+        if i > 0:
+            anchored = spans[i][0] - spans[i - 1][1] <= max_short_gap
+        else:
+            anchored = spans[1][0] - spans[0][1] <= max_short_gap
+        if not anchored:
+            return False
     return True
 
 
@@ -463,6 +503,7 @@ def verify_assessment(
     shown: dict[int, str],
     today: date,
     items: dict[int, str | None] | None = None,
+    max_short_gap: int = 80,
 ) -> RequirementMatch:
     """Applique les règles du code à la réponse du LLM : citations, rétrogradation, plancher des
     certifications de langue, durées, plafond des savoir-être, plafond de « solide ».
@@ -473,7 +514,7 @@ def verify_assessment(
     seen: set[tuple[int, str]] = set()
     for item in assessment.evidence:
         text = shown.get(item.chunk_id)
-        if text is None or not quote_in_chunk(item.quote, text):
+        if text is None or not quote_in_chunk(item.quote, text, max_short_gap):
             rejected.append(item)
             continue
         key = (item.chunk_id, normalize_for_match(item.quote))
@@ -646,7 +687,7 @@ async def _second_chance(
     except Exception as error:
         logger.warning("Seconde chance pour %s : échec (%s)", requirement.id, describe_error(error))
         return first.model_copy(update={"second_chance": True, "second_chance_reason": reason})
-    second = verify_assessment(retry, requirement, shown, today, items)
+    second = verify_assessment(retry, requirement, shown, today, items, settings.match_quote_short_gap)
     rejected = _merge_rejected(first.rejected_evidence_items, second.rejected_evidence_items)
     if first.evidence and not second.evidence:
         logger.info("Seconde chance pour %s : réponse sans preuve exacte, première réponse conservée", requirement.id)
@@ -696,7 +737,7 @@ async def evaluate_requirement(
         messages = build_match_messages(requirement, retrieved)
         assessment = await invoke_structured(llm, RequirementAssessment, messages, limiter, settings)
         items = experience_items(retrieved, settings.match_reserved_sections)
-        result = verify_assessment(assessment, requirement, shown, today, items)
+        result = verify_assessment(assessment, requirement, shown, today, items, settings.match_quote_short_gap)
         if reason := needs_second_chance(result, requirement, items):
             result = await _second_chance(
                 result, messages, requirement, shown, llm, limiter, settings, today, items, reason

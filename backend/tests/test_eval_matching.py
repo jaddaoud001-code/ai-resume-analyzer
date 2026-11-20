@@ -296,3 +296,37 @@ def test_run_case_uses_the_frozen_requirements_through_the_real_pipeline(
     # Kubernetes : citation inventée, seconde chance sans preuve retrouvée.
     assert (by_label["Kubernetes"].second_chance, by_label["Kubernetes"].recovered) == (True, False)
     assert run.score_gap == 0 and run.error is None
+
+
+class TestResultsFolder:
+    """Rapports bruts conservés dans le dépôt (eval/results) : publiables seulement s'ils ne
+    portent que les CV d'évaluation, anonymisés. Le CV réel n'est jamais lu par les tests."""
+
+    RESULTS = Path(__file__).resolve().parents[1] / "eval" / "results"
+    EVAL_CVS = {"demo_cv", "java_cv", "backend_cv"}
+    # Noms des personnes fictives des CV d'évaluation : remplacés par [NAME] avant l'analyse.
+    FICTIVE_NAMES = ("Camille Lefèvre", "Bastien Corlay", "Léna Morvan")
+
+    def test_default_path(self) -> None:
+        from datetime import date
+
+        from eval.eval_matching import results_path
+
+        path = results_path(date(2026, 11, 21), "référence", self.RESULTS)
+
+        assert path.name.startswith("2026-11-21_référence_v") and path.suffix == ".json"
+
+    def test_reports_only_cover_evaluation_cvs_and_carry_no_personal_data(self) -> None:
+        import json
+        import re
+
+        files = sorted(self.RESULTS.glob("*.json"))
+        assert files, "aucun rapport conservé"
+        for path in files:
+            text = path.read_text(encoding="utf-8")
+            reports = json.loads(text)
+            assert {key.split("__")[0] for key in reports} <= self.EVAL_CVS, path.name
+            assert not re.search(r"[\w.+-]+@[\w-]+\.[\w.]+|https?://|www\.", text), path.name
+            assert not re.search(r"(?:\+33\s?|\b0)[1-9](?:[ .-]\d{2}){4}\b", text), path.name
+            for name in self.FICTIVE_NAMES:
+                assert name not in text, (path.name, name)

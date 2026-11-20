@@ -1,0 +1,1455 @@
+{
+ "backend_cv__logistique (run 1)": {
+  "job_title": "Développeur·se backend confirmé·e – Plateforme de suivi logistique",
+  "score": 74,
+  "requirements": [
+   {
+    "requirement": {
+     "id": "R1",
+     "label": "Développement backend",
+     "category": "expérience",
+     "importance": "obligatoire",
+     "min_years": 2,
+     "search_queries": [
+      "développement backend",
+      "backend developer",
+      "expérience backend"
+     ]
+    },
+    "status": "ok",
+    "level": "mentionné",
+    "llm_level": "solide",
+    "evidence": [
+     {
+      "chunk_id": 2,
+      "quote": "Ingénieure logicielle · Ferlane Fret … Développement des endpoints FastAPI … Mise en production des services …"
+     }
+    ],
+    "rejected_evidence": 3,
+    "rejected_evidence_items": [
+     {
+      "chunk_id": 4,
+      "quote": "Développeuse freelance … Applications web Django … Bases PostgreSQL …"
+     },
+     {
+      "chunk_id": 2,
+      "quote": "Ingénieure logicielle … Développement des endpoints FastAPI … Mise en production des services …"
+     },
+     {
+      "chunk_id": 4,
+      "quote": "Développeuse freelance · missions pour des PME … Applications web Django … Bases PostgreSQL …"
+     }
+    ],
+    "periods": [
+     {
+      "start": "2025-02",
+      "end": "en cours"
+     }
+    ],
+    "rejected_periods": 1,
+    "total_months": 22,
+    "downgraded": false,
+    "capped_for_duration": true,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": true,
+    "second_chance_reason": "sans_preuve",
+    "gaps": [],
+    "justification": "Le candidat a développé des services backend avec Django, PostgreSQL, FastAPI et a mis en production des services sur Kubernetes, couvrant plus de deux ans d'expérience.",
+    "retrieved_chunk_ids": [
+     4,
+     2,
+     3,
+     0,
+     1
+    ],
+    "points": 40,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 2,
+     "input_tokens": 4647,
+     "output_tokens": 762,
+     "reasoning_tokens": 344,
+     "total_tokens": 5409
+    }
+   },
+   {
+    "requirement": {
+     "id": "R2",
+     "label": "Python",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": 3,
+     "search_queries": [
+      "Python",
+      "développement Python",
+      "Python 3 ans"
+     ]
+    },
+    "status": "ok",
+    "level": "solide",
+    "llm_level": "solide",
+    "evidence": [
+     {
+      "chunk_id": 5,
+      "quote": "Développeuse Python (données) … Scripts Python d'import et de nettoyage des relevés de trafic"
+     },
+     {
+      "chunk_id": 4,
+      "quote": "Applications web Django …"
+     },
+     {
+      "chunk_id": 2,
+      "quote": "Développement des endpoints FastAPI …"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [
+     {
+      "start": "2021-09",
+      "end": "2022-12"
+     },
+     {
+      "start": "2023-01",
+      "end": "2023-12"
+     },
+     {
+      "start": "2025-02",
+      "end": "en cours"
+     }
+    ],
+    "rejected_periods": 0,
+    "total_months": 50,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le candidat utilise Python dans trois expériences distinctes (scripts, Django, FastAPI) sur plus de trois ans au total, ce qui satisfait le niveau solide.",
+    "retrieved_chunk_ids": [
+     5,
+     0,
+     4,
+     7,
+     2
+    ],
+    "points": 100,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2087,
+     "output_tokens": 565,
+     "reasoning_tokens": 328,
+     "total_tokens": 2652
+    }
+   },
+   {
+    "requirement": {
+     "id": "R3",
+     "label": "SQL et bases de données relationnelles",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "SQL",
+      "bases de données relationnelles",
+      "SQL PostgreSQL"
+     ]
+    },
+    "status": "ok",
+    "level": "solide",
+    "llm_level": "solide",
+    "evidence": [
+     {
+      "chunk_id": 5,
+      "quote": "Requêtes SQL d'agrégation pour les rapports mensuels"
+     },
+     {
+      "chunk_id": 4,
+      "quote": "Bases PostgreSQL et interfaces d'échange avec les logiciels comptables des clients"
+     },
+     {
+      "chunk_id": 3,
+      "quote": "FastAPI · PostgreSQL · Kubernetes · Kafka"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le candidat utilise SQL et des bases de données relationnelles (PostgreSQL) dans plusieurs expériences professionnelles distinctes, démontrant une maîtrise solide.",
+    "retrieved_chunk_ids": [
+     7,
+     8,
+     3,
+     5,
+     4
+    ],
+    "points": 100,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1942,
+     "output_tokens": 398,
+     "reasoning_tokens": 172,
+     "total_tokens": 2340
+    }
+   },
+   {
+    "requirement": {
+     "id": "R4",
+     "label": "Déploiement cloud",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "déploiement cloud",
+      "cloud deployment",
+      "AWS Azure GCP"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 2,
+      "quote": "Mise en production des services sur un cluster Kubernetes managé … images Docker, manifestes Helm, montée en charge automatique selon le trafic."
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le candidat a déployé des services sur un cluster Kubernetes managé, utilisant Docker et Helm, ce qui constitue une mise en production cloud.",
+    "retrieved_chunk_ids": [
+     8,
+     2,
+     4,
+     1,
+     3
+    ],
+    "points": 75,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2078,
+     "output_tokens": 271,
+     "reasoning_tokens": 141,
+     "total_tokens": 2349
+    }
+   },
+   {
+    "requirement": {
+     "id": "R5",
+     "label": "Anglais professionnel",
+     "category": "langue",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "anglais professionnel",
+      "anglais courant",
+      "anglais technique"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 9,
+      "quote": "Anglais : courant"
+     },
+     {
+      "chunk_id": 3,
+      "quote": "Points hebdomadaires en anglais avec l'équipe d'exploitation de Toronto … documentation d'architecture rédigée en anglais"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le CV indique que l'anglais est courant et cite des points hebdomadaires ainsi que de la documentation rédigée en anglais, ce qui montre une utilisation professionnelle de la langue.",
+    "retrieved_chunk_ids": [
+     9,
+     3,
+     1,
+     5,
+     2
+    ],
+    "points": 75,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2052,
+     "output_tokens": 327,
+     "reasoning_tokens": 169,
+     "total_tokens": 2379
+    }
+   },
+   {
+    "requirement": {
+     "id": "R6",
+     "label": "Message queue (RabbitMQ, Kafka)",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": 1,
+     "search_queries": [
+      "RabbitMQ",
+      "Kafka",
+      "message queue"
+     ]
+    },
+    "status": "ok",
+    "level": "mentionné",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 2,
+      "quote": "Événements de suivi transmis par RabbitMQ (mars – août 2025), puis migration vers Kafka (juin 2025 – janv. 2026)"
+     },
+     {
+      "chunk_id": 3,
+      "quote": "FastAPI · PostgreSQL · Kubernetes · Kafka"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [
+     {
+      "start": "2025-03",
+      "end": "2026-01"
+     }
+    ],
+    "rejected_periods": 0,
+    "total_months": 11,
+    "downgraded": false,
+    "capped_for_duration": true,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "durée minimale de 1 an non atteinte (environ 10 mois d'utilisation de RabbitMQ/Kafka)"
+    ],
+    "justification": "Le candidat a utilisé RabbitMQ puis Kafka sur une période continue de mars 2025 à janvier 2026, soit environ 10 mois, ce qui démontre la compétence mais ne satisfait pas la durée minimale d'un an.",
+    "retrieved_chunk_ids": [
+     8,
+     2,
+     7,
+     3,
+     4
+    ],
+    "points": 40,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2063,
+     "output_tokens": 433,
+     "reasoning_tokens": 197,
+     "total_tokens": 2496
+    }
+   },
+   {
+    "requirement": {
+     "id": "R7",
+     "label": "Observabilité (métriques, tableaux de bord, alertes)",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "observabilité",
+      "métriques",
+      "tableaux de bord"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 2,
+      "quote": "Tableaux de bord Grafana et alertes Prometheus sur la latence et le taux d'erreurs des services"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le candidat a mis en place des tableaux de bord Grafana et des alertes Prometheus, ce qui prouve la maîtrise de l'observabilité.",
+    "retrieved_chunk_ids": [
+     7,
+     10,
+     2,
+     5,
+     3
+    ],
+    "points": 75,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2052,
+     "output_tokens": 257,
+     "reasoning_tokens": 105,
+     "total_tokens": 2309
+    }
+   },
+   {
+    "requirement": {
+     "id": "R8",
+     "label": "API REST",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "API REST",
+      "endpoints HTTP",
+      "services web"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 2,
+      "quote": "Développement des endpoints FastAPI consommés par l'application mobile des chauffeurs …"
+     },
+     {
+      "chunk_id": 3,
+      "quote": "FastAPI …"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le candidat développe et maintient des endpoints FastAPI, prouvant la maîtrise de la création d'API REST dans un contexte professionnel.",
+    "retrieved_chunk_ids": [
+     0,
+     8,
+     2,
+     3,
+     4
+    ],
+    "points": 75,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2063,
+     "output_tokens": 377,
+     "reasoning_tokens": 214,
+     "total_tokens": 2440
+    }
+   },
+   {
+    "requirement": {
+     "id": "R9",
+     "label": "CI/CD",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "CI/CD",
+      "intégration continue",
+      "pipelines de déploiement"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 2,
+      "quote": "Pipelines GitHub Actions … déploiement à chaque fusion sur la branche principale"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le candidat utilise des pipelines GitHub Actions pour automatiser les tests et le déploiement, ce qui constitue une mise en œuvre concrète de CI/CD.",
+    "retrieved_chunk_ids": [
+     8,
+     2,
+     1,
+     5,
+     3
+    ],
+    "points": 75,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2067,
+     "output_tokens": 229,
+     "reasoning_tokens": 83,
+     "total_tokens": 2296
+    }
+   },
+   {
+    "requirement": {
+     "id": "R10",
+     "label": "Tests automatisés",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "tests automatisés",
+      "tests unitaires",
+      "couverture de tests"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 2,
+      "quote": "Tests pytest sur les endpoints critiques … couverture portée de 45 % à 80 %"
+     }
+    ],
+    "rejected_evidence": 1,
+    "rejected_evidence_items": [
+     {
+      "chunk_id": 2,
+      "quote": "Pipelines GitHub Actions … tests … à chaque fusion sur la branche principale"
+     }
+    ],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le candidat a mis en place des tests automatisés avec pytest et les intègre dans des pipelines CI, augmentant la couverture de tests.",
+    "retrieved_chunk_ids": [
+     2,
+     8,
+     7,
+     5,
+     3
+    ],
+    "points": 75,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2045,
+     "output_tokens": 288,
+     "reasoning_tokens": 112,
+     "total_tokens": 2333
+    }
+   },
+   {
+    "requirement": {
+     "id": "R11",
+     "label": "Autonomie",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "autonomie",
+      "travail autonome",
+      "indépendant"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 4,
+      "quote": "seule du recueil des besoins … jusqu'à la livraison chez le client"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le texte indique que la candidate a mené les projets freelance de la collecte des besoins à la livraison de façon autonome, ce qui satisfait l'exigence d'autonomie.",
+    "retrieved_chunk_ids": [
+     0,
+     4,
+     1,
+     3,
+     2
+    ],
+    "points": 75,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2075,
+     "output_tokens": 270,
+     "reasoning_tokens": 120,
+     "total_tokens": 2345
+    }
+   },
+   {
+    "requirement": {
+     "id": "R12",
+     "label": "Communication claire avec interlocuteurs non techniques",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "communication claire",
+      "communication non technique",
+      "communication avec interlocuteurs non techniques"
+     ]
+    },
+    "status": "ok",
+    "level": "mentionné",
+    "llm_level": "mentionné",
+    "evidence": [
+     {
+      "chunk_id": 1,
+      "quote": "j'aime expliquer simplement des choix techniques aux équipes métier"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le profil indique explicitement que la candidate explique simplement des choix techniques aux équipes métier, ce qui correspond à une communication claire avec des interlocuteurs non techniques, mais aucune expérience concrète n’est décrite.",
+    "retrieved_chunk_ids": [
+     7,
+     1,
+     3,
+     2,
+     4
+    ],
+    "points": 40,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2075,
+     "output_tokens": 339,
+     "reasoning_tokens": 215,
+     "total_tokens": 2414
+    }
+   }
+  ],
+  "missing_mandatory": [],
+  "rejected_evidence_count": 4,
+  "errors": [],
+  "extraction_model": "openai/gpt-oss-120b",
+  "match_model": "openai/gpt-oss-120b",
+  "requirements_source": "provided",
+  "chunk_count": 12,
+  "timings": {
+   "extraction_s": 3.893001121468842e-06,
+   "indexing_s": 9.551356338000915,
+   "retrieval_s": 1.9111187320013414,
+   "evaluation_s": 244.32388573099888
+  },
+  "usage": {
+   "calls": 13,
+   "input_tokens": 27246,
+   "output_tokens": 4516,
+   "reasoning_tokens": 2200,
+   "total_tokens": 31762
+  },
+  "extraction_usage": {
+   "calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "reasoning_tokens": 0,
+   "total_tokens": 0
+  }
+ },
+ "java_cv__logistique (run 1)": {
+  "job_title": "Développeur·se backend confirmé·e – Plateforme de suivi logistique",
+  "score": 49,
+  "requirements": [
+   {
+    "requirement": {
+     "id": "R1",
+     "label": "Développement backend",
+     "category": "expérience",
+     "importance": "obligatoire",
+     "min_years": 2,
+     "search_queries": [
+      "développement backend",
+      "backend developer",
+      "expérience backend"
+     ]
+    },
+    "status": "ok",
+    "level": "solide",
+    "llm_level": "solide",
+    "evidence": [
+     {
+      "chunk_id": 2,
+      "quote": "Développement d'une API REST de suivi des expéditions avec Spring Boot…"
+     },
+     {
+      "chunk_id": 4,
+      "quote": "Application web Spring Boot et Thymeleaf, base MySQL …"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [
+     {
+      "start": "2023-09",
+      "end": "2025-08"
+     }
+    ],
+    "rejected_periods": 0,
+    "total_months": 24,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le candidat a développé des API backend en Java/Spring Boot pendant une alternance de deux ans et a réalisé un projet universitaire backend, ce qui montre une pratique continue et diversifiée du développement backend.",
+    "retrieved_chunk_ids": [
+     1,
+     2,
+     0,
+     3,
+     4
+    ],
+    "points": 100,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1998,
+     "output_tokens": 361,
+     "reasoning_tokens": 175,
+     "total_tokens": 2359
+    }
+   },
+   {
+    "requirement": {
+     "id": "R2",
+     "label": "Python",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": 3,
+     "search_queries": [
+      "Python",
+      "développement Python",
+      "Python 3 ans"
+     ]
+    },
+    "status": "ok",
+    "level": "mentionné",
+    "llm_level": "mentionné",
+    "evidence": [
+     {
+      "chunk_id": 7,
+      "quote": "notions de Python"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": 0,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Pas d'expérience ou projet démontrant l'utilisation de Python sur 3 ans"
+    ],
+    "justification": "Le CV ne cite que des notions de Python dans la section compétences, sans expérience, projet ou formation détaillée, ce qui ne satisfait pas la durée minimale de 3 ans.",
+    "retrieved_chunk_ids": [
+     7,
+     5,
+     4,
+     3,
+     2
+    ],
+    "points": 40,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1971,
+     "output_tokens": 201,
+     "reasoning_tokens": 67,
+     "total_tokens": 2172
+    }
+   },
+   {
+    "requirement": {
+     "id": "R3",
+     "label": "SQL et bases de données relationnelles",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "SQL",
+      "bases de données relationnelles",
+      "SQL PostgreSQL"
+     ]
+    },
+    "status": "ok",
+    "level": "solide",
+    "llm_level": "solide",
+    "evidence": [
+     {
+      "chunk_id": 7,
+      "quote": "Langages : Java, SQL, XML, notions de Python"
+     },
+     {
+      "chunk_id": 4,
+      "quote": "base MySQL …"
+     },
+     {
+      "chunk_id": 2,
+      "quote": "Requêtes SQL et index sur PostgreSQL …"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le candidat mentionne SQL dans la section compétences, utilise MySQL dans un projet et travaille avec PostgreSQL dans une expérience professionnelle, ce qui montre une utilisation concrète des bases de données relationnelles.",
+    "retrieved_chunk_ids": [
+     7,
+     8,
+     4,
+     2,
+     3
+    ],
+    "points": 100,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1978,
+     "output_tokens": 257,
+     "reasoning_tokens": 8,
+     "total_tokens": 2235
+    }
+   },
+   {
+    "requirement": {
+     "id": "R4",
+     "label": "Déploiement cloud",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "déploiement cloud",
+      "cloud deployment",
+      "AWS Azure GCP"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Aucune expérience ou projet de déploiement sur un cloud (AWS, Azure, GCP) n'est mentionné"
+    ],
+    "justification": "Le CV ne contient aucune preuve d'activité de déploiement cloud, seulement des compétences en Docker et Java.",
+    "retrieved_chunk_ids": [
+     8,
+     4,
+     7,
+     3,
+     2
+    ],
+    "points": 0,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1976,
+     "output_tokens": 149,
+     "reasoning_tokens": 48,
+     "total_tokens": 2125
+    }
+   },
+   {
+    "requirement": {
+     "id": "R5",
+     "label": "Anglais professionnel",
+     "category": "langue",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "anglais professionnel",
+      "anglais courant",
+      "anglais technique"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "mentionné",
+    "evidence": [
+     {
+      "chunk_id": 9,
+      "quote": "Anglais : B1 (TOEIC 785)"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": true,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "niveau professionnel non atteint"
+    ],
+    "justification": "Le CV indique un niveau B1 et un score TOEIC 785, ce qui montre une connaissance de l'anglais mais ne correspond pas au niveau professionnel requis.",
+    "retrieved_chunk_ids": [
+     9,
+     0,
+     2,
+     3,
+     4
+    ],
+    "points": 75,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1976,
+     "output_tokens": 294,
+     "reasoning_tokens": 168,
+     "total_tokens": 2270
+    }
+   },
+   {
+    "requirement": {
+     "id": "R6",
+     "label": "Message queue (RabbitMQ, Kafka)",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": 1,
+     "search_queries": [
+      "RabbitMQ",
+      "Kafka",
+      "message queue"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": 0,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Aucune expérience ou projet avec RabbitMQ, Kafka ou toute autre solution de message queue n'est mentionné(e)"
+    ],
+    "justification": "Le CV ne contient aucune référence à RabbitMQ, Kafka ou à l'utilisation de systèmes de message queue, donc la compétence n'est pas démontrée.",
+    "retrieved_chunk_ids": [
+     7,
+     4,
+     8,
+     2,
+     3
+    ],
+    "points": 0,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1983,
+     "output_tokens": 166,
+     "reasoning_tokens": 57,
+     "total_tokens": 2149
+    }
+   },
+   {
+    "requirement": {
+     "id": "R7",
+     "label": "Observabilité (métriques, tableaux de bord, alertes)",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "observabilité",
+      "métriques",
+      "tableaux de bord"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Aucune preuve d'expérience ou de projet lié à l'observabilité (métriques, tableaux de bord, alertes)"
+    ],
+    "justification": "Le CV ne mentionne ni l'utilisation d'outils d'observabilité, ni la mise en place de métriques, tableaux de bord ou alertes.",
+    "retrieved_chunk_ids": [
+     7,
+     8,
+     4,
+     2,
+     3
+    ],
+    "points": 0,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1983,
+     "output_tokens": 153,
+     "reasoning_tokens": 39,
+     "total_tokens": 2136
+    }
+   },
+   {
+    "requirement": {
+     "id": "R8",
+     "label": "API REST",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "API REST",
+      "endpoints HTTP",
+      "services web"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 2,
+      "quote": "Développement d'une API REST de suivi des expéditions avec Spring Boot"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "L'alternance décrit le développement d'une API REST, ce qui montre la compétence en pratique.",
+    "retrieved_chunk_ids": [
+     4,
+     2,
+     1,
+     0,
+     3
+    ],
+    "points": 75,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1991,
+     "output_tokens": 253,
+     "reasoning_tokens": 118,
+     "total_tokens": 2244
+    }
+   },
+   {
+    "requirement": {
+     "id": "R9",
+     "label": "CI/CD",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "CI/CD",
+      "intégration continue",
+      "pipelines de déploiement"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "absence de mise en place ou d'utilisation de pipelines CI/CD"
+    ],
+    "justification": "Le CV ne mentionne ni l'utilisation d'outils ni la mise en place de pipelines d'intégration ou de déploiement continu.",
+    "retrieved_chunk_ids": [
+     8,
+     4,
+     3,
+     9,
+     2
+    ],
+    "points": 0,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1985,
+     "output_tokens": 138,
+     "reasoning_tokens": 42,
+     "total_tokens": 2123
+    }
+   },
+   {
+    "requirement": {
+     "id": "R10",
+     "label": "Tests automatisés",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "tests automatisés",
+      "tests unitaires",
+      "couverture de tests"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 3,
+      "quote": "maintenance d'une application Java EE : correction d'anomalies et tests JUnit"
+     },
+     {
+      "chunk_id": 8,
+      "quote": "JUnit"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le stage mentionne explicitement la réalisation de tests JUnit, prouvant l'usage de tests automatisés. Aucun autre projet ne décrit de tels tests, donc le niveau reste démontré.",
+    "retrieved_chunk_ids": [
+     3,
+     7,
+     8,
+     4,
+     2
+    ],
+    "points": 75,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1975,
+     "output_tokens": 302,
+     "reasoning_tokens": 127,
+     "total_tokens": 2277
+    }
+   },
+   {
+    "requirement": {
+     "id": "R11",
+     "label": "Autonomie",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "autonomie",
+      "travail autonome",
+      "indépendant"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "autonomie"
+    ],
+    "justification": "Le CV ne contient aucune mention ni description d'une activité réalisée de façon autonome ou indépendante.",
+    "retrieved_chunk_ids": [
+     0,
+     1,
+     3,
+     4,
+     2
+    ],
+    "points": 0,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1989,
+     "output_tokens": 118,
+     "reasoning_tokens": 43,
+     "total_tokens": 2107
+    }
+   },
+   {
+    "requirement": {
+     "id": "R12",
+     "label": "Communication claire avec interlocuteurs non techniques",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "communication claire",
+      "communication non technique",
+      "communication avec interlocuteurs non techniques"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "communication claire avec interlocuteurs non techniques"
+    ],
+    "justification": "Le CV ne contient aucune mention ni description d'activités de communication avec des interlocuteurs non techniques.",
+    "retrieved_chunk_ids": [
+     7,
+     3,
+     1,
+     2,
+     4
+    ],
+    "points": 0,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1991,
+     "output_tokens": 168,
+     "reasoning_tokens": 86,
+     "total_tokens": 2159
+    }
+   }
+  ],
+  "missing_mandatory": [
+   {
+    "id": "R4",
+    "label": "Déploiement cloud",
+    "category": "compétence technique",
+    "importance": "obligatoire",
+    "min_years": null,
+    "search_queries": [
+     "déploiement cloud",
+     "cloud deployment",
+     "AWS Azure GCP"
+    ]
+   }
+  ],
+  "rejected_evidence_count": 0,
+  "errors": [],
+  "extraction_model": "openai/gpt-oss-120b",
+  "match_model": "openai/gpt-oss-120b",
+  "requirements_source": "provided",
+  "chunk_count": 12,
+  "timings": {
+   "extraction_s": 2.821998350555077e-06,
+   "indexing_s": 1.8653629569998884,
+   "retrieval_s": 1.8623499639979855,
+   "evaluation_s": 233.14151126300203
+  },
+  "usage": {
+   "calls": 12,
+   "input_tokens": 23796,
+   "output_tokens": 2560,
+   "reasoning_tokens": 978,
+   "total_tokens": 26356
+  },
+  "extraction_usage": {
+   "calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "reasoning_tokens": 0,
+   "total_tokens": 0
+  }
+ }
+}

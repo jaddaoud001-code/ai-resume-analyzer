@@ -49,6 +49,8 @@ from app.schemas import JobRequirements, MatchReport, ReportReady, RequirementMa
 
 EVAL_DIR = BACKEND_DIR / "eval"
 CASES_DIR = EVAL_DIR / "matching"
+# Rapports bruts conservés dans le dépôt (CV et offres d'évaluation fictifs ou publics).
+RESULTS_DIR = EVAL_DIR / "results"
 # Date fixe : les périodes « en cours » donnent la même durée d'un jour à l'autre.
 EVAL_TODAY = date(2026, 11, 14)
 
@@ -121,6 +123,11 @@ def check_case(job: JobRequirements, expected: dict[str, ExpectedLevel], name: s
         unknown = [level for level in item.levels if level not in RANK]
         if not item.levels or unknown:
             raise CaseMismatchError(f"{name} : {requirement_id} : niveaux invalides {item.levels}")
+
+
+def results_path(day: date, series: str, results_dir: Path = RESULTS_DIR) -> Path:
+    """eval/results/<date>_<série>_v<version du prompt>.json"""
+    return results_dir / f"{day.isoformat()}_{series}_v{MATCH_PROMPT_VERSION}.json"
 
 
 def find_cases(names: list[str] | None = None, series: str = "référence", cases_dir: Path = CASES_DIR) -> list[Case]:
@@ -576,7 +583,12 @@ def main() -> None:
     parser.add_argument(
         "--reports",
         type=Path,
-        help="fichier JSON où garder les rapports bruts de chaque cas (vérifications hors ligne ultérieures)",
+        nargs="?",
+        const=RESULTS_DIR,
+        help=(
+            "garder les rapports bruts de chaque cas (vérifications hors ligne ultérieures) ; sans chemin : "
+            "eval/results/<date>_<série>_v<version du prompt>.json"
+        ),
     )
     args = parser.parse_args()
     if args.runs < 1:
@@ -585,9 +597,13 @@ def main() -> None:
     cases = find_cases(args.case, args.series)
     runs = asyncio.run(evaluate(cases, args.runs, settings))
     if args.reports:
+        target = args.reports
+        if target == RESULTS_DIR:
+            target = results_path(date.today(), "cas" if args.case else args.series)
+        target.parent.mkdir(parents=True, exist_ok=True)
         reports = {f"{run.case} (run {run.run})": run.report for run in runs if run.report}
-        args.reports.write_text(json.dumps(reports, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-        print(f"Rapports bruts : {args.reports}", file=sys.stderr)
+        target.write_text(json.dumps(reports, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        print(f"Rapports bruts : {target}", file=sys.stderr)
     if args.json:
         print(
             json.dumps(
