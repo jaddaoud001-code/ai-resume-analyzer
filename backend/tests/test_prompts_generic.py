@@ -11,6 +11,7 @@ import pytest
 
 from app.matcher import _SYSTEM_PROMPT as MATCH_PROMPT
 from app.requirements import _SYSTEM_PROMPT as EXTRACTION_PROMPT
+from app.suggestions import JUDGE_PROMPT, PROPOSE_PROMPT, SEARCH_PROMPT
 
 EVAL_DIR = Path(__file__).resolve().parents[1] / "eval"
 # Des tournures courtes (« à l'aise en », « Bac+5 en informatique ») sont des formulations
@@ -41,7 +42,16 @@ def test_reference_cases_exist() -> None:
     assert {"hager.txt", "sii.txt"} <= set(names)
 
 
-@pytest.mark.parametrize("prompt_name, prompt", [("extraction", EXTRACTION_PROMPT), ("évaluation", MATCH_PROMPT)])
+@pytest.mark.parametrize(
+    "prompt_name, prompt",
+    [
+        ("extraction", EXTRACTION_PROMPT),
+        ("évaluation", MATCH_PROMPT),
+        ("suggestions : recherche", SEARCH_PROMPT),
+        ("suggestions : proposition", PROPOSE_PROMPT),
+        ("suggestions : juge", JUDGE_PROMPT),
+    ],
+)
 def test_prompt_examples_do_not_come_from_reference_cases(prompt_name: str, prompt: str) -> None:
     prompt_sequences = _sequences(prompt)
     for case, text in _reference_cases():

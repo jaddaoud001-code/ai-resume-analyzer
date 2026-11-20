@@ -30,6 +30,7 @@ backend/
     matcher.py         # matching exigence <-> passages du CV, vérifications, score ; analyze() = générateur d'événements
     schemas.py         # modèles Pydantic (Requirement, JobRequirements, MatchResult, Report)
     implications.py    # table des implications directes (framework -> langage, SGBD -> SQL, CI sur forge Git -> Git) : source unique dans le code ; le prompt du matching garde ses exemples (test : tous dans la table)
+    suggestions.py     # agent de suggestions (LangGraph, étape 3) : graphe, prompts, événements typés ; pas encore de route ni d'interface
     grounding.py       # agent de suggestions (étape 1) : contrôle d'ancrage d'une puce reformulée (sources du même item, aucun élément nouveau hors implications et termes de pratique décrits par la puce), application en mémoire (apply_rewrite)
   tests/
   eval/                # évaluation avec le vrai LLM, hors pytest (voir eval/README.md)
@@ -75,6 +76,27 @@ frontend/
 8. Score = moyenne pondérée des points (`MATCH_LEVEL_POINTS` : 0 / 40 / 75 / 100), poids `MATCH_WEIGHTS` (obligatoire 2, souhaitée 1, savoir-être souhaité 0,5), arrondi au demi supérieur ; le rapport liste à part les obligatoires « non démontrées »
 9. `analyze()` est un générateur asynchrone : `started` aussitôt, puis `requirements_extracted` et `cv_indexed` (extraction et indexation en parallèle, dans l'ordre où elles terminent), un `requirement_evaluated` par exigence dès qu'elle termine, des `status` quand un 429 fait attendre l'analyse, puis `report`. Une seule `asyncio.Queue` reçoit les fins de tâches, les attentes signalées et l'expiration du délai. Les erreurs fatales sont levées : `LLMProviderError`, `NoRequirementsError`, `EmbeddingsError`, `AnalysisTimeoutError` (au-delà de `ANALYSIS_TIMEOUT_S`). À la fermeture du générateur (fin, erreur, délai, consommateur parti), toutes les tâches non terminées sont annulées : une évaluation encore en attente dans le limiteur n'appelle jamais le LLM ; le nombre d'appels interrompus et évités est journalisé (« Analyse interrompue : … »)
 10. `POST /analyze` (multipart `file` + `job_offer`) diffuse ces événements en Server-Sent Events (voir « Flux SSE »)
+
+## Agent de suggestions (`app/suggestions.py`, en cours : étape 3 faite, sans route ni interface)
+
+But : pour les exigences techniques « mentionné » ou « non démontré » d'un rapport d'analyse, proposer la reformulation d'**une** puce **déjà présente** dans le CV qui les prouverait mieux, sans rien inventer ; sinon le dire (refus attendu, pas un échec). Savoir-être exclus (v1). Rien n'est appliqué : l'utilisateur acceptera ou refusera chaque suggestion. Le CV sera renvoyé par le client (PDF + rapport), aucune session.
+
+**Graphe** (LangGraph `StateGraph`, routage par le champ `route` de l'état, `recursion_limit` 500) :
+1. `select_targets` (code) : lacunes techniques (statut `ok`, niveau « mentionné » ou « non démontré », hors savoir-être), triées par gain potentiel (poids × écart en points à « démontré »), au plus `SUGGEST_MAX_REQUIREMENTS` ; index FAISS du CV construit une fois ; événement `agent_started` (cibles, lacunes écartées par la limite, limites).
+2. `next_target` : cible suivante (`target_started`), ou `finish` ; si le budget du run est atteint : `untreated_rest`.
+3. `search` : outil de recherche libre `search_cv` (code : chunks d'expérience ou de projet avec puces, numérotées) avec le libellé et les requêtes de l'exigence, puis LLM (`SearchDecision`) : `candidat` (chunk, puce), `deja_prouve` (refus « Le CV le prouve déjà : aucune reformulation nécessaire »), `rien` (refus « Rien dans le CV ne permet de le prouver ») ; une seule recherche supplémentaire si le LLM demande d'autres requêtes ; un candidat inexistant ou hors expérience vaut « rien ».
+4. `propose` : LLM (`Proposal` : nouvelle puce, faits avec citations, compétences impliquées, justification), avec les motifs des tentatives refusées.
+5. `verify` : **contrôle d'ancrage du code** (`check_grounding`) d'abord ; seulement s'il passe, **juge LLM** (`JudgeVerdict`, ne peut que rejeter : verbe renforcé, portée élargie, résultat ajouté, sens changé). Rejet -> nouvelle tentative de `propose` (au plus `SUGGEST_MAX_ATTEMPTS`), sinon refus `aucune_reformulation_fidele`.
+6. `reevaluate` : puce appliquée en mémoire (`apply_rewrite`), nouvel index, **vrai matcher** (`retrieve_for_requirement` + `evaluate_requirement`, mêmes vérifications, seconde chance comprise) ; niveau en points supérieur à celui du rapport -> `suggestion` (avant / après, puce source, faits, implications, niveaux, justification, tokens) ; sinon nouvelle tentative, puis refus `sans_effet` **compté mais non montré** (`shown=false`).
+7. `untreated_rest` : cibles restantes « non traitées » (budget du run) ; `finish` : `done` (suggestions, refus, non montrés, non traitées, tokens) ou `error`.
+
+**Garde-fous** : budgets vérifiés avant chaque appel au LLM et avant la réévaluation, par le compteur de tokens existant (`current_usage`) : `SUGGEST_MAX_TOKENS_PER_REQUIREMENT` dépassé -> cette exigence « non traitée » ; `SUGGEST_MAX_TOKENS_PER_RUN` dépassé -> cible courante et suivantes « non traitées ». Tous les appels passent par le limiteur partagé ; une attente sur 429 devient un événement `status` (`AnalysisMonitor`). Refus durable du fournisseur (quota journalier, accès refusé) : arrêt propre, événement `error` (`quota_exceeded`, `provider_access_denied`), les suggestions déjà produites restent. Autre erreur du LLM sur une cible : refus `erreur`, cible suivante. Les tokens d'un appel en échec sont comptés.
+
+**Événements** (`AgentEvent`, Pydantic, destinés au futur flux SSE) : `agent_started`, `target_started`, `step` (`kind` : search, propose, verify, reevaluate ; `status` : ok, rejected ; `attempt` ; `detail`), `suggestion`, `refusal` (`reason` : rien_dans_le_cv, deja_prouve, aucune_reformulation_fidele, sans_effet, non_traitee, erreur ; `message` ; `shown`), `status`, `done`, `error`. `suggest()` les produit au fil de l'eau (`astream`, mode `updates`), `run_suggestions()` les rassemble.
+
+**Prompts** (`SEARCH_PROMPT`, `PROPOSE_PROMPT`, `JUDGE_PROMPT`) : CV donnée non fiable ; exemples génériques, couverts par le test des prompts génériques ; règles d'implication tirées de la table `app/implications.py`.
+
+**Tests** (`tests/test_suggestions_agent.py`, faux LLM scénarisés, vrai matcher sur un faux LLM d'évaluation, CV `gain_cv.pdf`) : suggestion honnête (R9 CI/CD), tricherie rejetée par l'ancrage puis refus, rejet du juge, « rien dans le CV », une seule recherche supplémentaire, réévaluation sans gain (non montrée), budget du run et d'une exigence, quota journalier, exigence déjà prouvée ciblée par un faux négatif, sélection (savoir-être et erreurs exclus, plus lourdes d'abord), sérialisation des événements.
 
 ## Flux SSE (`POST /analyze`)
 
@@ -139,6 +161,9 @@ Variables de `.env` (modèle complet dans `.env.example`) :
 | `MATCH_K` | chunks par exigence | `5` |
 | `MATCH_RESERVED_K`, `MATCH_RESERVED_SECTIONS` | places réservées aux expériences et projets ; mots-clés de leurs titres (JSON) | `3`, `["EXPERIENCE", "PROJET", "STAGE"]` |
 | `MATCH_QUOTE_SHORT_GAP` | écart maximal (caractères du texte normalisé) entre un morceau court de citation et le précédent, sauf morceau en début de ligne ou de puce | `80` |
+| `SUGGEST_MAX_REQUIREMENTS`, `SUGGEST_MAX_ATTEMPTS` | agent de suggestions : exigences traitées par analyse, propositions par exigence | `3`, `2` |
+| `SUGGEST_MAX_TOKENS_PER_REQUIREMENT`, `SUGGEST_MAX_TOKENS_PER_RUN` | budgets de tokens de l'agent | `15000`, `45000` |
+| `SUGGEST_MAX_LENGTH_RATIO` | longueur maximale d'une puce reformulée (rapport à l'originale) | `1.6` |
 | `MATCH_PROFILE_SECTIONS` | mots-clés des titres de profil ou de résumé, toujours envoyés pour un savoir-être (JSON) | `["PROFIL", "RESUME", "SUMMARY", "A PROPOS"]` |
 | `MATCH_LEVEL_POINTS`, `MATCH_WEIGHTS` | JSON | voir pipeline, étape 8 |
 | `GROQ_API_KEY`, `OPENAI_API_KEY`, `MISTRAL_API_KEY` | clés | aucune |

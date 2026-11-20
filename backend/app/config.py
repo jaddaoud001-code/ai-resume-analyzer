@@ -79,6 +79,15 @@ class Settings(BaseSettings):
     # ligne ou une puce du chunk, ou s'il commence au plus à cette distance (caractères du texte
     # normalisé) après la fin du morceau précédent.
     match_quote_short_gap: int = 80
+
+    # Agent de suggestions (v1) : exigences traitées au plus (les plus lourdes d'abord),
+    # propositions par exigence, budgets de tokens par exigence et par run, longueur maximale
+    # d'une puce reformulée (rapport à l'originale).
+    suggest_max_requirements: int = 3
+    suggest_max_attempts: int = 2
+    suggest_max_tokens_per_requirement: int = 15_000
+    suggest_max_tokens_per_run: int = 45_000
+    suggest_max_length_ratio: float = 1.6
     match_level_points: dict[str, int] = {
         "non démontré": 0,
         "mentionné": 40,
