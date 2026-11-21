@@ -151,6 +151,7 @@ Une exigence en erreur n'est comptée ni exacte ni fausse (colonne « erreur »)
 | Fichier | Run |
 |---|---|
 | `2026-11-20_difficile_v4.json` | série difficile, prompt v4, correctifs du 2026-11-19 (copié depuis le run du 2026-11-20 ; vérifié : aucune donnée du CV réel du développeur) |
+| `2026-11-21_référence_v4.json` | série de référence, prompt v4, tous les correctifs du 2026-11-17 au 2026-11-21 (écrit directement par `--reports`) |
 
 ## Agent de suggestions : préparation de l'évaluation (`eval/suggestions/`)
 

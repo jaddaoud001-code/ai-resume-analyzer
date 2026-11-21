@@ -1,0 +1,3112 @@
+{
+ "demo_cv__hager (run 1)": {
+  "job_title": "Stagiaire Ingénieur(e) informatique & IA",
+  "score": 37,
+  "requirements": [
+   {
+    "requirement": {
+     "id": "R1",
+     "label": "BAC+5 en informatique et intelligence artificielle",
+     "category": "formation",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "Master informatique IA",
+      "Diplôme Bac+5 IA",
+      "Formation IA"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 14,
+      "quote": "Diplôme d'ingénieure, informatique et IA · École d'ingénieurs de la Côte d'Opale 2021 – 2026"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le CV indique un diplôme d'ingénieur en informatique et IA obtenu entre 2021 et 2026, correspondant à un niveau Bac+5.",
+    "retrieved_chunk_ids": [
+     10,
+     14,
+     11,
+     13,
+     12
+    ],
+    "points": 75,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2022,
+     "output_tokens": 263,
+     "reasoning_tokens": 126,
+     "total_tokens": 2285
+    }
+   },
+   {
+    "requirement": {
+     "id": "R2",
+     "label": "Anglais professionnel",
+     "category": "langue",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "anglais professionnel",
+      "anglais business",
+      "anglais technique"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 7,
+      "quote": "Anglais : B2 (TOEIC 905)"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le TOEIC 905 atteste d'un niveau d'anglais professionnel selon les standards de l'exigence.",
+    "retrieved_chunk_ids": [
+     7,
+     8,
+     12,
+     11,
+     13
+    ],
+    "points": 75,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1953,
+     "output_tokens": 179,
+     "reasoning_tokens": 71,
+     "total_tokens": 2132
+    }
+   },
+   {
+    "requirement": {
+     "id": "R3",
+     "label": "Java",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "Java",
+      "développement Java",
+      "programmation Java"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Java"
+    ],
+    "justification": "Aucun extrait du CV ne mentionne Java, le développement Java ou la programmation Java.",
+    "retrieved_chunk_ids": [
+     0,
+     1,
+     12,
+     11,
+     13
+    ],
+    "points": 0,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1977,
+     "output_tokens": 105,
+     "reasoning_tokens": 31,
+     "total_tokens": 2082
+    }
+   },
+   {
+    "requirement": {
+     "id": "R4",
+     "label": "JSP",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "JSP",
+      "JavaServer Pages",
+      "développement JSP"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "JSP"
+    ],
+    "justification": "",
+    "retrieved_chunk_ids": [
+     1,
+     0,
+     12,
+     11,
+     13
+    ],
+    "points": 0,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1978,
+     "output_tokens": 78,
+     "reasoning_tokens": 27,
+     "total_tokens": 2056
+    }
+   },
+   {
+    "requirement": {
+     "id": "R5",
+     "label": "XML",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "XML",
+      "format XML",
+      "manipulation XML"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "XML"
+    ],
+    "justification": "Aucun des extraits du CV ne mentionne XML, ni son utilisation dans une expérience, un projet ou une formation.",
+    "retrieved_chunk_ids": [
+     1,
+     2,
+     12,
+     13,
+     11
+    ],
+    "points": 0,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1958,
+     "output_tokens": 115,
+     "reasoning_tokens": 34,
+     "total_tokens": 2073
+    }
+   },
+   {
+    "requirement": {
+     "id": "R6",
+     "label": "SQL",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "SQL",
+      "bases de données SQL",
+      "requêtes SQL"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 1,
+      "quote": "Python, TypeScript, SQL"
+     },
+     {
+      "chunk_id": 12,
+      "quote": "Tableaux de bord de suivi des demandes de support en SQL et Python … SQL · Pandas · PostgreSQL"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "SQL est listée dans les compétences et utilisée concrètement dans l'expérience d'alternance où des tableaux de bord sont créés avec des requêtes SQL, confirmant la maîtrise.",
+    "retrieved_chunk_ids": [
+     1,
+     12,
+     4,
+     13,
+     11
+    ],
+    "points": 75,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1955,
+     "output_tokens": 351,
+     "reasoning_tokens": 168,
+     "total_tokens": 2306
+    }
+   },
+   {
+    "requirement": {
+     "id": "R7",
+     "label": "Git",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "Git",
+      "gestion de version Git",
+      "contrôle de source Git"
+     ]
+    },
+    "status": "ok",
+    "level": "mentionné",
+    "llm_level": "mentionné",
+    "evidence": [
+     {
+      "chunk_id": 5,
+      "quote": "Docker, Git, GitLab CI, Linux"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Git est uniquement présentée dans la section COMPÉTENCES sans preuve d’utilisation dans une expérience ou un projet.",
+    "retrieved_chunk_ids": [
+     5,
+     1,
+     12,
+     13,
+     11
+    ],
+    "points": 40,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1957,
+     "output_tokens": 146,
+     "reasoning_tokens": 41,
+     "total_tokens": 2103
+    }
+   },
+   {
+    "requirement": {
+     "id": "R8",
+     "label": "Outils d'IA générative",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "IA générative",
+      "outils IA générative",
+      "génération IA"
+     ]
+    },
+    "status": "ok",
+    "level": "solide",
+    "llm_level": "solide",
+    "evidence": [
+     {
+      "chunk_id": 11,
+      "quote": "Stage ingénieure IA … comparaison de trois LLM sur l'exactitude, le coût et la latence."
+     },
+     {
+      "chunk_id": 13,
+      "quote": "Classifieur de tickets de support … avec scikit-learn puis un LLM ; précision 0,87."
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le CV mentionne l’utilisation de modèles de langage (LLM) dans un stage et dans un projet scolaire, ce qui prouve la maîtrise d’outils d’IA générative sur plusieurs expériences.",
+    "retrieved_chunk_ids": [
+     3,
+     0,
+     11,
+     12,
+     13
+    ],
+    "points": 100,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1991,
+     "output_tokens": 345,
+     "reasoning_tokens": 166,
+     "total_tokens": 2336
+    }
+   },
+   {
+    "requirement": {
+     "id": "R9",
+     "label": "PLM Windchill",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "Windchill",
+      "PLM Windchill",
+      "gestion PLM Windchill"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Aucune expérience ou projet lié à PLM Windchill n'est mentionné"
+    ],
+    "justification": "Le CV ne contient aucune référence à Windchill ou à la gestion PLM Windchill.",
+    "retrieved_chunk_ids": [
+     1,
+     3,
+     13,
+     12,
+     11
+    ],
+    "points": 0,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1968,
+     "output_tokens": 121,
+     "reasoning_tokens": 30,
+     "total_tokens": 2089
+    }
+   },
+   {
+    "requirement": {
+     "id": "R10",
+     "label": "Rétro-ingénierie assistée par IA",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "rétro-ingénierie IA",
+      "reverse engineering IA",
+      "analyse rétro IA"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Aucune preuve de rétro‑ingénierie assistée par IA n’est présentée dans le CV."
+    ],
+    "justification": "Le CV ne mentionne ni la rétro‑ingénierie ni l’utilisation d’IA pour cette activité, il ne peut donc pas être considéré comme démontré.",
+    "retrieved_chunk_ids": [
+     10,
+     0,
+     11,
+     12,
+     13
+    ],
+    "points": 0,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2029,
+     "output_tokens": 162,
+     "reasoning_tokens": 51,
+     "total_tokens": 2191
+    }
+   },
+   {
+    "requirement": {
+     "id": "R11",
+     "label": "Documentation technique",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "documentation technique",
+      "rédaction de documentation",
+      "documenter un système"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Documentation technique non prouvée"
+    ],
+    "justification": "Aucun extrait du CV ne mentionne la rédaction ou la création de documentation technique, ni une expérience où la documentation d'un système est décrite.",
+    "retrieved_chunk_ids": [
+     16,
+     1,
+     12,
+     13,
+     11
+    ],
+    "points": 0,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1965,
+     "output_tokens": 152,
+     "reasoning_tokens": 61,
+     "total_tokens": 2117
+    }
+   },
+   {
+    "requirement": {
+     "id": "R12",
+     "label": "Initiative et autonomie",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "initiative",
+      "autonomie",
+      "travail autonome"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Aucun extrait du CV ne décrit explicitement une prise d'initiative ou un travail autonome dans une expérience, un projet ou une formation.",
+    "retrieved_chunk_ids": [
+     1,
+     12,
+     10,
+     11,
+     13
+    ],
+    "points": 0,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1986,
+     "output_tokens": 154,
+     "reasoning_tokens": 72,
+     "total_tokens": 2140
+    }
+   },
+   {
+    "requirement": {
+     "id": "R13",
+     "label": "Travail en équipe",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "travail en équipe",
+      "collaboration",
+      "esprit d'équipe"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "absence de preuve de travail en équipe ou de collaboration"
+    ],
+    "justification": "Le CV ne mentionne aucune expérience, projet ou description illustrant le travail en équipe ou la collaboration.",
+    "retrieved_chunk_ids": [
+     0,
+     12,
+     11,
+     10,
+     13
+    ],
+    "points": 0,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2016,
+     "output_tokens": 163,
+     "reasoning_tokens": 77,
+     "total_tokens": 2179
+    }
+   },
+   {
+    "requirement": {
+     "id": "R14",
+     "label": "Capacités d'analyse et de synthèse",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "analyse",
+      "synthèse",
+      "capacités d'analyse"
+     ]
+    },
+    "status": "ok",
+    "level": "mentionné",
+    "llm_level": "mentionné",
+    "evidence": [
+     {
+      "chunk_id": 12,
+      "quote": "Nettoyage et pseudonymisation des données clients avant analyse"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le CV cite le terme « analyse » dans la description d’une tâche, mais aucune expérience ne décrit explicitement l’utilisation de capacités d’analyse ou de synthèse.",
+    "retrieved_chunk_ids": [
+     3,
+     10,
+     12,
+     11,
+     13
+    ],
+    "points": 40,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1997,
+     "output_tokens": 313,
+     "reasoning_tokens": 195,
+     "total_tokens": 2310
+    }
+   }
+  ],
+  "missing_mandatory": [
+   {
+    "id": "R3",
+    "label": "Java",
+    "category": "compétence technique",
+    "importance": "obligatoire",
+    "min_years": null,
+    "search_queries": [
+     "Java",
+     "développement Java",
+     "programmation Java"
+    ]
+   },
+   {
+    "id": "R4",
+    "label": "JSP",
+    "category": "compétence technique",
+    "importance": "obligatoire",
+    "min_years": null,
+    "search_queries": [
+     "JSP",
+     "JavaServer Pages",
+     "développement JSP"
+    ]
+   },
+   {
+    "id": "R5",
+    "label": "XML",
+    "category": "compétence technique",
+    "importance": "obligatoire",
+    "min_years": null,
+    "search_queries": [
+     "XML",
+     "format XML",
+     "manipulation XML"
+    ]
+   }
+  ],
+  "rejected_evidence_count": 0,
+  "errors": [],
+  "extraction_model": "openai/gpt-oss-120b",
+  "match_model": "openai/gpt-oss-120b",
+  "requirements_source": "provided",
+  "chunk_count": 17,
+  "timings": {
+   "extraction_s": 3.877001290675253e-06,
+   "indexing_s": 8.109991211997112,
+   "retrieval_s": 2.6404379419982433,
+   "evaluation_s": 261.16721095200046
+  },
+  "usage": {
+   "calls": 14,
+   "input_tokens": 27752,
+   "output_tokens": 2647,
+   "reasoning_tokens": 1150,
+   "total_tokens": 30399
+  },
+  "extraction_usage": {
+   "calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "reasoning_tokens": 0,
+   "total_tokens": 0
+  }
+ },
+ "demo_cv__sii (run 1)": {
+  "job_title": "Stagiaire IA Applicatif H/F",
+  "score": 65,
+  "requirements": [
+   {
+    "requirement": {
+     "id": "R1",
+     "label": "Diplôme d'ingénieur",
+     "category": "formation",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "Diplôme d'ingénieur",
+      "École d'ingénieurs",
+      "Bac+5 ingénierie"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 14,
+      "quote": "Diplôme d'ingénieure, informatique et IA … École d'ingénieurs de la Côte d'Opale … 2021 – 2026"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le CV indique clairement l'obtention d'un diplôme d'ingénieur en informatique et IA délivré par une école d'ingénieurs.",
+    "retrieved_chunk_ids": [
+     14,
+     7,
+     11,
+     13,
+     12
+    ],
+    "points": 75,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1995,
+     "output_tokens": 250,
+     "reasoning_tokens": 115,
+     "total_tokens": 2245
+    }
+   },
+   {
+    "requirement": {
+     "id": "R2",
+     "label": "Python",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "Python",
+      "développement Python",
+      "programmation Python"
+     ]
+    },
+    "status": "ok",
+    "level": "solide",
+    "llm_level": "solide",
+    "evidence": [
+     {
+      "chunk_id": 12,
+      "quote": "Tableaux de bord de suivi des demandes de support en SQL et Python …"
+     },
+     {
+      "chunk_id": 13,
+      "quote": "Classifieur de tickets de support … Python …"
+     },
+     {
+      "chunk_id": 11,
+      "quote": "Assistant de recherche documentaire … Python …"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Python est utilisé dans plusieurs expériences professionnelles et un projet académique, montrant une maîtrise solide.",
+    "retrieved_chunk_ids": [
+     0,
+     1,
+     12,
+     13,
+     11
+    ],
+    "points": 100,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1977,
+     "output_tokens": 346,
+     "reasoning_tokens": 136,
+     "total_tokens": 2323
+    }
+   },
+   {
+    "requirement": {
+     "id": "R3",
+     "label": "RAG",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "RAG",
+      "retrieval augmented generation",
+      "recherche documentaire avec LLM"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 11,
+      "quote": "Assistant de recherche documentaire (RAG) sur 12 000 fiches internes … découpage, embeddings multilingues, index FAISS."
+     },
+     {
+      "chunk_id": 2,
+      "quote": "LLM, RAG, embeddings, évaluation de modèles"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le stage décrit la mise en œuvre d'un système RAG avec FAISS, prouvant l'utilisation concrète de la compétence, complétée par une mention dans la section compétences.",
+    "retrieved_chunk_ids": [
+     10,
+     11,
+     2,
+     13,
+     12
+    ],
+    "points": 75,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1999,
+     "output_tokens": 316,
+     "reasoning_tokens": 120,
+     "total_tokens": 2315
+    }
+   },
+   {
+    "requirement": {
+     "id": "R4",
+     "label": "Embeddings",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "embeddings",
+      "représentations vectorielles",
+      "recherche sémantique"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 2,
+      "quote": "LLM, RAG, embeddings, évaluation de … modèles"
+     },
+     {
+      "chunk_id": 11,
+      "quote": "Assistant de recherche documentaire (RAG) … embeddings multilingues, index FAISS"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le CV mentionne les embeddings dans la section compétences et les utilise concrètement lors d’un stage IA (embeddings multilingues indexés avec FAISS), ce qui constitue une preuve d’utilisation.",
+    "retrieved_chunk_ids": [
+     2,
+     11,
+     6,
+     12,
+     13
+    ],
+    "points": 75,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1964,
+     "output_tokens": 284,
+     "reasoning_tokens": 96,
+     "total_tokens": 2248
+    }
+   },
+   {
+    "requirement": {
+     "id": "R5",
+     "label": "Intégration d'un outil ITSM",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "ITSM",
+      "outil de gestion des tickets",
+      "ServiceNow"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Aucune preuve d'intégration d'un outil ITSM tel que ServiceNow ou autre système de gestion de tickets."
+    ],
+    "justification": "Le CV ne mentionne ni l'utilisation ni l'intégration d'un outil ITSM dans les expériences, projets ou compétences.",
+    "retrieved_chunk_ids": [
+     10,
+     13,
+     1,
+     11,
+     12
+    ],
+    "points": 0,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1996,
+     "output_tokens": 142,
+     "reasoning_tokens": 39,
+     "total_tokens": 2138
+    }
+   },
+   {
+    "requirement": {
+     "id": "R6",
+     "label": "Anonymisation des données",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "anonymisation données",
+      "data anonymisation",
+      "privacy data"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 12,
+      "quote": "Nettoyage et pseudonymisation des données clients avant analyse"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le CV indique que la candidate a réalisé du nettoyage et de la pseudonymisation des données clients dans le cadre de son alternance, ce qui correspond à l'anonymisation des données.",
+    "retrieved_chunk_ids": [
+     12,
+     1,
+     3,
+     11,
+     13
+    ],
+    "points": 75,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1962,
+     "output_tokens": 260,
+     "reasoning_tokens": 110,
+     "total_tokens": 2222
+    }
+   },
+   {
+    "requirement": {
+     "id": "R7",
+     "label": "Évaluation de modèles IA",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "évaluation IA",
+      "benchmark modèles IA",
+      "qualité modèle IA"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 2,
+      "quote": "LLM, RAG, embeddings, évaluation de … modèles"
+     },
+     {
+      "chunk_id": 11,
+      "quote": "Jeu d'évaluation de 200 questions … comparaison de trois LLM sur l'exactitude, le coût et la latence"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le CV montre que la candidate a réalisé un jeu d'évaluation de modèles IA lors de son stage, comparant plusieurs LLM, ce qui constitue une utilisation concrète de l'évaluation de modèles IA.",
+    "retrieved_chunk_ids": [
+     2,
+     10,
+     11,
+     13,
+     12
+    ],
+    "points": 75,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2001,
+     "output_tokens": 343,
+     "reasoning_tokens": 143,
+     "total_tokens": 2344
+    }
+   },
+   {
+    "requirement": {
+     "id": "R8",
+     "label": "Analyse de données de tickets",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "analyse de tickets",
+      "historique des tickets",
+      "analyse des demandes de support"
+     ]
+    },
+    "status": "ok",
+    "level": "solide",
+    "llm_level": "solide",
+    "evidence": [
+     {
+      "chunk_id": 13,
+      "quote": "Classifieur de tickets de support … Classement de 5 000 tickets par catégorie et priorité"
+     },
+     {
+      "chunk_id": 12,
+      "quote": "Tableaux de bord de suivi des demandes de support … en SQL et Python"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le candidat a classifié et analysé des tickets de support dans un projet académique et a créé des tableaux de bord d’analyse des demandes de support en contexte professionnel.",
+    "retrieved_chunk_ids": [
+     13,
+     12,
+     1,
+     3,
+     11
+    ],
+    "points": 100,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1965,
+     "output_tokens": 377,
+     "reasoning_tokens": 217,
+     "total_tokens": 2342
+    }
+   },
+   {
+    "requirement": {
+     "id": "R9",
+     "label": "Autonomie",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "autonome",
+      "travail autonome"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "autonomie non démontrée dans les expériences ou projets"
+    ],
+    "justification": "Aucune expérience, projet ou formation ne décrit explicitement une capacité à travailler de façon autonome.",
+    "retrieved_chunk_ids": [
+     12,
+     6,
+     11,
+     10,
+     13
+    ],
+    "points": 0,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1981,
+     "output_tokens": 148,
+     "reasoning_tokens": 63,
+     "total_tokens": 2129
+    }
+   },
+   {
+    "requirement": {
+     "id": "R10",
+     "label": "Rigueur",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "rigoureux",
+      "rigueur"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "rigueur"
+    ],
+    "justification": "Le CV ne contient aucune mention explicite ni description d'une pratique rigoureuse dans les expériences, projets ou le profil.",
+    "retrieved_chunk_ids": [
+     0,
+     11,
+     12,
+     10,
+     13
+    ],
+    "points": 0,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2012,
+     "output_tokens": 141,
+     "reasoning_tokens": 60,
+     "total_tokens": 2153
+    }
+   },
+   {
+    "requirement": {
+     "id": "R11",
+     "label": "Travail en équipe",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "travail en équipe",
+      "teamwork",
+      "collaboration"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "travail en équipe / collaboration non démontré"
+    ],
+    "justification": "Le CV ne mentionne aucune expérience, projet ou description illustrant le travail en équipe ou la collaboration.",
+    "retrieved_chunk_ids": [
+     0,
+     12,
+     11,
+     10,
+     13
+    ],
+    "points": 0,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2014,
+     "output_tokens": 162,
+     "reasoning_tokens": 77,
+     "total_tokens": 2176
+    }
+   },
+   {
+    "requirement": {
+     "id": "R12",
+     "label": "Résolution de problèmes concrets",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "résolution de problèmes",
+      "solution concrète",
+      "problem solving"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "solide",
+    "evidence": [
+     {
+      "chunk_id": 13,
+      "quote": "Classifieur de tickets de support … Classement de 5 000 tickets … avec scikit-learn puis un LLM"
+     },
+     {
+      "chunk_id": 12,
+      "quote": "Tableaux de bord de suivi des demandes de support … rapports hebdomadaires automatisés"
+     },
+     {
+      "chunk_id": 11,
+      "quote": "Jeu d'évaluation de 200 questions … comparaison de trois LLM sur l'exactitude, le coût et la latence"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": true,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le candidat a résolu plusieurs problèmes concrets : classification de tickets, suivi des demandes de support et évaluation comparative de modèles LLM, démontrant une capacité à apporter des solutions pratiques.",
+    "retrieved_chunk_ids": [
+     3,
+     13,
+     10,
+     12,
+     11
+    ],
+    "points": 75,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1997,
+     "output_tokens": 442,
+     "reasoning_tokens": 149,
+     "total_tokens": 2439
+    }
+   },
+   {
+    "requirement": {
+     "id": "R13",
+     "label": "Orientation utilisateur",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "orientation utilisateur",
+      "compréhension des besoins",
+      "user centric"
+     ]
+    },
+    "status": "ok",
+    "level": "mentionné",
+    "llm_level": "mentionné",
+    "evidence": [
+     {
+      "chunk_id": 10,
+      "quote": "je les mets entre les mains de leurs utilisateurs"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le profil indique mettre les assistants entre les mains des utilisateurs, ce qui montre une orientation utilisateur mentionnée mais sans preuve d'application concrète dans une expérience ou un projet.",
+    "retrieved_chunk_ids": [
+     1,
+     10,
+     13,
+     12,
+     11
+    ],
+    "points": 40,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1989,
+     "output_tokens": 253,
+     "reasoning_tokens": 137,
+     "total_tokens": 2242
+    }
+   }
+  ],
+  "missing_mandatory": [],
+  "rejected_evidence_count": 0,
+  "errors": [],
+  "extraction_model": "openai/gpt-oss-120b",
+  "match_model": "openai/gpt-oss-120b",
+  "requirements_source": "provided",
+  "chunk_count": 17,
+  "timings": {
+   "extraction_s": 3.8569996831938624e-06,
+   "indexing_s": 4.672178911998344,
+   "retrieval_s": 2.908284994002315,
+   "evaluation_s": 252.1851751590002
+  },
+  "usage": {
+   "calls": 13,
+   "input_tokens": 25852,
+   "output_tokens": 3464,
+   "reasoning_tokens": 1462,
+   "total_tokens": 29316
+  },
+  "extraction_usage": {
+   "calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "reasoning_tokens": 0,
+   "total_tokens": 0
+  }
+ },
+ "java_cv__hager (run 1)": {
+  "job_title": "Stagiaire Ingénieur(e) informatique & IA",
+  "score": 47,
+  "requirements": [
+   {
+    "requirement": {
+     "id": "R1",
+     "label": "BAC+5 en informatique et intelligence artificielle",
+     "category": "formation",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "Master informatique IA",
+      "Diplôme Bac+5 IA",
+      "Formation IA"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Absence de diplôme de niveau Bac+5 en informatique ou intelligence artificielle"
+    ],
+    "justification": "Le CV ne mentionne qu'un baccalauréat général et aucune formation de niveau master en informatique ou IA, donc l'exigence n'est pas démontrée.",
+    "retrieved_chunk_ids": [
+     7,
+     6,
+     3,
+     4,
+     2
+    ],
+    "points": 0,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1976,
+     "output_tokens": 166,
+     "reasoning_tokens": 61,
+     "total_tokens": 2142
+    }
+   },
+   {
+    "requirement": {
+     "id": "R2",
+     "label": "Anglais professionnel",
+     "category": "langue",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "anglais professionnel",
+      "anglais business",
+      "anglais technique"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 9,
+      "quote": "Anglais : B1 (TOEIC 785)"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "niveau d'anglais professionnel non atteint"
+    ],
+    "justification": "Le CV indique un niveau B1 en anglais avec un score TOEIC de 785, ce qui constitue une preuve démontrée mais ne correspond pas au niveau professionnel requis.",
+    "retrieved_chunk_ids": [
+     9,
+     0,
+     2,
+     3,
+     4
+    ],
+    "points": 75,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1976,
+     "output_tokens": 247,
+     "reasoning_tokens": 115,
+     "total_tokens": 2223
+    }
+   },
+   {
+    "requirement": {
+     "id": "R3",
+     "label": "Java",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "Java",
+      "développement Java",
+      "programmation Java"
+     ]
+    },
+    "status": "ok",
+    "level": "solide",
+    "llm_level": "solide",
+    "evidence": [
+     {
+      "chunk_id": 3,
+      "quote": "Maintenance d'une application Java EE … correction d'anomalies … Java"
+     },
+     {
+      "chunk_id": 2,
+      "quote": "Alternance développeur backend Java … Développement d'une API REST … Spring Boot … Java 17"
+     },
+     {
+      "chunk_id": 4,
+      "quote": "Gestion de prêts … Application web Spring Boot … Java"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le candidat utilise Java dans plusieurs expériences professionnelles et un projet académique, démontrant une maîtrise solide du langage.",
+    "retrieved_chunk_ids": [
+     0,
+     1,
+     3,
+     2,
+     4
+    ],
+    "points": 100,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1988,
+     "output_tokens": 406,
+     "reasoning_tokens": 180,
+     "total_tokens": 2394
+    }
+   },
+   {
+    "requirement": {
+     "id": "R4",
+     "label": "JSP",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "JSP",
+      "JavaServer Pages",
+      "développement JSP"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "JSP non mentionné dans les expériences ou projets"
+    ],
+    "justification": "Aucun des extraits du CV ne fait référence à JSP, JavaServer Pages ou à un développement JSP.",
+    "retrieved_chunk_ids": [
+     3,
+     1,
+     8,
+     2,
+     4
+    ],
+    "points": 0,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1993,
+     "output_tokens": 115,
+     "reasoning_tokens": 28,
+     "total_tokens": 2108
+    }
+   },
+   {
+    "requirement": {
+     "id": "R5",
+     "label": "XML",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "XML",
+      "format XML",
+      "manipulation XML"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 2,
+      "quote": "Échanges avec les transporteurs au format XML : génération avec JAXB et validation par schéma XSD."
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le candidat a généré et validé des échanges XML dans le cadre de son alternance, ce qui montre une utilisation concrète de la compétence.",
+    "retrieved_chunk_ids": [
+     7,
+     9,
+     4,
+     3,
+     2
+    ],
+    "points": 75,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1964,
+     "output_tokens": 240,
+     "reasoning_tokens": 90,
+     "total_tokens": 2204
+    }
+   },
+   {
+    "requirement": {
+     "id": "R6",
+     "label": "SQL",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "SQL",
+      "bases de données SQL",
+      "requêtes SQL"
+     ]
+    },
+    "status": "ok",
+    "level": "solide",
+    "llm_level": "solide",
+    "evidence": [
+     {
+      "chunk_id": 7,
+      "quote": "Langages : Java, SQL, XML, notions de Python"
+     },
+     {
+      "chunk_id": 2,
+      "quote": "Requêtes SQL et index sur PostgreSQL pour accélérer les recherches de colis."
+     },
+     {
+      "chunk_id": 4,
+      "quote": "base MySQL ; gestion des réservations et des retards."
+     }
+    ],
+    "rejected_evidence": 2,
+    "rejected_evidence_items": [
+     {
+      "chunk_id": 7,
+      "quote": "Langages … SQL …"
+     },
+     {
+      "chunk_id": 2,
+      "quote": "Requêtes SQL … PostgreSQL"
+     }
+    ],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": true,
+    "second_chance_reason": "solide",
+    "gaps": [],
+    "justification": "SQL est mentionné dans la liste des langages, utilisé dans les requêtes PostgreSQL de l'alternance et dans la base MySQL du projet, démontrant une utilisation récurrente.",
+    "retrieved_chunk_ids": [
+     7,
+     4,
+     8,
+     2,
+     3
+    ],
+    "points": 100,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 2,
+     "input_tokens": 4259,
+     "output_tokens": 626,
+     "reasoning_tokens": 268,
+     "total_tokens": 4885
+    }
+   },
+   {
+    "requirement": {
+     "id": "R7",
+     "label": "Git",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "Git",
+      "gestion de version Git",
+      "contrôle de source Git"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 8,
+      "quote": "Frameworks et outils … Git …"
+     },
+     {
+      "chunk_id": 3,
+      "quote": "Travail en équipe de quatre avec Git … branches, revues de merge requests sur GitLab"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Git est mentionné dans la section compétences et utilisé concrètement lors du stage, avec gestion de branches et revues de merge requests sur GitLab.",
+    "retrieved_chunk_ids": [
+     4,
+     8,
+     3,
+     7,
+     2
+    ],
+    "points": 75,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1972,
+     "output_tokens": 304,
+     "reasoning_tokens": 130,
+     "total_tokens": 2276
+    }
+   },
+   {
+    "requirement": {
+     "id": "R8",
+     "label": "Outils d'IA générative",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "IA générative",
+      "outils IA générative",
+      "génération IA"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Aucun outil d'IA générative mentionné ou utilisé dans les expériences, projets ou compétences."
+    ],
+    "justification": "Le CV ne contient aucune référence à des outils d'IA générative, ni dans les compétences, ni dans les projets ou expériences.",
+    "retrieved_chunk_ids": [
+     8,
+     11,
+     4,
+     3,
+     2
+    ],
+    "points": 0,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1985,
+     "output_tokens": 139,
+     "reasoning_tokens": 37,
+     "total_tokens": 2124
+    }
+   },
+   {
+    "requirement": {
+     "id": "R9",
+     "label": "PLM Windchill",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "Windchill",
+      "PLM Windchill",
+      "gestion PLM Windchill"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Aucun des extraits du CV ne fait référence à Windchill ou à la gestion PLM Windchill.",
+    "retrieved_chunk_ids": [
+     4,
+     7,
+     2,
+     9,
+     3
+    ],
+    "points": 0,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1978,
+     "output_tokens": 107,
+     "reasoning_tokens": 29,
+     "total_tokens": 2085
+    }
+   },
+   {
+    "requirement": {
+     "id": "R10",
+     "label": "Rétro-ingénierie assistée par IA",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "rétro-ingénierie IA",
+      "reverse engineering IA",
+      "analyse rétro IA"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Aucune preuve de rétro‑ingénierie assistée par IA dans le CV."
+    ],
+    "justification": "Le CV ne mentionne ni l'utilisation d'outils d'IA pour la rétro‑ingénierie, ni de projets ou expériences liés à cette compétence.",
+    "retrieved_chunk_ids": [
+     0,
+     4,
+     1,
+     2,
+     3
+    ],
+    "points": 0,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 2006,
+     "output_tokens": 148,
+     "reasoning_tokens": 41,
+     "total_tokens": 2154
+    }
+   },
+   {
+    "requirement": {
+     "id": "R11",
+     "label": "Documentation technique",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "documentation technique",
+      "rédaction de documentation",
+      "documenter un système"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 2,
+      "quote": "Rédaction de la documentation technique de l'API (OpenAPI) … guide d'exploitation"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le candidat a rédigé la documentation technique de l'API REST dans le cadre de son alternance, ce qui montre une utilisation concrète de la compétence.",
+    "retrieved_chunk_ids": [
+     7,
+     8,
+     3,
+     4,
+     2
+    ],
+    "points": 75,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1974,
+     "output_tokens": 264,
+     "reasoning_tokens": 112,
+     "total_tokens": 2238
+    }
+   },
+   {
+    "requirement": {
+     "id": "R12",
+     "label": "Initiative et autonomie",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "initiative",
+      "autonomie",
+      "travail autonome"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "absence de preuve d'initiative ou d'autonomie dans les expériences ou projets décrits"
+    ],
+    "justification": "Le CV ne contient aucune mention ni description d'initiative ou de travail autonome dans les expériences, projets ou le profil.",
+    "retrieved_chunk_ids": [
+     8,
+     4,
+     3,
+     1,
+     2
+    ],
+    "points": 0,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1994,
+     "output_tokens": 147,
+     "reasoning_tokens": 51,
+     "total_tokens": 2141
+    }
+   },
+   {
+    "requirement": {
+     "id": "R13",
+     "label": "Travail en équipe",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "travail en équipe",
+      "collaboration",
+      "esprit d'équipe"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 3,
+      "quote": "Travail en équipe de quatre avec Git …"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le stage décrit un travail en équipe de quatre, ce qui montre la capacité à collaborer.",
+    "retrieved_chunk_ids": [
+     3,
+     7,
+     1,
+     4,
+     2
+    ],
+    "points": 75,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1983,
+     "output_tokens": 230,
+     "reasoning_tokens": 102,
+     "total_tokens": 2213
+    }
+   },
+   {
+    "requirement": {
+     "id": "R14",
+     "label": "Capacités d'analyse et de synthèse",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "analyse",
+      "synthèse",
+      "capacités d'analyse"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Aucune preuve de capacités d'analyse ou de synthèse dans les extraits fournis."
+    ],
+    "justification": "Le CV ne décrit aucune expérience, projet ou formation où les capacités d'analyse ou de synthèse sont explicitement mentionnées ou démontrées.",
+    "retrieved_chunk_ids": [
+     7,
+     4,
+     1,
+     3,
+     2
+    ],
+    "points": 0,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1987,
+     "output_tokens": 161,
+     "reasoning_tokens": 59,
+     "total_tokens": 2148
+    }
+   }
+  ],
+  "missing_mandatory": [
+   {
+    "id": "R1",
+    "label": "BAC+5 en informatique et intelligence artificielle",
+    "category": "formation",
+    "importance": "obligatoire",
+    "min_years": null,
+    "search_queries": [
+     "Master informatique IA",
+     "Diplôme Bac+5 IA",
+     "Formation IA"
+    ]
+   },
+   {
+    "id": "R4",
+    "label": "JSP",
+    "category": "compétence technique",
+    "importance": "obligatoire",
+    "min_years": null,
+    "search_queries": [
+     "JSP",
+     "JavaServer Pages",
+     "développement JSP"
+    ]
+   },
+   {
+    "id": "R8",
+    "label": "Outils d'IA générative",
+    "category": "compétence technique",
+    "importance": "obligatoire",
+    "min_years": null,
+    "search_queries": [
+     "IA générative",
+     "outils IA générative",
+     "génération IA"
+    ]
+   }
+  ],
+  "rejected_evidence_count": 2,
+  "errors": [],
+  "extraction_model": "openai/gpt-oss-120b",
+  "match_model": "openai/gpt-oss-120b",
+  "requirements_source": "provided",
+  "chunk_count": 12,
+  "timings": {
+   "extraction_s": 4.548004653770477e-06,
+   "indexing_s": 2.949812507002207,
+   "retrieval_s": 2.6775575389983715,
+   "evaluation_s": 294.57264929500525
+  },
+  "usage": {
+   "calls": 15,
+   "input_tokens": 30035,
+   "output_tokens": 3300,
+   "reasoning_tokens": 1303,
+   "total_tokens": 33335
+  },
+  "extraction_usage": {
+   "calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "reasoning_tokens": 0,
+   "total_tokens": 0
+  }
+ },
+ "java_cv__sii (run 1)": {
+  "job_title": "Stagiaire IA Applicatif H/F",
+  "score": 9,
+  "requirements": [
+   {
+    "requirement": {
+     "id": "R1",
+     "label": "Diplôme d'ingénieur",
+     "category": "formation",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "Diplôme d'ingénieur",
+      "École d'ingénieurs",
+      "Bac+5 ingénierie"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Diplôme d'ingénieur (Bac+5) non présent"
+    ],
+    "justification": "Le CV ne mentionne aucun diplôme d'ingénieur ou équivalent Bac+5 en ingénierie.",
+    "retrieved_chunk_ids": [
+     6,
+     7,
+     2,
+     3,
+     4
+    ],
+    "points": 0,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1980,
+     "output_tokens": 135,
+     "reasoning_tokens": 44,
+     "total_tokens": 2115
+    }
+   },
+   {
+    "requirement": {
+     "id": "R2",
+     "label": "Python",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "Python",
+      "développement Python",
+      "programmation Python"
+     ]
+    },
+    "status": "ok",
+    "level": "mentionné",
+    "llm_level": "mentionné",
+    "evidence": [
+     {
+      "chunk_id": 7,
+      "quote": "notions de Python"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "expérience pratique en Python"
+    ],
+    "justification": "Le CV ne cite que des notions de Python dans la section compétences, sans projet ou expérience où Python est utilisé.",
+    "retrieved_chunk_ids": [
+     7,
+     5,
+     4,
+     3,
+     2
+    ],
+    "points": 40,
+    "weight": 2.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1961,
+     "output_tokens": 167,
+     "reasoning_tokens": 61,
+     "total_tokens": 2128
+    }
+   },
+   {
+    "requirement": {
+     "id": "R3",
+     "label": "RAG",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "RAG",
+      "retrieval augmented generation",
+      "recherche documentaire avec LLM"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "RAG (retrieval‑augmented generation)"
+    ],
+    "justification": "Le CV ne cite ni RAG, ni retrieval‑augmented generation, ni projet de recherche documentaire avec LLM.",
+    "retrieved_chunk_ids": [
+     7,
+     4,
+     8,
+     3,
+     2
+    ],
+    "points": 0,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1975,
+     "output_tokens": 123,
+     "reasoning_tokens": 34,
+     "total_tokens": 2098
+    }
+   },
+   {
+    "requirement": {
+     "id": "R4",
+     "label": "Embeddings",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "embeddings",
+      "représentations vectorielles",
+      "recherche sémantique"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Aucune preuve d'expérience ou de projet lié aux embeddings, représentations vectorielles ou recherche sémantique."
+    ],
+    "justification": "Le CV ne contient aucune mention ni description d'utilisation d'embeddings ou de techniques associées.",
+    "retrieved_chunk_ids": [
+     9,
+     7,
+     3,
+     4,
+     2
+    ],
+    "points": 0,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1972,
+     "output_tokens": 125,
+     "reasoning_tokens": 27,
+     "total_tokens": 2097
+    }
+   },
+   {
+    "requirement": {
+     "id": "R5",
+     "label": "Intégration d'un outil ITSM",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "ITSM",
+      "outil de gestion des tickets",
+      "ServiceNow"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Intégration d'un outil ITSM"
+    ],
+    "justification": "Aucun des extraits du CV ne mentionne ni l'utilisation, ni l'intégration d'un outil ITSM tel que ServiceNow.",
+    "retrieved_chunk_ids": [
+     4,
+     7,
+     5,
+     3,
+     2
+    ],
+    "points": 0,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1973,
+     "output_tokens": 133,
+     "reasoning_tokens": 42,
+     "total_tokens": 2106
+    }
+   },
+   {
+    "requirement": {
+     "id": "R6",
+     "label": "Anonymisation des données",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "anonymisation données",
+      "data anonymisation",
+      "privacy data"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Anonymisation des données"
+    ],
+    "justification": "Aucun extrait du CV ne mentionne ni l'utilisation ni la mise en œuvre de techniques d'anonymisation des données.",
+    "retrieved_chunk_ids": [
+     0,
+     7,
+     4,
+     3,
+     2
+    ],
+    "points": 0,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1972,
+     "output_tokens": 125,
+     "reasoning_tokens": 40,
+     "total_tokens": 2097
+    }
+   },
+   {
+    "requirement": {
+     "id": "R7",
+     "label": "Évaluation de modèles IA",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "évaluation IA",
+      "benchmark modèles IA",
+      "qualité modèle IA"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Aucune preuve d'évaluation de modèles IA n'est présentée."
+    ],
+    "justification": "Le CV ne mentionne ni l'évaluation, ni le benchmark de modèles d'IA, ni aucune compétence liée à l'IA.",
+    "retrieved_chunk_ids": [
+     7,
+     4,
+     8,
+     3,
+     2
+    ],
+    "points": 0,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1977,
+     "output_tokens": 128,
+     "reasoning_tokens": 31,
+     "total_tokens": 2105
+    }
+   },
+   {
+    "requirement": {
+     "id": "R8",
+     "label": "Analyse de données de tickets",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "analyse de tickets",
+      "historique des tickets",
+      "analyse des demandes de support"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "Aucune expérience ou projet d'analyse de données de tickets n'est mentionné"
+    ],
+    "justification": "Le CV ne contient aucune preuve d'analyse de données de tickets, seulement du développement d'API et de bases de données.",
+    "retrieved_chunk_ids": [
+     4,
+     7,
+     1,
+     2,
+     3
+    ],
+    "points": 0,
+    "weight": 1.0,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1989,
+     "output_tokens": 149,
+     "reasoning_tokens": 54,
+     "total_tokens": 2138
+    }
+   },
+   {
+    "requirement": {
+     "id": "R9",
+     "label": "Autonomie",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "autonome",
+      "travail autonome"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "absence de preuve d'autonomie dans les expériences ou projets"
+    ],
+    "justification": "Aucun extrait ne montre que le candidat a travaillé de façon autonome ; les expériences décrivent du travail en équipe ou des tâches sans indication d'autonomie.",
+    "retrieved_chunk_ids": [
+     3,
+     9,
+     4,
+     2,
+     1
+    ],
+    "points": 0,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1987,
+     "output_tokens": 146,
+     "reasoning_tokens": 49,
+     "total_tokens": 2133
+    }
+   },
+   {
+    "requirement": {
+     "id": "R10",
+     "label": "Rigueur",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "rigoureux",
+      "rigueur"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "rigueur"
+    ],
+    "justification": "Le CV ne contient aucune mention explicite ni description d'une rigueur dans les expériences, projets ou le profil.",
+    "retrieved_chunk_ids": [
+     0,
+     3,
+     4,
+     1,
+     2
+    ],
+    "points": 0,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1989,
+     "output_tokens": 128,
+     "reasoning_tokens": 48,
+     "total_tokens": 2117
+    }
+   },
+   {
+    "requirement": {
+     "id": "R11",
+     "label": "Travail en équipe",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "travail en équipe",
+      "teamwork",
+      "collaboration"
+     ]
+    },
+    "status": "ok",
+    "level": "démontré",
+    "llm_level": "démontré",
+    "evidence": [
+     {
+      "chunk_id": 3,
+      "quote": "Travail en équipe de quatre avec Git …"
+     }
+    ],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [],
+    "justification": "Le stage indique explicitement un travail en équipe de quatre personnes, ce qui démontre la capacité à collaborer.",
+    "retrieved_chunk_ids": [
+     3,
+     7,
+     1,
+     4,
+     2
+    ],
+    "points": 75,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1981,
+     "output_tokens": 239,
+     "reasoning_tokens": 107,
+     "total_tokens": 2220
+    }
+   },
+   {
+    "requirement": {
+     "id": "R12",
+     "label": "Résolution de problèmes concrets",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "résolution de problèmes",
+      "solution concrète",
+      "problem solving"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "absence de preuve explicite de résolution de problèmes concrets dans les expériences ou projets"
+    ],
+    "justification": "Le CV ne décrit aucune situation où le candidat a résolu des problèmes concrets ; les seules activités mentionnées sont techniques (correction de bugs, développement) sans indication de résolution de problèmes.",
+    "retrieved_chunk_ids": [
+     7,
+     4,
+     1,
+     3,
+     2
+    ],
+    "points": 0,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1987,
+     "output_tokens": 229,
+     "reasoning_tokens": 119,
+     "total_tokens": 2216
+    }
+   },
+   {
+    "requirement": {
+     "id": "R13",
+     "label": "Orientation utilisateur",
+     "category": "savoir-être",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "orientation utilisateur",
+      "compréhension des besoins",
+      "user centric"
+     ]
+    },
+    "status": "ok",
+    "level": "non démontré",
+    "llm_level": "non démontré",
+    "evidence": [],
+    "rejected_evidence": 0,
+    "rejected_evidence_items": [],
+    "periods": [],
+    "rejected_periods": 0,
+    "total_months": null,
+    "downgraded": false,
+    "capped_for_duration": false,
+    "capped_soft_skill": false,
+    "certification_floor": false,
+    "capped_single_item": false,
+    "second_chance": false,
+    "second_chance_reason": null,
+    "gaps": [
+     "orientation utilisateur"
+    ],
+    "justification": "Le CV ne contient aucune mention ni description d'actions montrant une orientation utilisateur ou une compréhension des besoins des utilisateurs.",
+    "retrieved_chunk_ids": [
+     9,
+     4,
+     1,
+     3,
+     2
+    ],
+    "points": 0,
+    "weight": 0.5,
+    "error": null,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 1993,
+     "output_tokens": 139,
+     "reasoning_tokens": 58,
+     "total_tokens": 2132
+    }
+   }
+  ],
+  "missing_mandatory": [
+   {
+    "id": "R1",
+    "label": "Diplôme d'ingénieur",
+    "category": "formation",
+    "importance": "obligatoire",
+    "min_years": null,
+    "search_queries": [
+     "Diplôme d'ingénieur",
+     "École d'ingénieurs",
+     "Bac+5 ingénierie"
+    ]
+   }
+  ],
+  "rejected_evidence_count": 0,
+  "errors": [],
+  "extraction_model": "openai/gpt-oss-120b",
+  "match_model": "openai/gpt-oss-120b",
+  "requirements_source": "provided",
+  "chunk_count": 12,
+  "timings": {
+   "extraction_s": 7.365000783465803e-06,
+   "indexing_s": 2.3895710700016934,
+   "retrieval_s": 2.134404545999132,
+   "evaluation_s": 254.95725599100115
+  },
+  "usage": {
+   "calls": 13,
+   "input_tokens": 25736,
+   "output_tokens": 1966,
+   "reasoning_tokens": 714,
+   "total_tokens": 27702
+  },
+  "extraction_usage": {
+   "calls": 0,
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "reasoning_tokens": 0,
+   "total_tokens": 0
+  }
+ }
+}
