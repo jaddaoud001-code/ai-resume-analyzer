@@ -133,6 +133,29 @@ def test_measure_splits_rejections_by_cause() -> None:
     assert (summary["baisses de niveau (échecs)"], summary["cibles au-delà de la limite"]) == (1, 2)
 
 
+def test_first_word_rule_rejections_are_counted_apart_with_the_rejected_proposal() -> None:
+    from app.grounding import ACTION_LOST
+    from app.suggestions import GROUNDING_PREFIX
+
+    only = f"{GROUNDING_PREFIX}« Classement » {ACTION_LOST} (même racine acceptée)."
+    mixed = f"{GROUNDING_PREFIX}« Service » {ACTION_LOST} (même racine acceptée). ; « rest » n'apparaît pas"
+    other = f"{GROUNDING_PREFIX}« cloud » n'apparaît pas dans cette expérience."
+    events = [
+        AgentStep(requirement_id="R9", kind="propose", status="ok", attempt=1, detail="Analyse des tickets…"),
+        AgentStep(requirement_id="R9", kind="verify", status="rejected", attempt=1, detail=only),
+        AgentStep(requirement_id="R8", kind="verify", status="rejected", attempt=1, detail=mixed),
+        AgentStep(requirement_id="R4", kind="verify", status="rejected", attempt=1, detail=other),
+    ]
+
+    result = measure(GAIN_CASE, GAIN["implicit_report"], events, GAIN, 0.0)
+
+    assert len(result.action_rejections) == 1 and "« Analyse des tickets… »" in result.action_rejections[0]
+    assert result.action_with_other_issues == 1 and len(result.grounding_rejections) == 2
+    summary = summarize([result])
+    assert summary["rejets par la règle du premier mot (seul motif)"] == 1
+    assert summary["rejets où la règle du premier mot s'ajoute à d'autres motifs"] == 1
+
+
 def test_measure_warns_when_annotations_come_from_another_report() -> None:
     assert measure(GAIN_CASE, "autre.json : x (run 1)", [], GAIN, 0.0).warning is not None
 

@@ -504,3 +504,38 @@ class TestActionKept:
         text = "Tests automatisés JUnit et correction d'anomalies lors de la maintenance d'une application Java EE."
 
         assert _check(JAVA, _rewrite(3, 0, text, [(3, self.MAINTENANCE)])) == []
+
+
+class TestActionRoot:
+    """Règle du premier mot : la racine (6 premières lettres normalisées) suffit."""
+
+    @pytest.mark.parametrize(
+        ("word", "text", "kept"),
+        [
+            ("Développement", "Développé les endpoints", True),
+            ("Classement", "Classé 5 000 tickets", True),
+            ("Classement", "Tickets classés par priorité", True),
+            ("Maintenance", "maintenu une application", True),
+            ("Tests", "Testé chaque endpoint", True),
+            ("Classement", "Analyse de 5 000 tickets", False),
+            ("Participation", "Pilotage de la refonte", False),  # verbe gonflé
+            ("Développement", "Conception des endpoints", False),
+        ],
+    )
+    def test_root_comparison(self, word: str, text: str, kept: bool) -> None:
+        from app.grounding import keeps_root
+
+        assert keeps_root(text, word) is kept
+
+    def test_on_real_bullets(self) -> None:
+        classement = bullets(next(c for c in DEMO if c.index == 13).text)[0].text
+        assert classement.startswith("Classement de 5 000 tickets")
+        classe = classement.replace("Classement de 5 000 tickets", "Classé 5 000 tickets")
+        analyse = classement.replace("Classement de 5 000 tickets", "Analyse de 5 000 tickets")
+        assert _check(DEMO, _rewrite(13, 0, classe, [(13, classement)])) == []
+        assert _check(DEMO, _rewrite(13, 0, analyse, [(13, classement)])) == ["action_perdue"]
+
+        developpement = bullets(next(c for c in BACKEND if c.index == 2).text)[0].text
+        assert developpement.startswith("Développement des endpoints FastAPI")
+        developpe = developpement.replace("Développement des endpoints", "Développé les endpoints")
+        assert _check(BACKEND, _rewrite(2, 0, developpe, [(2, developpement)])) == []

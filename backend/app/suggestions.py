@@ -275,6 +275,8 @@ class _BudgetExceeded(Exception):
         self.scope = scope
 
 
+GROUNDING_PREFIX = "Contrôle d'ancrage : "  # détail des rejets par l'ancrage (lu par l'évaluation)
+
 ATTEMPT_FEEDBACK_DROP = (
     "La reformulation précédente a fait baisser le niveau : garde tous les faits de la puce d'origine et "
     "n'ajoute que le terme de l'offre."
@@ -618,7 +620,7 @@ def build_graph(deps: AgentDeps) -> Any:
             return retry_or_refuse(state, "verify", reason, "aucune_reformulation_fidele")
         grounding = check_grounding(rewrite, deps.chunks, sections, settings.suggest_max_length_ratio)
         if not grounding.ok:
-            reason = "Contrôle d'ancrage : " + " ; ".join(i.message for i in grounding.issues)
+            reason = GROUNDING_PREFIX + " ; ".join(i.message for i in grounding.issues)
             return retry_or_refuse(state, "verify", reason, "aucune_reformulation_fidele")
         original = bullets(by_id[rewrite.chunk_id].text)[rewrite.bullet_index].text
         messages = [

@@ -79,10 +79,32 @@ _LETTERS = re.compile(r"[A-Za-zÀ-ÿ]+")
 _FILLERS = frozenset({"les", "des", "une", "aux", "pour", "avec", "sur", "dans", "par", "the"})
 
 
+_ROOT_LENGTH = 6
+# Motif du rejet par la règle du premier mot, repéré par l'évaluation (rejets comptés à part).
+ACTION_LOST = "(ce que décrit la puce d'origine) doit rester dans la reformulation"
+
+
 def lead_word(text: str) -> str | None:
     """Premier mot significatif d'une puce, qui nomme ce qui a été fait (« Classement de 5 000
-    tickets » -> « Classement ») : il doit rester dans la reformulation."""
+    tickets » -> « Classement ») : sa racine doit rester dans la reformulation. Protège contre le
+    changement d'action et le gonflement du verbe (« Participation » -> « Pilotage »)."""
     return next((w for w in _LETTERS.findall(text) if len(w) >= 3 and w.lower() not in _FILLERS), None)
+
+
+def root(word: str) -> str:
+    """Racine simple : les 6 premières lettres normalisées (sans casse ni accents), le mot entier
+    s'il est plus court, sans « s » ou « x » final. « Développement » et « Développé » -> « develo »,
+    « Classement » et « classé » -> « classe »."""
+    plain = normalize(word)
+    if len(plain) > 3 and plain[-1] in "sx":
+        plain = plain[:-1]
+    return plain[:_ROOT_LENGTH]
+
+
+def keeps_root(text: str, word: str) -> bool:
+    """Un mot du texte commence par la racine de `word`."""
+    stem = root(word)
+    return any(normalize(w).startswith(stem) for w in _LETTERS.findall(text))
 
 
 _NUMBER = re.compile(r"\d+(?:[.,]\d+)?")
@@ -249,8 +271,8 @@ def check_grounding(
             allowed_skills |= {normalize(e) for e in _entities(broad)}
 
     lead = lead_word(original)
-    if lead is not None and not mentions_term(new_text, lead):
-        issue("action_perdue", f"« {lead} » (ce que décrit la puce d'origine) doit rester dans la reformulation.")
+    if lead is not None and not keeps_root(new_text, lead):
+        issue("action_perdue", f"« {lead} » {ACTION_LOST} (même racine acceptée).")
 
     described = normalize(original)
     entities = {normalize(e): e for e in reversed(_entities(new_text))}  # un seul signalement par terme

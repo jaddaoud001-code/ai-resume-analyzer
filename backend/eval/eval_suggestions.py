@@ -49,12 +49,14 @@ from langchain_core.language_models import BaseChatModel  # noqa: E402
 from app.chunking import chunk_cv  # noqa: E402
 from app.config import Settings  # noqa: E402
 from app.embeddings import get_embeddings  # noqa: E402
+from app.grounding import ACTION_LOST  # noqa: E402
 from app.llm import get_llm, llm_model, match_settings, suggest_settings  # noqa: E402
 from app.llm_calls import RateLimiter  # noqa: E402
 from app.matcher import MATCH_PROMPT_VERSION, analyze  # noqa: E402
 from app.pdf_parser import extract_text  # noqa: E402
 from app.schemas import Chunk, JobRequirements, MatchReport, ReportReady  # noqa: E402
 from app.suggestions import (  # noqa: E402
+    GROUNDING_PREFIX,  # noqa: E402
     SUGGEST_PROMPT_VERSION,
     AgentDone,
     AgentError,
@@ -189,7 +191,11 @@ class CaseResult:
     report_source: str
     outcomes: list[TargetOutcome] = field(default_factory=list)
     suggestions: list[dict[str, Any]] = field(default_factory=list)  # audit humain
-    grounding_rejections: list[str] = field(default_factory=list)
+    grounding_rejections: list[str] = field(default_factory=list)  # hors règle du premier mot seule
+    # Règle du premier mot (action gardée) : seul motif du rejet, avec la proposition rejetée
+    # (à auditer : une reformulation honnête bloquée ?), et rejets où elle s'ajoute à d'autres.
+    action_rejections: list[str] = field(default_factory=list)
+    action_with_other_issues: int = 0
     judge_rejections: list[str] = field(default_factory=list)
     term_rejections: list[str] = field(default_factory=list)
     level_drops: list[str] = field(default_factory=list)  # chaque réévaluation en baisse
@@ -206,7 +212,10 @@ def measure(case: str, report_source: str, events: list[Any], annotation: dict[s
     annotated = annotation.get("implicit_report")
     if annotated and annotated != report_source:
         result.warning = f"annotations établies sur {annotated} : cibles à revoir"
+    proposed: dict[str, str] = {}  # dernière proposition de chaque exigence
     for event in events:
+        if isinstance(event, AgentStep) and event.kind == "propose" and event.status == "ok":
+            proposed[event.requirement_id] = event.detail or ""
         if isinstance(event, Suggestion | Refusal):
             outcome = classify(event, annotation)
             result.outcomes.append(outcome)
@@ -240,6 +249,13 @@ def measure(case: str, report_source: str, events: list[Any], annotation: dict[s
             elif detail.startswith("Terme absent"):
                 result.term_rejections.append(line)
             else:
+                issues = detail.removeprefix(GROUNDING_PREFIX).split(" ; ")
+                action = [i for i in issues if ACTION_LOST in i]
+                if action and len(action) == len(issues):
+                    proposal = proposed.get(event.requirement_id, "")
+                    result.action_rejections.append(f"{line} — proposition : « {proposal} »")
+                    continue
+                result.action_with_other_issues += bool(action)
                 result.grounding_rejections.append(line)
         elif isinstance(event, AgentDone):
             result.usage = event.usage.model_dump()
@@ -272,7 +288,11 @@ def summarize(results: list[CaseResult]) -> dict[str, Any]:
         "réévaluations impossibles": verdicts["reevaluation_impossible"],
         "non concluants": verdicts["non_concluant"],
         "non annotées": verdicts["non_annotee"],
-        "rejets par l'ancrage": sum(len(r.grounding_rejections) for r in results),
+        "rejets par l'ancrage (hors premier mot seul)": sum(len(r.grounding_rejections) for r in results),
+        "rejets par la règle du premier mot (seul motif)": sum(len(r.action_rejections) for r in results),
+        "rejets où la règle du premier mot s'ajoute à d'autres motifs": sum(
+            r.action_with_other_issues for r in results
+        ),
         "rejets par le juge": sum(len(r.judge_rejections) for r in results),
         "rejets pour terme absent": sum(len(r.term_rejections) for r in results),
         "tokens": tokens,
@@ -414,6 +434,7 @@ def print_report(results: list[CaseResult], settings: Settings) -> None:
         for label, lines in (
             ("terme absent", result.term_rejections),
             ("rejet par l'ancrage", result.grounding_rejections),
+            ("rejet par la règle du premier mot (seul motif, à auditer)", result.action_rejections),
             ("rejet par le juge", result.judge_rejections),
             ("réévaluation en baisse", result.level_drops),
         ):
