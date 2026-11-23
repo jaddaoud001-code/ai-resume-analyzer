@@ -74,7 +74,7 @@
       "note": "Déjà prouvé par le CV (corrigé du matching) : si l'analyse le donne « mentionné » ou « non démontré », c'est un faux négatif du matching ; « aucune reformulation nécessaire » ou une reformulation fidèle sont acceptables, jamais comptées comme invention ni comme faux refus."
     }
   ],
-  "implicit_status": "proposé, à valider (2026-11-23)",
+  "implicit_status": "validé (2026-11-23)",
   "implicit_report": "2026-11-21_référence_v4.json : demo_cv__sii (run 1)",
   "implicit_note": "Agent v2 : cibles implicites (compétence technique « démontré » ou « solide » dont aucune preuve citée ne nomme le terme de l'offre, app.terms.is_implicit) dans le rapport implicit_report. possible = la puce source peut nommer un terme de l'offre (terms_expected) sans rien ajouter ; sinon tempting_rewrite est la reformulation tentante, et caught_by dit qui doit l'arrêter (contrôle d'ancrage du code, ou seulement le juge). Les lacunes (gaps) reçoivent une carte « à décrire ».",
   "implicit": [
@@ -93,8 +93,8 @@
         "bullet_text": "Nettoyage et pseudonymisation des données clients avant analyse."
       },
       "tempting_rewrite": "Nettoyage et anonymisation des données clients avant analyse.",
-      "caught_by": "juge",
-      "reason": "La puce dit « pseudonymisation » : une pseudonymisation n'est pas une anonymisation (données réidentifiables avec la clé). Seul le juge peut le voir : « anonymisation » n'est pas un élément factuel pour l'ancrage.",
+      "caught_by": "ancrage",
+      "reason": "La puce dit « pseudonymisation » : une pseudonymisation n'est pas une anonymisation (données réidentifiables avec la clé). « anonymisation » est un terme contrôlé par l'ancrage (accepté seulement s'il figure déjà dans l'item), sans exception : le code l'arrête sans compter sur le juge.",
       "temptations": [
         "« pseudonymisation » réécrit en « anonymisation »"
       ]
@@ -134,10 +134,17 @@
         "bullet_text": "Classement de 5 000 tickets par catégorie et priorité, avec scikit-learn puis un LLM ; précision 0,87."
       },
       "expected_rewrite": "Analyse de données de tickets : classement de 5 000 tickets par catégorie et priorité, avec scikit-learn puis un LLM ; précision 0,87.",
-      "reason": "Cas limite à valider : le classement automatique de 5 000 tickets est un traitement de données de tickets ; l'appeler « analyse » reste dans le sens. Autre source possible : les tableaux de bord des demandes de support (alternance), qui ne disent pas « tickets ».",
+      "reason": "Ambigu (décision du 2026-11-23) : le refus et une reformulation qui GARDE « classement » en ajoutant le terme de l'offre sont acceptables ; remplacer « classement » par « analyse » est une invention, arrêtée par l'ancrage (le mot qui ouvre la puce d'origine doit rester).",
       "temptations": [
+        "« classement » remplacé par « analyse »",
         "ajouter des enseignements tirés de l'analyse (tendances, délais)"
-      ]
+      ],
+      "must_keep": [
+        "classement"
+      ],
+      "refusal_acceptable": true,
+      "tempting_rewrite": "Analyse de données de tickets : 5 000 tickets répartis par catégorie et priorité, avec scikit-learn puis un LLM ; précision 0,87.",
+      "caught_by": "ancrage"
     }
   ]
 }

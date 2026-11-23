@@ -4,7 +4,9 @@ L'agent ne peut réécrire qu'UNE puce existante d'une expérience ou d'un proje
 la nouvelle puce porte sa citation source, prise dans le même item (même expérience ou même
 projet) ; aucun élément nouveau (nombre, date, nom propre, technologie) n'y apparaît, sauf une
 compétence qui découle directement d'un fait du même item selon la table des implications
-(app.implications). Le contrôle rejette avec des motifs précis, réinjectés dans la proposition
+(app.implications), ou un nom plus large à sens unique (app.terms.ONE_WAY_SYNONYMS : « LLM » ->
+« IA générative »). Le premier mot significatif de la puce d'origine (ce qui a été fait) doit
+rester. Le contrôle rejette avec des motifs précis, réinjectés dans la proposition
 suivante ; il ne juge pas le sens (verbe gonflé, portée ajoutée) : c'est le rôle du juge LLM,
 qui ne peut que rejeter.
 
@@ -21,6 +23,7 @@ from pydantic import BaseModel, Field
 from app.implications import IMPLICATIONS, contains_term, implication_for, normalize
 from app.matcher import experience_items, quote_in_chunk
 from app.schemas import Chunk, SearchResult
+from app.terms import ONE_WAY_SYNONYMS, mentions_term
 
 PLACEHOLDERS = ("[NAME]", "[EMAIL]", "[PHONE]", "[URL]")
 _PLACEHOLDER = re.compile(r"\[(?:NAME|EMAIL|PHONE|URL)\]")
@@ -43,7 +46,10 @@ TECH_TERMS: frozenset[str] = frozenset(
         "embeddings", "faiss", "pytorch", "tensorflow", "scikit-learn", "pandas", "itsm", "servicenow", "jira",
         "windchill", "plm", "sap", "openapi", "junit", "pytest", "maven", "jpa", "hibernate", "thymeleaf",
         "file de messages", "message queue", "observabilite", "supervision", "monitoring",
-        "integration continue", "deploiement continu",
+        "integration continue", "deploiement continu", "ia generative",
+        # Traitement des données personnelles : « anonymisation » ne s'écrit que si l'item le dit
+        # déjà (une pseudonymisation n'est pas une anonymisation), sans exception.
+        "anonymisation", "anonymisations", "anonymiser", "anonymise", "anonymisee", "anonymises", "anonymisees",
     )
 )  # fmt: skip
 
@@ -69,6 +75,16 @@ PRACTICE_TERMS: dict[str, tuple[str, Callable[[str], bool]]] = {
     },
 }
 _WORD = re.compile(r"[\wÀ-ÿ][\wÀ-ÿ+#./-]*")
+_LETTERS = re.compile(r"[A-Za-zÀ-ÿ]+")
+_FILLERS = frozenset({"les", "des", "une", "aux", "pour", "avec", "sur", "dans", "par", "the"})
+
+
+def lead_word(text: str) -> str | None:
+    """Premier mot significatif d'une puce, qui nomme ce qui a été fait (« Classement de 5 000
+    tickets » -> « Classement ») : il doit rester dans la reformulation."""
+    return next((w for w in _LETTERS.findall(text) if len(w) >= 3 and w.lower() not in _FILLERS), None)
+
+
 _NUMBER = re.compile(r"\d+(?:[.,]\d+)?")
 
 
@@ -225,6 +241,16 @@ def check_grounding(
             )
         else:
             allowed_skills.add(normalize(implied.skill))
+
+    # Noms plus larges autorisés à sens unique (« LLM » cité dans l'item -> « IA générative ») :
+    # les éléments factuels du nom large sont alors admis.
+    for narrow, broad in ONE_WAY_SYNONYMS:
+        if contains_term(item_text, narrow) and mentions_term(new_text, broad):
+            allowed_skills |= {normalize(e) for e in _entities(broad)}
+
+    lead = lead_word(original)
+    if lead is not None and not mentions_term(new_text, lead):
+        issue("action_perdue", f"« {lead} » (ce que décrit la puce d'origine) doit rester dans la reformulation.")
 
     described = normalize(original)
     entities = {normalize(e): e for e in reversed(_entities(new_text))}  # un seul signalement par terme

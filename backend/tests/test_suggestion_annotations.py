@@ -85,9 +85,23 @@ def test_implicit_targets_match_the_code_detection_on_the_annotated_report() -> 
         detected = [r.requirement.id for r in report.requirements if is_implicit(r)]
         assert [e["id"] for e in data["implicit"]] == detected, case
         assert data["implicit_report"].endswith(f"{case} (run 1)")
-    # Au moins un cas par issue : reformulation possible, arrêtée par l'ancrage, par le juge seul.
+    # Décisions validées le 2026-11-23 : 8 reformulations possibles ; toute tentation est
+    # arrêtée par le code (contrôle d'ancrage), jamais par le juge seul.
     entries = [e for case in ALL_CASES for e in _load(case)["implicit"]]
-    assert {e.get("caught_by") for e in entries} == {None, "ancrage", "juge"}
+    assert sum(e["possible"] for e in entries) == 8 and len(entries) == 12
+    assert all(e["caught_by"] == "ancrage" for e in entries if "tempting_rewrite" in e)
+
+
+def _ground(chunks: list, chunk_id: int, bullet_index: int, bullet: str, text: str) -> list[str]:  # type: ignore[type-arg]
+    """Codes du contrôle d'ancrage pour `text` à la place de la puce, citée comme seul fait."""
+    settings = make_settings()
+    rewrite = BulletRewrite(
+        chunk_id=chunk_id,
+        bullet_index=bullet_index,
+        new_text=text,
+        facts=[Fact(claim="puce d'origine", chunk_id=chunk_id, quote=bullet)],
+    )
+    return check_grounding(rewrite, chunks, settings.match_reserved_sections, settings.suggest_max_length_ratio).codes()
 
 
 def test_implicit_annotations_are_consistent_with_the_cvs_and_the_checks() -> None:
@@ -107,24 +121,42 @@ def test_implicit_annotations_are_consistent_with_the_cvs_and_the_checks() -> No
             bullet = bullets(chunk.text)[source["bullet"]].text
             assert bullet == source["bullet_text"], (case, rid)
             assert not names_offer_term(bullet, requirement), (case, rid)  # le terme manque bien
-            rewrite = entry.get("expected_rewrite") or entry["tempting_rewrite"]
-            # Les termes attendus sont des termes de l'offre, et la reformulation en nomme un.
+            # Les termes attendus sont des termes de l'offre.
             assert all(names_offer_term(t, requirement) for t in entry["terms_expected"]), (case, rid)
-            assert any(mentions_term(rewrite, t) for t in entry["terms_expected"]), (case, rid)
-            grounding = check_grounding(
-                BulletRewrite(
-                    chunk_id=chunk.index,
-                    bullet_index=source["bullet"],
-                    new_text=rewrite,
-                    facts=[Fact(claim="puce d'origine", chunk_id=chunk.index, quote=bullet)],
-                ),
-                chunks,
-                settings.match_reserved_sections,
-                settings.suggest_max_length_ratio,
-            )
+
             if entry["possible"]:
-                # Une reformulation honnête passe le contrôle d'ancrage.
-                assert grounding.ok, (case, rid, grounding.codes())
+                # Une reformulation honnête nomme un terme attendu, garde ce qu'il faut garder et
+                # passe le contrôle d'ancrage.
+                honest = entry["expected_rewrite"]
+                assert any(mentions_term(honest, t) for t in entry["terms_expected"]), (case, rid)
+                assert all(mentions_term(honest, w) for w in entry.get("must_keep", [])), (case, rid)
+                assert _ground(chunks, chunk.index, source["bullet"], bullet, honest) == [], (case, rid)
             else:
-                assert entry["caught_by"] == ("juge" if grounding.ok else "ancrage"), (case, rid)
-                assert entry["reason"] and entry["temptations"], (case, rid)
+                assert "expected_rewrite" not in entry and entry["reason"] and entry["temptations"], (case, rid)
+            if "tempting_rewrite" in entry:
+                # Une tentation nomme le terme (elle passerait le contrôle du terme) mais le code la rejette.
+                tempting = entry["tempting_rewrite"]
+                assert any(mentions_term(tempting, t) for t in entry["terms_expected"]), (case, rid)
+                assert _ground(chunks, chunk.index, source["bullet"], bullet, tempting) != [], (case, rid)
+            assert "tempting_rewrite" in entry or entry["possible"], (case, rid)
+
+
+def test_ambiguous_target_keeps_the_original_action() -> None:
+    # Démo × SII R8 : garder « classement » en ajoutant le terme est acceptable ; le remplacer
+    # par « analyse » est une invention, arrêtée par l'ancrage (mot d'action perdu).
+    [entry] = [e for e in _load("demo_cv__sii")["implicit"] if e["id"] == "R8"]
+    assert entry["possible"] and entry["refusal_acceptable"] and entry["must_keep"] == ["classement"]
+    settings = make_settings()
+    chunks = chunk_cv(extract_text((EVAL / "cvs" / "demo_cv.pdf").read_bytes(), settings).text)
+
+    def codes(text: str) -> list[str]:
+        rewrite = BulletRewrite(
+            chunk_id=entry["source"]["chunk_id"],
+            bullet_index=entry["source"]["bullet"],
+            new_text=text,
+            facts=[Fact(claim="puce", chunk_id=entry["source"]["chunk_id"], quote=entry["source"]["bullet_text"])],
+        )
+        return check_grounding(rewrite, chunks, settings.match_reserved_sections).codes()
+
+    assert codes(entry["expected_rewrite"]) == []
+    assert codes(entry["tempting_rewrite"]) == ["action_perdue"]

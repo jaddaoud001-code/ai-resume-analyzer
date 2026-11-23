@@ -11,7 +11,9 @@ annotation (`implicit`) :
   niveau qui ne baisse pas ; source annotée ou non, terme attendu ou non) ;
 - suggestion sur une cible annotée impossible : **affirmation inventée** (objectif 0 ; toutes
   les suggestions sont listées pour un audit humain) ;
-- refus sur une cible impossible : **refus juste** ; sur une cible possible : **faux refus** ;
+- refus sur une cible impossible : **refus juste** ; sur une cible possible : **faux refus**, sauf
+  cible ambiguë (`refusal_acceptable`) : **refus acceptable** ; une suggestion qui perd un mot à
+  garder (`must_keep`) est une **affirmation inventée** ;
 - reformulation qui fait baisser le niveau : **baisse de niveau** (échec, non montrée) ;
 - « non traitée » (budget) et erreur du LLM : non concluant ; **réévaluation impossible** à part ;
 - compétence « mentionné » ou « non démontré » : **carte « à décrire »** (aucun appel au LLM).
@@ -76,6 +78,7 @@ Verdict = Literal[
     "gain",
     "faux_refus",
     "refus_juste",
+    "refus_acceptable",
     "carte",
     "baisse_de_niveau",
     "reevaluation_impossible",
@@ -145,6 +148,10 @@ def classify(event: Suggestion | Refusal, annotation: dict[str, Any]) -> TargetO
         levels = {"level_before": event.level_before, "level_after": event.level_after}
         if kind == "possible":
             assert entry is not None
+            lost = [w for w in entry.get("must_keep", []) if not mentions_term(event.after, w)]
+            if lost:
+                detail = f"« {', '.join(lost)} » remplacé : invention (cible ambiguë)"
+                return TargetOutcome(**base, verdict="invention", detail=detail, **levels)  # type: ignore[arg-type]
             source = entry["source"]
             return TargetOutcome(
                 **base,  # type: ignore[arg-type]
@@ -169,7 +176,8 @@ def classify(event: Suggestion | Refusal, annotation: dict[str, Any]) -> TargetO
     elif kind == "impossible":
         verdict = "refus_juste"
     elif kind == "possible":
-        verdict = "faux_refus"
+        assert entry is not None
+        verdict = "refus_acceptable" if entry.get("refusal_acceptable") else "faux_refus"
     else:
         verdict = "non_annotee"
     return TargetOutcome(**base, verdict=verdict, reason=reason, detail=event.detail)  # type: ignore[arg-type]
@@ -257,6 +265,7 @@ def summarize(results: list[CaseResult]) -> dict[str, Any]:
         "gains depuis la source annotée": sum(1 for o in gains if o.source_expected),
         "gains avec un terme attendu": sum(1 for o in gains if o.term_expected),
         "refus justes": verdicts["refus_juste"],
+        "refus acceptables (cible ambiguë)": verdicts["refus_acceptable"],
         "faux refus": verdicts["faux_refus"],
         "baisses de niveau (échecs)": verdicts["baisse_de_niveau"],
         "réévaluations en baisse (tentatives)": sum(len(r.level_drops) for r in results),

@@ -125,7 +125,7 @@
       "note": "Déjà prouvé par le CV (corrigé du matching) : si l'analyse le donne « mentionné » ou « non démontré », c'est un faux négatif du matching ; « aucune reformulation nécessaire » ou une reformulation fidèle sont acceptables, jamais comptées comme invention ni comme faux refus."
     }
   ],
-  "implicit_status": "proposé, à valider (2026-11-23)",
+  "implicit_status": "validé (2026-11-23)",
   "implicit_report": "2026-11-20_difficile_v4.json : java_cv__logistique (run 1)",
   "implicit_note": "Agent v2 : cibles implicites (compétence technique « démontré » ou « solide » dont aucune preuve citée ne nomme le terme de l'offre, app.terms.is_implicit) dans le rapport implicit_report. possible = la puce source peut nommer un terme de l'offre (terms_expected) sans rien ajouter ; sinon tempting_rewrite est la reformulation tentante, et caught_by dit qui doit l'arrêter (contrôle d'ancrage du code, ou seulement le juge). Les lacunes (gaps) reçoivent une carte « à décrire ».",
   "implicit": [

@@ -47,3 +47,6 @@ def test_implicit_only_for_proven_technical_skills_without_the_term() -> None:
     assert not is_implicit(_match("Anglais", "démontré", "TOEIC 900", category="langue"))
     assert not is_implicit(_match("Rigueur", "démontré", "revues de code", category="savoir-être"))
     assert to_describe(_match("Go", "mentionné", "Gin")) and not to_describe(_match("Go", "démontré", "Go"))
+    # Cartes étendues aux langues (sans reformulation) ; jamais aux savoir-être.
+    assert to_describe(_match("Anglais", "mentionné", "Anglais : B2", category="langue"))
+    assert not to_describe(_match("Rigueur", "non démontré", category="savoir-être"))

@@ -67,6 +67,29 @@ def _refusal(rid: str, reason: str) -> Refusal:
     )
 
 
+class TestAmbiguousTarget:
+    SII = ANNOTATIONS["demo_cv__sii"]
+
+    def _event(self, after: str | None) -> Suggestion | Refusal:
+        from app.schemas import JobRequirements
+
+        sii = JobRequirements.model_validate(
+            json.loads((Path(__file__).resolve().parents[1] / "eval/offers/sii.requirements.json").read_text())
+        )
+        requirement = next(r for r in sii.requirements if r.id == "R8")
+        if after is None:
+            return Refusal(requirement=requirement, reason="aucune_puce", message="—", shown=True, usage=TokenUsage())
+        return _suggestion("R9", bullet=0, after=after).model_copy(update={"requirement": requirement, "chunk_id": 13})
+
+    def test_refusal_and_keeping_the_action_are_acceptable_replacing_it_is_an_invention(self) -> None:
+        entry = next(e for e in self.SII["implicit"] if e["id"] == "R8")
+
+        assert classify(self._event(None), self.SII).verdict == "refus_acceptable"
+        assert classify(self._event(entry["expected_rewrite"]), self.SII).verdict == "gain"
+        invented = classify(self._event(entry["tempting_rewrite"]), self.SII)
+        assert invented.verdict == "invention" and "classement" in (invented.detail or "")
+
+
 class TestClassify:
     def test_suggestions(self) -> None:
         gain = classify(_suggestion("R9"), GAIN)

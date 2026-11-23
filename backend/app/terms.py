@@ -27,6 +27,13 @@ DIRECT_SYNONYMS: tuple[tuple[str, ...], ...] = (
     ("tests automatisés", "tests automatiques"),
 )
 
+# Noms à sens unique (étroit, large) : le nom large peut désigner ce que nomme l'étroit, pas
+# l'inverse (un LLM est un modèle d'IA générative ; l'IA générative n'est pas forcément un LLM).
+# Ils ne rendent pas une preuve explicite (un tri par mots-clés sur le nom large ne trouve pas
+# l'étroit) ; ils autorisent seulement le contrôle d'ancrage à admettre le nom large dans une
+# puce dont l'item cite l'étroit.
+ONE_WAY_SYNONYMS: tuple[tuple[str, str], ...] = (("LLM", "IA générative"),)
+
 _INTRO = re.compile(
     r"^(?:outils?|ma[iî]trise|connaissances?|exp[ée]riences?|pratique)\s+(?:d['’]\s*|de\s+|des\s+|du\s+|en\s+)",
     re.IGNORECASE,
@@ -88,11 +95,16 @@ def is_implicit(result: RequirementMatch) -> bool:
     )
 
 
+# Catégories qui reçoivent une carte « à décrire » (aucun appel au LLM) ; les reformulations
+# restent réservées aux compétences techniques (is_implicit).
+DESCRIBE_CATEGORIES = ("compétence technique", "langue")
+
+
 def to_describe(result: RequirementMatch) -> bool:
-    """Compétence technique « mentionné » ou « non démontré » : carte « si vous l'avez
-    réellement pratiqué, décrivez-le », sans texte proposé."""
+    """Compétence technique ou langue « mentionné » ou « non démontré » : carte « si vous
+    l'avez réellement pratiqué, décrivez-le », sans texte proposé."""
     return (
         result.status == "ok"
-        and result.requirement.category == "compétence technique"
+        and result.requirement.category in DESCRIBE_CATEGORIES
         and result.level in ("mentionné", "non démontré")
     )

@@ -87,8 +87,8 @@ RefusalReason = Literal[
     "erreur",
 ]
 REFUSAL_MESSAGES: dict[RefusalReason, str] = {
-    "a_decrire": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le dans une "
-    "expérience ou un projet (contexte, outils, ce que vous avez fait).",
+    "a_decrire": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce "
+    "que vous avez fait, certification éventuelle).",
     "deja_explicite": "Le terme de l'offre figure déjà dans le CV : aucune reformulation nécessaire.",
     "aucune_puce": "Aucune puce d'expérience ou de projet ne permet de nommer ce terme sans rien inventer.",
     "aucune_reformulation_fidele": "Aucune reformulation fidèle au CV n'a été trouvée.",

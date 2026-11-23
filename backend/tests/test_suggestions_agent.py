@@ -312,19 +312,22 @@ def test_level_drop_is_retried_once_then_counted_but_not_shown() -> None:
 def test_gaps_get_a_describe_card_without_llm_call() -> None:
     agent = FakeStructuredChatModel(responses=[])
 
-    events = _run(_report(levels={"R4": "mentionné", "R6": "non démontré", "R11": "non démontré"}), agent)
+    levels = {"R4": "mentionné", "R5": "mentionné", "R6": "non démontré", "R11": "non démontré"}
+    events = _run(_report(levels=levels), agent)
 
     started = events[0]
     assert isinstance(started, AgentStarted) and started.targets == []
-    assert [t.id for t in started.to_describe] == ["R4", "R6"]  # R11 : savoir-être, exclu
+    # R5 (langue) reçoit aussi sa carte ; R11 (savoir-être) est exclu.
+    assert [t.id for t in started.to_describe] == ["R4", "R5", "R6"]
     cards = [e for e in events if isinstance(e, Refusal)]
     assert [(e.requirement.id, e.reason, e.shown) for e in cards] == [
         ("R4", "a_decrire", True),
+        ("R5", "a_decrire", True),
         ("R6", "a_decrire", True),
     ]
     assert cards[0].message.startswith("Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué")
     done = events[-1]
-    assert isinstance(done, AgentDone) and (done.refusals, done.to_describe, done.suggestions) == (2, 2, 0)
+    assert isinstance(done, AgentDone) and (done.refusals, done.to_describe, done.suggestions) == (3, 3, 0)
     assert agent.calls == [] and done.usage.total_tokens == 0
 
 

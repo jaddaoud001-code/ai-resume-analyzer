@@ -423,3 +423,84 @@ class TestPracticeTermsNeedTheDescribedPractice:
         )
 
         assert "element_nouveau" in _check(GAIN, rewrite)
+
+
+# --- Règles du 2026-11-23 : anonymisation contrôlée, nom à sens unique, action gardée --------
+
+DEMO = _chunks("demo_cv.pdf")  # 11 : stage (LLM), 12 : alternance (pseudonymisation), 13 : projet
+STAGE_EVAL = "Jeu d'évaluation de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence."
+PSEUDO = "Nettoyage et pseudonymisation des données clients avant analyse."
+
+
+def _with_text(chunks: list[Chunk], index: int, old: str, new: str) -> list[Chunk]:
+    return [c.model_copy(update={"text": c.text.replace(old, new)}) if c.index == index else c for c in chunks]
+
+
+class TestAnonymisation:
+    @pytest.mark.parametrize(
+        "text",
+        [
+            "Nettoyage et anonymisation des données clients avant analyse.",
+            "Nettoyage des données clients, anonymisées avant analyse.",
+            "Nettoyage des données clients avant analyse, pour les anonymiser.",
+        ],
+    )
+    def test_pseudonymisation_never_becomes_anonymisation(self, text: str) -> None:
+        # Terme contrôlé sans exception : le code l'arrête, sans compter sur le juge.
+        assert "element_nouveau" in _check(DEMO, _rewrite(12, 1, text, [(12, PSEUDO)]))
+
+    def test_accepted_when_the_item_already_says_it(self) -> None:
+        chunks = _with_text(DEMO, 12, "pseudonymisation", "anonymisation")
+        original = PSEUDO.replace("pseudonymisation", "anonymisation")
+        text = "Nettoyage et anonymisation des données clients avant analyse, avec Pandas."
+
+        assert _check(chunks, _rewrite(12, 1, text, [(12, original)])) == []
+
+
+class TestOneWayName:
+    HONEST = "Jeu d'évaluation de 200 questions ; comparaison de trois LLM (IA générative) sur l'exactitude, le coût et la latence."  # noqa: E501
+
+    def test_llm_allows_generative_ai_without_ia_in_the_title(self) -> None:
+        # Le sigle « IA » retiré de l'intitulé du stage : l'acceptation repose sur LLM -> IA générative.
+        chunks = _with_text(DEMO, 11, "Stage ingénieure IA", "Stage ingénieure")
+        assert "IA" not in next(c for c in chunks if c.index == 11).text.replace("LLM", "")
+
+        assert _check(chunks, _rewrite(11, 1, self.HONEST, [(11, STAGE_EVAL)])) == []
+
+    def test_it_goes_through_the_one_way_rule(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        import app.grounding as grounding
+
+        chunks = _with_text(DEMO, 11, "Stage ingénieure IA", "Stage ingénieure")
+        monkeypatch.setattr(grounding, "ONE_WAY_SYNONYMS", ())
+
+        assert "element_nouveau" in _check(chunks, _rewrite(11, 1, self.HONEST, [(11, STAGE_EVAL)]))
+
+    def test_not_without_an_llm_in_the_item_nor_in_reverse(self) -> None:
+        # Alternance (aucun LLM) : « IA générative » reste un élément nouveau.
+        bullet = (
+            "Tableaux de bord de suivi des demandes de support en SQL et Python ; rapports hebdomadaires automatisés."
+        )
+        text = "Tableaux de bord d'IA générative : suivi des demandes de support en SQL et Python ; rapports."
+        assert "element_nouveau" in _check(DEMO, _rewrite(12, 0, text, [(12, bullet)]))
+        # Sens inverse : un item qui dirait « IA générative » n'autorise pas « LLM ».
+        chunks = _with_text(DEMO, 11, "trois LLM", "trois modèles d'IA générative")
+        original = STAGE_EVAL.replace("trois LLM", "trois modèles d'IA générative")
+        reverse = STAGE_EVAL.replace("trois LLM", "trois LLM d'IA générative")
+        assert "LLM" not in next(c for c in chunks if c.index == 11).text
+        assert "element_nouveau" in _check(chunks, _rewrite(11, 1, reverse, [(11, original)]))
+
+
+class TestActionKept:
+    MAINTENANCE = "Maintenance d'une application Java EE : correction d'anomalies et tests JUnit."
+
+    def test_the_word_that_opens_the_bullet_must_stay(self) -> None:
+        kept = "Maintenance d'une application Java EE : correction d'anomalies et tests automatisés JUnit."
+        lost = "Développement d'une application Java EE : correction d'anomalies et tests automatisés JUnit."
+
+        assert _check(JAVA, _rewrite(3, 0, kept, [(3, self.MAINTENANCE)])) == []
+        assert _check(JAVA, _rewrite(3, 0, lost, [(3, self.MAINTENANCE)])) == ["action_perdue"]
+
+    def test_reordering_and_plural_are_fine(self) -> None:
+        text = "Tests automatisés JUnit et correction d'anomalies lors de la maintenance d'une application Java EE."
+
+        assert _check(JAVA, _rewrite(3, 0, text, [(3, self.MAINTENANCE)])) == []

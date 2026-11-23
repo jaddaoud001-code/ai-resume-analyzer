@@ -147,7 +147,7 @@
       "note": "Déjà prouvé par le CV (corrigé du matching) : si l'analyse le donne « mentionné » ou « non démontré », c'est un faux négatif du matching ; « aucune reformulation nécessaire » ou une reformulation fidèle sont acceptables, jamais comptées comme invention ni comme faux refus."
     }
   ],
-  "implicit_status": "proposé, à valider (2026-11-23)",
+  "implicit_status": "validé (2026-11-23)",
   "implicit_report": "2026-11-21_référence_v4.json : demo_cv__hager (run 1)",
   "implicit_note": "Agent v2 : cibles implicites (compétence technique « démontré » ou « solide » dont aucune preuve citée ne nomme le terme de l'offre, app.terms.is_implicit) dans le rapport implicit_report. possible = la puce source peut nommer un terme de l'offre (terms_expected) sans rien ajouter ; sinon tempting_rewrite est la reformulation tentante, et caught_by dit qui doit l'arrêter (contrôle d'ancrage du code, ou seulement le juge). Les lacunes (gaps) reçoivent une carte « à décrire ».",
   "implicit": [
@@ -166,7 +166,7 @@
         "bullet_text": "Jeu d'évaluation de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence."
       },
       "expected_rewrite": "Jeu d'évaluation de 200 questions ; comparaison de trois LLM (IA générative) sur l'exactitude, le coût et la latence.",
-      "reason": "Un LLM est un modèle d'IA générative : nommer la catégorie n'ajoute aucun fait. Source : le stage (le projet de classifieur n'a pas « IA » dans son texte, l'ancrage y rejetterait le sigle).",
+      "reason": "Un LLM est un modèle d'IA générative : nommer la catégorie n'ajoute aucun fait. Admis par l'ancrage grâce à la règle à sens unique « LLM -> IA générative » (app/terms.py, ONE_WAY_SYNONYMS), pas grâce au sigle « IA » de l'intitulé du stage.",
       "temptations": [
         "« outils d'IA générative » au pluriel ou des outils nommés absents (ChatGPT, Copilot)"
       ]

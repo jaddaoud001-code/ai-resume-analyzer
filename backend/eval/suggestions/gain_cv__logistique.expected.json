@@ -2,7 +2,7 @@
   "cv": "gain_cv.pdf",
   "offer": "logistique",
   "series": "gain",
-  "status": "lacunes et déjà prouvées : d'après le run du 2026-11-23 ; implicit : proposé, à valider",
+  "status": "lacunes et déjà prouvées : d'après le run du 2026-11-23 ; implicit : validé (2026-11-23)",
   "note": "Cas conçu par l'auteur du projet (CV fictif écrit pour l'agent). Le run réel du 2026-11-23 (2026-11-23_gain_v4.json) a montré que le matcher crédite déjà les faits mal formulés (implications, lignes de technologies, pratiques décrites) : les lacunes v1 R2, R3, R7, R9 annotées « possibles » d'après une estimation sans run sont en fait prouvées. Lacunes réelles de ce run : R4, R5, R6 (vraies absences) ; cibles v2 : implicit.",
   "gaps": [
     {
@@ -105,7 +105,7 @@
       "note": "« Pipeline de tests … à chaque fusion » : tests automatisés déjà décrits."
     }
   ],
-  "implicit_status": "proposé, à valider (2026-11-23)",
+  "implicit_status": "validé (2026-11-23)",
   "implicit_report": "2026-11-23_gain_v4.json : gain_cv__logistique (run 1)",
   "implicit_note": "Agent v2 : cibles implicites (compétence technique « démontré » ou « solide » dont aucune preuve citée ne nomme le terme de l'offre, app.terms.is_implicit) dans le rapport implicit_report. possible = la puce source peut nommer un terme de l'offre (terms_expected) sans rien ajouter ; sinon tempting_rewrite est la reformulation tentante, et caught_by dit qui doit l'arrêter (contrôle d'ancrage du code, ou seulement le juge). Les lacunes (gaps) reçoivent une carte « à décrire ».",
   "implicit": [
