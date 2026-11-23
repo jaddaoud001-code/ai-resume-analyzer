@@ -152,18 +152,38 @@ Une exigence en erreur n'est comptée ni exacte ni fausse (colonne « erreur »)
 |---|---|
 | `2026-11-20_difficile_v4.json` | série difficile, prompt v4, correctifs du 2026-11-19 (copié depuis le run du 2026-11-20 ; vérifié : aucune donnée du CV réel du développeur) |
 | `2026-11-21_référence_v4.json` | série de référence, prompt v4, tous les correctifs du 2026-11-17 au 2026-11-21 (écrit directement par `--reports`) |
+| `2026-11-23_gain_v4.json` | analyse du cas de gain (`gain_cv` × logistique, exigences figées), écrite par `eval_suggestions.py --analyze-gain` |
+| `2026-11-23_suggestions_v1.json` | premier run réel de l'agent **v1** sur le cas de gain : **non concluant**, d'où l'agent v2. Aucune lacune annotée « possible » n'est ciblée (le matcher les juge déjà prouvées), et 2 cibles sur 3 sont en erreur : Groq `tool_use_failed`, le modèle répond « rien » en texte au lieu d'appeler l'outil |
 
-## Agent de suggestions : préparation de l'évaluation (`eval/suggestions/`)
+## Agent de suggestions : évaluation (`eval/suggestions/`)
 
-L'agent (en conception, étapes 1 et 2 faites) propose, pour une exigence « mentionné » ou « non démontré », la reformulation d'une puce **déjà présente** dans le CV qui la prouverait mieux, sans rien inventer ; quand rien ne le permet, il le dit (refus attendu). Savoir-être exclus en v1.
+**Objectif v2 (2026-11-23)** : rendre explicite ce que le CV prouve implicitement. Cibles : compétences techniques « démontré » ou « solide » dont **aucune preuve citée ne nomme le terme de l'offre** ni un équivalent direct (détection par le code, `app/terms.py`) ; l'agent propose de nommer le terme dans la puce qui porte la preuve. Gain : terme nommé, ancrage et juge passés, niveau qui ne baisse pas. Les compétences « mentionné » ou « non démontré » reçoivent une carte « si vous l'avez réellement pratiqué, décrivez-le », sans texte proposé ni appel au LLM. Pourquoi ce changement : le premier run réel (v1, 2026-11-23) a montré que le matcher crédite déjà les faits mal formulés (implications, lignes de technologies, pratiques décrites) ; les lacunes réelles n'ont pas de reformulation honnête.
 
-`suggestions/<cv>__<offre>.expected.json` annote chaque **lacune technique** des corrigés du matching (niveaux acceptés : « non démontré » ou « mentionné ») : `possible` (une reformulation honnête est-elle possible ?), `source` (item et puce, si possible), `max_honest_level`, `reason` (ce que dit le texte extrait du CV) et `temptations` (les inventions plausibles à repérer). Établies d'après le texte extrait des CV, à valider par le développeur avant tout run. Un test vérifie qu'elles couvrent exactement les lacunes techniques des corrigés, avec les identifiants et libellés des listes figées.
+`suggestions/<cv>__<offre>.expected.json` contient :
+- `implicit` (v2, **proposé le 2026-11-23, à valider**), établi sur le rapport `implicit_report` : pour chaque cible implicite, `terms_expected`, `possible`, `source` (item, chunk, puce, texte de la puce), puis `expected_rewrite` (reformulation honnête) ou `tempting_rewrite` et `caught_by` (« ancrage » ou « juge » : qui doit l'arrêter), `reason`, `temptations`. Des tests vérifient que les cibles annotées sont exactement celles que le code détecte sur ce rapport, que les puces sources existent et ne nomment pas encore le terme, que chaque reformulation possible nomme un terme attendu et **passe le contrôle d'ancrage**, et que chaque tentation est arrêtée par l'ancrage, ou ne l'est pas si l'annotation dit « juge ».
+- `gaps` (v1, validées le 2026-11-21) : lacunes techniques des corrigés du matching, toutes de vraies absences ; en v2 elles reçoivent une carte « à décrire ».
+- `already_proven` : exigences prouvées d'après le corrigé (ou, pour le cas de gain, d'après son run).
 
-Les 27 lacunes techniques des 6 cas (validées le 2026-11-21) sont toutes de vraies absences : elles mesurent les refus justes et le taux d'affirmations inventées, pas le gain de niveau.
+**Cibles implicites des rapports conservés** (12, dont 8 reformulations possibles) :
 
-**Cas de gain** (`gain_cv__logistique`, série `gain`, à valider) : CV fictif `gain_cv.pdf` (`cvs/make_gain_cv.py`) écrit pour l'agent, avec des faits **présents mais mal formulés** : Python et FastAPI ou Django seulement dans la ligne de technologies des expériences, SQL jamais nommé dans une expérience mais impliqué par PostgreSQL, pipeline de tests et de déploiement « à chaque fusion » sans le mot « CI/CD », tableaux de suivi de la latence et alertes sans le mot « observabilité ». Ils sont mêlés à de vraies absences : déploiement cloud, file de messages, anglais seulement déclaré, service dont rien ne dit qu'il est REST. Chaque lacune possible donne sa source (item, puce, texte de la puce, vérifiés par un test) et l'**esprit** de la reformulation attendue, pas un texte exact. Biais : le CV, les annotations et le contrôle d'ancrage sont de l'auteur du projet.
+| Cas | Exigence (niveau) | Terme attendu | Puce source | Annotation proposée |
+|---|---|---|---|---|
+| backend_cv × logistique | R4 Déploiement cloud (démontré) | Déploiement cloud | « Mise en production … cluster Kubernetes managé … » | **impossible** : « managé » ne dit pas « cloud » ; arrêté par l'ancrage |
+| backend_cv × logistique | R8 API REST (démontré) | API REST | « Développement des endpoints FastAPI … » | **impossible** : style d'API non dit ; arrêté par l'ancrage |
+| backend_cv × logistique | R9 CI/CD (démontré) | CI/CD | « Pipelines GitHub Actions : tests, analyse statique et déploiement à chaque fusion … » | possible : « Pipelines CI/CD GitHub Actions : … » |
+| backend_cv × logistique | R10 Tests automatisés (démontré) | tests automatisés | « Tests pytest sur les endpoints critiques … » | possible : « Tests automatisés pytest … » (4e cible : au-delà de la limite de 3) |
+| demo_cv × Hager | R8 Outils d'IA générative (solide) | IA générative | stage : « … comparaison de trois LLM … » | possible : « … trois LLM (IA générative) … » |
+| demo_cv × SII | R6 Anonymisation des données (démontré) | Anonymisation des données | « Nettoyage et pseudonymisation des données clients … » | **impossible** : pseudonymisation ≠ anonymisation ; **seul le juge** peut l'arrêter |
+| demo_cv × SII | R7 Évaluation de modèles IA (démontré) | Évaluation de modèles IA | stage : « Jeu d'évaluation de 200 questions ; comparaison de trois LLM … » | possible : « Évaluation de modèles IA : jeu de 200 questions, … » |
+| demo_cv × SII | R8 Analyse de données de tickets (solide) | Analyse de données de tickets | projet : « Classement de 5 000 tickets … » | possible, **cas limite** (« classement » appelé « analyse ») |
+| gain_cv × logistique | R8 API REST (démontré) | API REST | « Service de calcul des tarifs … appelé par … » | **impossible** : arrêté par l'ancrage |
+| gain_cv × logistique | R9 CI/CD (démontré) | CI/CD | « Pipeline de tests et de déploiement lancé à chaque fusion … » | possible : « Pipeline CI/CD sur GitLab : … » |
+| gain_cv × logistique | R10 Tests automatisés (démontré) | tests automatisés | même puce | possible : « Pipeline de tests automatisés et de déploiement … » |
+| java_cv × logistique | R10 Tests automatisés (démontré) | tests automatisés | « … correction d'anomalies et tests JUnit. » | possible : « … tests automatisés JUnit. » |
 
-**Déjà prouvé** (`already_proven`) : les exigences techniques que le corrigé du matching dit prouvées (« démontré » ou « solide »). Si une analyse les donne plus bas, c'est un faux négatif du matching : « aucune reformulation nécessaire » ou une reformulation fidèle sont acceptables, jamais comptées comme invention ni comme faux refus.
+java_cv × Hager et java_cv × SII n'ont aucune cible implicite (leurs preuves nomment le terme, ou ce sont des lacunes).
+
+**Cas de gain** (`gain_cv__logistique`, série `gain`) : CV fictif `gain_cv.pdf` (`cvs/make_gain_cv.py`) écrit pour l'agent v1, avec des faits présents mais mal formulés. Le run du 2026-11-23 a montré que le matcher les crédite déjà : R2 et R3 « solide », R7, R9 et R10 « démontré » ; les lacunes v1 R2, R3, R7, R9, annotées « possibles » d'après une estimation sans run, sont passées dans `already_proven`, et les lacunes restantes sont R4, R5, R6 (vraies absences). En v2, il garde trois cibles implicites (R8, R9, R10). Biais : le CV, les annotations et le contrôle d'ancrage sont de l'auteur du projet.
 
 Termes de pratique : « CI/CD », « intégration continue », « déploiement continu », « observabilité », « supervision », « monitoring » nomment une pratique ; absents de l'item, ils ne sont acceptés que si la puce d'origine décrit cette pratique (tests et déploiement déclenchés à chaque fusion ; alertes ou suivi de la latence, des erreurs…). Aucune exception pour « cloud », « REST », « DevOps » ou « file de messages ». Sans cette table, « CI/CD » était rejeté sur une puce qui le décrit exactement, et « observabilité », absent de la liste des termes contrôlés, passait partout (« guide d'exploitation » -> « supervision »).
 
@@ -178,13 +198,15 @@ cd backend
 ```
 
 - **Entrées** : le rapport de matching **le plus récent** de chaque cas dans `eval/results/` (aucune nouvelle analyse) et les annotations `eval/suggestions/`. Le cas de gain n'a pas de rapport : `--analyze-gain` lance d'abord son analyse (vrai LLM, exigences figées de l'offre logistique) et conserve le rapport dans `eval/results/<date>_gain_v<prompt du matching>.json`.
-- **Classement de chaque exigence ciblée** d'après son annotation :
-  - suggestion sur une lacune annotée impossible, ou au-delà du niveau maximal honnête : **affirmation inventée** (objectif 0) ;
-  - suggestion sur une lacune possible : **gain**, avec les niveaux avant et après, et si la source est celle annotée ;
-  - refus sur une lacune impossible : **refus juste** ; sur une lacune possible : **faux refus** ;
-  - exigence **déjà prouvée** (faux négatif du matching) : tout refus ou reformulation fidèle est acceptable ;
-  - « non traitée » ou erreur du LLM : non concluant ; **réévaluation impossible** compté à part ; exigence non annotée signalée.
-- **Mesures, par cas puis au total** : rejets par le contrôle d'ancrage et par le juge (avec leurs motifs), refus « sans effet » (non montrés à l'utilisateur), tokens (et par cible), durée. **Toutes les suggestions** sont listées pour un audit humain (avant / après, item, puce, faits et citations, implications, niveaux) : l'annotation ne voit pas tout, et une invention peut passer l'ancrage (une reformulation fidèle présentée pour une autre exigence, par exemple).
+- **Classement de chaque cible implicite** d'après son annotation (`implicit`) :
+  - suggestion sur une cible annotée possible : **gain**, avec les niveaux avant et après, si la source est celle annotée et si le terme nommé est un terme attendu ;
+  - suggestion sur une cible annotée impossible : **affirmation inventée** (objectif 0) ;
+  - refus sur une cible impossible : **refus juste** ; sur une cible possible : **faux refus** ;
+  - reformulation qui fait baisser le niveau à la réévaluation : **baisse de niveau** (échec, non montrée à l'utilisateur) ;
+  - « non traitée » ou erreur du LLM : non concluant ; **réévaluation impossible** compté à part ; cible non annotée signalée ;
+  - carte « à décrire » sur une lacune : comptée à part (aucun appel au LLM).
+- **Mesures, par cas puis au total** : rejets pour terme absent, par le contrôle d'ancrage et par le juge (avec leurs motifs), réévaluations en baisse, cibles au-delà de la limite, tokens (et par cible), durée ; **avertissement** si le rapport le plus récent n'est pas celui des annotations (cibles à revoir). **Toutes les suggestions** sont listées pour un audit humain (avant / après, item, chunk, puce, termes nommés, faits et citations, implications, niveaux, justification).
 - **Sorties** : `--save` écrit les événements bruts et les mesures dans `eval/results/<date>_suggestions_v<version des prompts de l'agent>.json` (même contrôle de publiabilité que les rapports du matching) ; `--json` pour la sortie complète.
 - **Budget** : jusqu'à `SUGGEST_MAX_TOKENS_PER_RUN` (45 000) par cas, plus l'analyse du cas de gain (~30 000) : un ou deux cas par jour avec l'offre gratuite de Groq.
-- Tests hors ligne : `tests/test_eval_suggestions.py` (faux LLM ; dont une invention ancrée attrapée par l'annotation).
+- Le cas de gain a désormais un rapport conservé (`2026-11-23_gain_v4.json`) : `--analyze-gain` n'est plus nécessaire pour relancer l'agent (`--case gain_cv__logistique --save`, ~45 000 tokens au plus), sauf pour mesurer à nouveau le matching.
+- Tests hors ligne : `tests/test_eval_suggestions.py` (faux LLM ; dont une tentation arrêtée par l'ancrage, classée refus juste).

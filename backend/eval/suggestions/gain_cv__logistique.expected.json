@@ -2,97 +2,14 @@
   "cv": "gain_cv.pdf",
   "offer": "logistique",
   "series": "gain",
-  "status": "proposé, à valider",
-  "note": "Cas conçu par l'auteur du projet (CV fictif écrit pour l'agent) : faits présents mais mal formulés, mêlés à de vraies absences. Niveaux actuels établis d'après le texte extrait et les règles du matching (pas de run) ; savoir-être exclus (v1).",
+  "status": "lacunes et déjà prouvées : d'après le run du 2026-11-23 ; implicit : proposé, à valider",
+  "note": "Cas conçu par l'auteur du projet (CV fictif écrit pour l'agent). Le run réel du 2026-11-23 (2026-11-23_gain_v4.json) a montré que le matcher crédite déjà les faits mal formulés (implications, lignes de technologies, pratiques décrites) : les lacunes v1 R2, R3, R7, R9 annotées « possibles » d'après une estimation sans run sont en fait prouvées. Lacunes réelles de ce run : R4, R5, R6 (vraies absences) ; cibles v2 : implicit.",
   "gaps": [
-    {
-      "id": "R2",
-      "label": "Python",
-      "current_levels": [
-        "mentionné"
-      ],
-      "possible": true,
-      "source": {
-        "item": "Développeuse backend · Transports Velmaris",
-        "bullet": 0,
-        "bullet_text": "Service de calcul des tarifs de livraison, appelé par le site marchand et l'application des livreurs."
-      },
-      "expected_rewrite": "Nommer Python (et FastAPI) dans la puce du service de calcul des tarifs : les deux figurent dans la ligne de technologies de cette expérience.",
-      "max_honest_level": "démontré",
-      "reason": "Python n'apparaît que dans les lignes de technologies (« Python · FastAPI · PostgreSQL · Docker », « Python · Django · MySQL ») et la liste de compétences. Une seule puce reformulée : « démontré » (« solide » demanderait deux expériences). La source doit être Velmaris (mars 2022 – en cours, 57 mois au 2026-11-14) : Brumelle seule (30 mois) resterait sous les 3 ans exigés, donc plafonnée à « mentionné ».",
-      "temptations": [
-        "allonger ou affirmer une durée (« 5 ans de Python »)",
-        "attribuer Python à une réalisation qui ne le dit pas dans une autre expérience"
-      ]
-    },
-    {
-      "id": "R3",
-      "label": "SQL et bases de données relationnelles",
-      "current_levels": [
-        "mentionné",
-        "démontré"
-      ],
-      "possible": true,
-      "source": {
-        "item": "Développeuse backend · Transports Velmaris",
-        "bullet": 3,
-        "bullet_text": "Traitement des requêtes lentes de la base des commandes : index et réécriture des requêtes."
-      },
-      "expected_rewrite": "Nommer SQL et PostgreSQL dans la puce du traitement des requêtes lentes : PostgreSQL figure dans la ligne de technologies de l'expérience, et un SGBD relationnel implique SQL (table des implications).",
-      "max_honest_level": "démontré",
-      "reason": "SQL n'est nommé que dans la liste de compétences ; le travail sur les requêtes et les index est décrit sans le nom du langage ni du SGBD (PostgreSQL seulement dans la ligne de technologies).",
-      "temptations": [
-        "ajouter un volume ou un gain chiffré (« requêtes 10 fois plus rapides »)",
-        "MySQL (Brumelle) attribué à Velmaris"
-      ]
-    },
-    {
-      "id": "R7",
-      "label": "Observabilité (métriques, tableaux de bord, alertes)",
-      "current_levels": [
-        "mentionné",
-        "démontré"
-      ],
-      "possible": true,
-      "source": {
-        "item": "Développeuse backend · Transports Velmaris",
-        "bullet": 2,
-        "bullet_text": "Tableaux de suivi de la latence et alertes envoyées à l'astreinte en cas d'erreurs."
-      },
-      "expected_rewrite": "Nommer la pratique (« observabilité », « supervision ») : la puce décrit des tableaux de suivi de la latence et des alertes.",
-      "max_honest_level": "démontré",
-      "reason": "La pratique est décrite sans le terme de l'offre et sans outil nommé.",
-      "temptations": [
-        "ajouter des outils absents (Grafana, Prometheus)",
-        "ajouter des métriques chiffrées (disponibilité 99,9 %)"
-      ]
-    },
-    {
-      "id": "R9",
-      "label": "CI/CD",
-      "current_levels": [
-        "mentionné",
-        "démontré"
-      ],
-      "possible": true,
-      "source": {
-        "item": "Développeuse backend · Transports Velmaris",
-        "bullet": 1,
-        "bullet_text": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
-      },
-      "expected_rewrite": "Nommer la pratique (« CI/CD », « intégration et déploiement continus ») : la puce décrit des tests et un déploiement déclenchés à chaque fusion.",
-      "max_honest_level": "démontré",
-      "reason": "Intégration et déploiement continus décrits sans le sigle de l'offre.",
-      "temptations": [
-        "« GitLab CI » ou un autre outil non écrit",
-        "déploiement « dans le cloud » ou « sur Kubernetes »"
-      ]
-    },
     {
       "id": "R4",
       "label": "Déploiement cloud",
       "current_levels": [
-        "non démontré"
+        "mentionné"
       ],
       "possible": false,
       "source": null,
@@ -135,23 +52,6 @@
         "« traitements asynchrones par file de messages »",
         "RabbitMQ ou Kafka ajoutés"
       ]
-    },
-    {
-      "id": "R8",
-      "label": "API REST",
-      "current_levels": [
-        "non démontré",
-        "mentionné"
-      ],
-      "possible": false,
-      "source": null,
-      "expected_rewrite": null,
-      "max_honest_level": "mentionné",
-      "reason": "Un service appelé par le site et l'application, avec FastAPI dans la ligne de technologies : rien n'écrit que c'est une API REST (style d'API non dit, et non impliqué par la table).",
-      "temptations": [
-        "« API REST de calcul des tarifs »",
-        "« endpoints REST »"
-      ]
     }
   ],
   "already_proven": [
@@ -165,12 +65,112 @@
       "note": "« Développeuse backend · Transports Velmaris » (mars 2022 – en cours, 57 mois) : déjà prouvé ; aucune reformulation nécessaire."
     },
     {
+      "id": "R2",
+      "label": "Python",
+      "levels": [
+        "solide"
+      ],
+      "note": "Prouvé d'après le run du 2026-11-23 (niveau solide) ; les faits mal formulés sont crédités par le matcher (implication, ligne de technologies ou pratique décrite)."
+    },
+    {
+      "id": "R3",
+      "label": "SQL et bases de données relationnelles",
+      "levels": [
+        "solide"
+      ],
+      "note": "Prouvé d'après le run du 2026-11-23 (niveau solide) ; les faits mal formulés sont crédités par le matcher (implication, ligne de technologies ou pratique décrite)."
+    },
+    {
+      "id": "R7",
+      "label": "Observabilité (métriques, tableaux de bord, alertes)",
+      "levels": [
+        "démontré"
+      ],
+      "note": "Prouvé d'après le run du 2026-11-23 (niveau démontré) ; les faits mal formulés sont crédités par le matcher (implication, ligne de technologies ou pratique décrite)."
+    },
+    {
+      "id": "R9",
+      "label": "CI/CD",
+      "levels": [
+        "démontré"
+      ],
+      "note": "Prouvé d'après le run du 2026-11-23 (niveau démontré) ; les faits mal formulés sont crédités par le matcher (implication, ligne de technologies ou pratique décrite)."
+    },
+    {
       "id": "R10",
       "label": "Tests automatisés",
       "levels": [
         "démontré"
       ],
       "note": "« Pipeline de tests … à chaque fusion » : tests automatisés déjà décrits."
+    }
+  ],
+  "implicit_status": "proposé, à valider (2026-11-23)",
+  "implicit_report": "2026-11-23_gain_v4.json : gain_cv__logistique (run 1)",
+  "implicit_note": "Agent v2 : cibles implicites (compétence technique « démontré » ou « solide » dont aucune preuve citée ne nomme le terme de l'offre, app.terms.is_implicit) dans le rapport implicit_report. possible = la puce source peut nommer un terme de l'offre (terms_expected) sans rien ajouter ; sinon tempting_rewrite est la reformulation tentante, et caught_by dit qui doit l'arrêter (contrôle d'ancrage du code, ou seulement le juge). Les lacunes (gaps) reçoivent une carte « à décrire ».",
+  "implicit": [
+    {
+      "id": "R8",
+      "label": "API REST",
+      "level": "démontré",
+      "terms_expected": [
+        "API REST"
+      ],
+      "possible": false,
+      "source": {
+        "item": "Développeuse backend · Transports Velmaris",
+        "chunk_id": 2,
+        "bullet": 0,
+        "bullet_text": "Service de calcul des tarifs de livraison, appelé par le site marchand et l'application des livreurs."
+      },
+      "tempting_rewrite": "API REST de calcul des tarifs de livraison, appelée par le site marchand et l'application des livreurs.",
+      "caught_by": "ancrage",
+      "reason": "Un service appelé par deux applications ne dit pas le style d'API ; FastAPI -> REST n'est pas une implication de la table (« démontré » du matcher à surveiller, README).",
+      "temptations": [
+        "« service … appelé par » réécrit en « API REST »"
+      ]
+    },
+    {
+      "id": "R9",
+      "label": "CI/CD",
+      "level": "démontré",
+      "terms_expected": [
+        "CI/CD",
+        "intégration continue",
+        "déploiement continu"
+      ],
+      "possible": true,
+      "source": {
+        "item": "Développeuse backend · Transports Velmaris",
+        "chunk_id": 2,
+        "bullet": 1,
+        "bullet_text": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+      },
+      "expected_rewrite": "Pipeline CI/CD sur GitLab : tests et déploiement lancés à chaque fusion sur la branche principale.",
+      "reason": "Tests et déploiement lancés à chaque fusion : intégration et déploiement continus décrits sans leur nom.",
+      "temptations": [
+        "ajouter un hébergement cloud ou un outil absent"
+      ]
+    },
+    {
+      "id": "R10",
+      "label": "Tests automatisés",
+      "level": "démontré",
+      "terms_expected": [
+        "tests automatisés"
+      ],
+      "possible": true,
+      "source": {
+        "item": "Développeuse backend · Transports Velmaris",
+        "chunk_id": 2,
+        "bullet": 1,
+        "bullet_text": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+      },
+      "expected_rewrite": "Pipeline de tests automatisés et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.",
+      "reason": "Des tests lancés à chaque fusion par un pipeline sont automatisés par définition.",
+      "temptations": [
+        "ajouter un type de tests ou une couverture"
+      ]
     }
   ]
 }

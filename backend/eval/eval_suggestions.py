@@ -1,21 +1,22 @@
-"""Évaluation de l'agent de suggestions (hors pytest).
+"""Évaluation de l'agent de suggestions v2 (hors pytest).
 
 Entrées : les rapports bruts du matching conservés dans eval/results/ (le plus récent pour
 chaque cas, aucune nouvelle analyse) et les annotations eval/suggestions/<cas>.expected.json.
 Pour chaque cas, l'agent (vrai LLM de l'agent, vrai matcher pour la réévaluation, limiteur
-partagé) tourne sur le rapport et le CV fictif ; chaque exigence ciblée est classée d'après
-son annotation :
+partagé) tourne sur le rapport et le CV fictif. Objectif v2 : nommer le terme de l'offre dans
+la puce qui porte une preuve implicite. Chaque cible implicite est classée d'après son
+annotation (`implicit`) :
 
-- suggestion sur une lacune annotée impossible, ou au-delà du niveau maximal honnête :
-  **affirmation inventée** (objectif 0 ; toutes les suggestions sont listées pour un audit
-  humain, car l'annotation ne voit pas tout) ;
-- suggestion sur une lacune possible : **gain** (niveau avant -> après, source attendue ou non) ;
-- refus sur une lacune impossible : **refus juste** ; sur une lacune possible : **faux refus** ;
-- exigence **déjà prouvée** (faux négatif du matching) : « aucune reformulation nécessaire » ou
-  reformulation fidèle acceptables, jamais comptées comme invention ni comme faux refus ;
-- « non traitée » (budget) et erreur du LLM : non concluant ; **réévaluation impossible** à part.
-S'y ajoutent les rejets par le contrôle d'ancrage et par le juge (avec motifs), les refus
-« sans effet » (non montrés à l'utilisateur), les tokens et la durée.
+- suggestion sur une cible annotée possible : **gain** (terme nommé, ancrage et juge passés,
+  niveau qui ne baisse pas ; source annotée ou non, terme attendu ou non) ;
+- suggestion sur une cible annotée impossible : **affirmation inventée** (objectif 0 ; toutes
+  les suggestions sont listées pour un audit humain) ;
+- refus sur une cible impossible : **refus juste** ; sur une cible possible : **faux refus** ;
+- reformulation qui fait baisser le niveau : **baisse de niveau** (échec, non montrée) ;
+- « non traitée » (budget) et erreur du LLM : non concluant ; **réévaluation impossible** à part ;
+- compétence « mentionné » ou « non démontré » : **carte « à décrire »** (aucun appel au LLM).
+S'y ajoutent les rejets par le contrôle d'ancrage, par le juge et pour terme absent (avec
+motifs), les tokens et la durée.
 
 Usage (depuis backend/) :
     .venv/bin/python eval/eval_suggestions.py                     # cas qui ont un rapport
@@ -55,26 +56,28 @@ from app.suggestions import (  # noqa: E402
     SUGGEST_PROMPT_VERSION,
     AgentDone,
     AgentError,
+    AgentStarted,
     AgentStep,
     Refusal,
     Suggestion,
     suggest,
 )
+from app.terms import mentions_term  # noqa: E402
 
 EVAL_DIR = BACKEND_DIR / "eval"
 ANNOTATIONS_DIR = EVAL_DIR / "suggestions"
 RESULTS_DIR = EVAL_DIR / "results"
 EVAL_TODAY = date(2026, 11, 14)  # même date fixe que l'évaluation du matching
 GAIN_CASE = "gain_cv__logistique"
-LEVEL_RANK = {"non démontré": 0, "mentionné": 1, "démontré": 2, "solide": 3}
 
-Kind = Literal["possible", "impossible", "deja_prouve", "non_annotee"]
+Kind = Literal["possible", "impossible", "lacune", "non_annotee"]
 Verdict = Literal[
     "invention",
     "gain",
     "faux_refus",
     "refus_juste",
-    "deja_prouve_acceptable",
+    "carte",
+    "baisse_de_niveau",
     "reevaluation_impossible",
     "non_concluant",
     "non_annotee",
@@ -101,13 +104,19 @@ def latest_reports(directory: Path = RESULTS_DIR) -> dict[str, tuple[str, MatchR
     return found
 
 
+def report_by_source(source: str, directory: Path = RESULTS_DIR) -> MatchReport:
+    """Le rapport désigné par « <fichier> : <clé> » (champ implicit_report des annotations)."""
+    name, key = source.split(" : ", 1)
+    return MatchReport.model_validate(json.loads((directory / name).read_text(encoding="utf-8"))[key])
+
+
 def annotation_kind(annotation: dict[str, Any], requirement_id: str) -> tuple[Kind, dict[str, Any] | None]:
+    for entry in annotation.get("implicit", []):
+        if entry["id"] == requirement_id:
+            return ("possible" if entry["possible"] else "impossible"), entry
     for gap in annotation.get("gaps", []):
         if gap["id"] == requirement_id:
-            return ("possible" if gap["possible"] else "impossible"), gap
-    for entry in annotation.get("already_proven", []):
-        if entry["id"] == requirement_id:
-            return "deja_prouve", entry
+            return "lacune", gap
     return "non_annotee", None
 
 
@@ -123,7 +132,8 @@ class TargetOutcome:
     reason: str | None = None  # raison du refus, ou None pour une suggestion
     level_before: str | None = None
     level_after: str | None = None
-    source_expected: bool | None = None  # suggestion sur une lacune possible : source annotée ?
+    source_expected: bool | None = None  # gain : puce source annotée ?
+    term_expected: bool | None = None  # gain : un des termes attendus est nommé ?
     detail: str | None = None
 
 
@@ -133,27 +143,29 @@ def classify(event: Suggestion | Refusal, annotation: dict[str, Any]) -> TargetO
     base = {"id": requirement.id, "label": requirement.label, "kind": kind}
     if isinstance(event, Suggestion):
         levels = {"level_before": event.level_before, "level_after": event.level_after}
-        if kind == "impossible":
-            return TargetOutcome(
-                **base, verdict="invention", detail="suggestion sur une lacune sans suggestion honnête", **levels
-            )  # type: ignore[arg-type]
         if kind == "possible":
             assert entry is not None
-            if LEVEL_RANK.get(event.level_after, 0) > LEVEL_RANK.get(entry["max_honest_level"], 0):
-                return TargetOutcome(**base, verdict="invention", detail="niveau au-delà du maximum honnête", **levels)  # type: ignore[arg-type]
-            source = entry["source"] or {}
-            expected = event.item == source.get("item") and event.bullet_index == source.get("bullet")
-            return TargetOutcome(**base, verdict="gain", source_expected=expected, **levels)  # type: ignore[arg-type]
-        if kind == "deja_prouve":
-            return TargetOutcome(**base, verdict="deja_prouve_acceptable", detail="reformulation à auditer", **levels)  # type: ignore[arg-type]
+            source = entry["source"]
+            return TargetOutcome(
+                **base,  # type: ignore[arg-type]
+                verdict="gain",
+                source_expected=event.chunk_id == source["chunk_id"] and event.bullet_index == source["bullet"],
+                term_expected=any(mentions_term(event.after, t) for t in entry["terms_expected"]),
+                **levels,
+            )
+        if kind == "impossible":
+            return TargetOutcome(**base, verdict="invention", detail="aucune reformulation honnête annotée", **levels)  # type: ignore[arg-type]
         return TargetOutcome(**base, verdict="non_annotee", **levels)  # type: ignore[arg-type]
     reason = event.reason
-    if reason == "reevaluation_impossible":
-        verdict: Verdict = "reevaluation_impossible"
+    verdict: Verdict
+    if reason == "a_decrire":
+        verdict = "carte"
+    elif reason == "baisse_de_niveau":
+        verdict = "baisse_de_niveau"
+    elif reason == "reevaluation_impossible":
+        verdict = "reevaluation_impossible"
     elif reason in ("non_traitee", "erreur"):
         verdict = "non_concluant"
-    elif kind == "deja_prouve":
-        verdict = "deja_prouve_acceptable"
     elif kind == "impossible":
         verdict = "refus_juste"
     elif kind == "possible":
@@ -171,21 +183,25 @@ class CaseResult:
     suggestions: list[dict[str, Any]] = field(default_factory=list)  # audit humain
     grounding_rejections: list[str] = field(default_factory=list)
     judge_rejections: list[str] = field(default_factory=list)
-    hidden_no_gain: int = 0
+    term_rejections: list[str] = field(default_factory=list)
+    level_drops: list[str] = field(default_factory=list)  # chaque réévaluation en baisse
+    skipped: int = 0  # cibles implicites au-delà de la limite
     usage: dict[str, int] = field(default_factory=dict)
     seconds: float = 0.0
     error: str | None = None
+    warning: str | None = None
     events: list[dict[str, Any]] = field(default_factory=list, repr=False)
 
 
 def measure(case: str, report_source: str, events: list[Any], annotation: dict[str, Any], seconds: float) -> CaseResult:
     result = CaseResult(case=case, report_source=report_source, seconds=seconds)
+    annotated = annotation.get("implicit_report")
+    if annotated and annotated != report_source:
+        result.warning = f"annotations établies sur {annotated} : cibles à revoir"
     for event in events:
         if isinstance(event, Suggestion | Refusal):
             outcome = classify(event, annotation)
             result.outcomes.append(outcome)
-            if isinstance(event, Refusal) and event.reason == "sans_effet":
-                result.hidden_no_gain += 1
             if isinstance(event, Suggestion):
                 result.suggestions.append(
                     {
@@ -193,19 +209,30 @@ def measure(case: str, report_source: str, events: list[Any], annotation: dict[s
                         "exigence": event.requirement.label,
                         "verdict": outcome.verdict,
                         "item": event.item,
+                        "chunk": event.chunk_id,
                         "puce": event.bullet_index,
                         "avant": event.before,
                         "après": event.after,
+                        "termes": event.terms,
                         "faits": [f"[{f.chunk_id}] « {f.quote} » -> {f.claim}" for f in event.facts],
                         "implications": [f"{s.skill} <- « {s.quote} »" for s in event.implied_skills],
                         "niveaux": f"{event.level_before} -> {event.level_after}",
                         "justification": event.justification,
                     }
                 )
-        elif isinstance(event, AgentStep) and event.kind == "verify" and event.status == "rejected":
+        elif isinstance(event, AgentStarted):
+            result.skipped = event.skipped
+        elif isinstance(event, AgentStep) and event.status == "rejected" and event.kind in ("verify", "reevaluate"):
             detail = event.detail or ""
-            target = result.judge_rejections if detail.startswith("Juge") else result.grounding_rejections
-            target.append(f"{event.requirement_id} (tentative {event.attempt}) : {detail}")
+            line = f"{event.requirement_id} (tentative {event.attempt}) : {detail}"
+            if event.kind == "reevaluate":
+                result.level_drops.append(line)
+            elif detail.startswith("Juge"):
+                result.judge_rejections.append(line)
+            elif detail.startswith("Terme absent"):
+                result.term_rejections.append(line)
+            else:
+                result.grounding_rejections.append(line)
         elif isinstance(event, AgentDone):
             result.usage = event.usage.model_dump()
         elif isinstance(event, AgentError):
@@ -216,26 +243,31 @@ def measure(case: str, report_source: str, events: list[Any], annotation: dict[s
 
 def summarize(results: list[CaseResult]) -> dict[str, Any]:
     outcomes = [o for r in results for o in r.outcomes]
+    targets = [o for o in outcomes if o.verdict != "carte"]
     verdicts = Counter(o.verdict for o in outcomes)
-    possible = [o for o in outcomes if o.kind == "possible"]
+    possible = [o for o in targets if o.kind == "possible"]
     gains = [o for o in possible if o.verdict == "gain"]
     tokens = sum(r.usage.get("total_tokens", 0) for r in results)
     return {
-        "cibles": len(outcomes),
+        "cibles implicites traitées": len(targets),
+        "cibles au-delà de la limite": sum(r.skipped for r in results),
+        "cartes « à décrire »": verdicts["carte"],
         "affirmations inventées": verdicts["invention"],
-        "refus justes": verdicts["refus_juste"],
-        "faux refus": verdicts["faux_refus"],
-        "déjà prouvées (acceptable)": verdicts["deja_prouve_acceptable"],
         "gains": f"{len(gains)}/{len(possible)}" if possible else "–",
         "gains depuis la source annotée": sum(1 for o in gains if o.source_expected),
+        "gains avec un terme attendu": sum(1 for o in gains if o.term_expected),
+        "refus justes": verdicts["refus_juste"],
+        "faux refus": verdicts["faux_refus"],
+        "baisses de niveau (échecs)": verdicts["baisse_de_niveau"],
+        "réévaluations en baisse (tentatives)": sum(len(r.level_drops) for r in results),
         "réévaluations impossibles": verdicts["reevaluation_impossible"],
         "non concluants": verdicts["non_concluant"],
         "non annotées": verdicts["non_annotee"],
-        "sans effet (non montrés)": sum(r.hidden_no_gain for r in results),
         "rejets par l'ancrage": sum(len(r.grounding_rejections) for r in results),
         "rejets par le juge": sum(len(r.judge_rejections) for r in results),
+        "rejets pour terme absent": sum(len(r.term_rejections) for r in results),
         "tokens": tokens,
-        "tokens par cible": round(tokens / len(outcomes)) if outcomes else None,
+        "tokens par cible": round(tokens / len(targets)) if targets else None,
         "durée (s)": round(sum(r.seconds for r in results), 1),
         "arrêts": [f"{r.case} : {r.error}" for r in results if r.error],
     }
@@ -358,17 +390,26 @@ def print_report(results: list[CaseResult], settings: Settings) -> None:
     for result in results:
         print(f"\n=== {result.case} — {result.seconds:.0f} s ; {result.usage.get('total_tokens', 0)} tokens")
         print(f"  Rapport de matching : {result.report_source}")
+        if result.warning:
+            print(f"  ATTENTION : {result.warning}")
         for o in result.outcomes:
             levels = f" ; {o.level_before} -> {o.level_after}" if o.level_after else ""
             source = (
                 "" if o.source_expected is None else (" ; source annotée" if o.source_expected else " ; autre source")
             )
+            detail = f" — {o.detail}" if o.detail and o.verdict not in ("carte", "gain") else ""
             print(f"  {o.id:>3} {o.label[:40]:<40} [{o.kind}] {o.verdict.upper()}"
-                  f"{f' ({o.reason})' if o.reason else ''}{levels}{source}")  # fmt: skip
-        for line in result.grounding_rejections:
-            print(f"    rejet par l'ancrage : {line}")
-        for line in result.judge_rejections:
-            print(f"    rejet par le juge : {line}")
+                  f"{f' ({o.reason})' if o.reason else ''}{levels}{source}{detail}")  # fmt: skip
+        if result.skipped:
+            print(f"    cibles implicites au-delà de la limite : {result.skipped}")
+        for label, lines in (
+            ("terme absent", result.term_rejections),
+            ("rejet par l'ancrage", result.grounding_rejections),
+            ("rejet par le juge", result.judge_rejections),
+            ("réévaluation en baisse", result.level_drops),
+        ):
+            for line in lines:
+                print(f"    {label} : {line}")
         if result.error:
             print(f"  ARRÊT : {result.error}")
     print("\n=== Suggestions à auditer (toutes)")
@@ -376,11 +417,12 @@ def print_report(results: list[CaseResult], settings: Settings) -> None:
         for s in result.suggestions:
             print(
                 f"  [{s['verdict']}] {result.case} {s['id']} {s['exigence']} ({s['niveaux']})"
-                f" — {s['item']}, puce {s['puce']}"
+                f" — {s['item']}, chunk {s['chunk']}, puce {s['puce']} ; termes : {', '.join(s['termes'])}"
             )
             print(f"      avant : {s['avant']}\n      après : {s['après']}")
             for line in s["faits"] + s["implications"]:
                 print(f"      {line}")
+            print(f"      justification : {s['justification']}")
     print("\n=== Synthèse")
     for key, value in summarize(results).items():
         print(f"  {key} : {value}")

@@ -1,43 +1,57 @@
-"""Évaluation de l'agent de suggestions (eval/eval_suggestions.py) : classification d'après les
-annotations, choix des rapports, mesures ; de bout en bout avec de faux LLM. Aucun appel réseau."""
+"""Évaluation de l'agent de suggestions v2 (eval/eval_suggestions.py) : classification d'après
+les annotations (cibles implicites, lacunes), choix des rapports, mesures ; de bout en bout
+avec de faux LLM. Aucun appel réseau."""
 
 import asyncio
 import json
 from pathlib import Path
 
+from app.grounding import Fact
 from app.llm_calls import RateLimiter
 from app.schemas import TokenUsage
-from app.suggestions import JudgeVerdict, Refusal, SearchDecision, Suggestion
+from app.suggestions import AgentStarted, AgentStep, JudgeVerdict, Proposal, Refusal, SearchDecision, Suggestion
 from eval.eval_suggestions import (
     GAIN_CASE,
     classify,
     latest_reports,
     load_annotations,
     measure,
+    report_by_source,
     results_path,
     run_case,
     summarize,
 )
 from tests.conftest import FakeStructuredChatModel, KeywordEmbeddings, make_settings
-from tests.test_suggestions_agent import CANDIDATE_CI_CD, HONEST, JOB, _matcher, _report
+from tests.test_suggestions_agent import (
+    CANDIDATE_CI_CD,
+    HONEST,
+    HONEST_CI_CD,
+    IMPLICIT_CI_CD,
+    JOB,
+    VELMARIS,
+    _matcher,
+    _report,
+)
 
 ANNOTATIONS = load_annotations()
 GAIN = ANNOTATIONS[GAIN_CASE]
 REQUIREMENTS = {r.id: r for r in JOB.requirements}
+SERVICE = "Service de calcul des tarifs de livraison, appelé par le site marchand et l'application des livreurs."
 
 
-def _suggestion(rid: str, before: str = "mentionné", after: str = "démontré", bullet: int = 1) -> Suggestion:
+def _suggestion(rid: str, bullet: int = 1, after: str = HONEST_CI_CD) -> Suggestion:
     return Suggestion(
         requirement=REQUIREMENTS[rid],
         item="Développeuse backend · Transports Velmaris",
-        chunk_id=2,
+        chunk_id=VELMARIS,
         bullet_index=bullet,
         before="avant",
-        after="après",
+        after=after,
+        terms=["CI/CD"],
         facts=[],
         implied_skills=[],
-        level_before=before,
-        level_after=after,
+        level_before="démontré",
+        level_after="démontré",
         justification="—",
         usage=TokenUsage(),
     )
@@ -45,47 +59,59 @@ def _suggestion(rid: str, before: str = "mentionné", after: str = "démontré",
 
 def _refusal(rid: str, reason: str) -> Refusal:
     return Refusal(
-        requirement=REQUIREMENTS[rid], reason=reason, message="—", shown=reason != "sans_effet", usage=TokenUsage()
-    )  # type: ignore[arg-type]
+        requirement=REQUIREMENTS[rid],
+        reason=reason,  # type: ignore[arg-type]
+        message="—",
+        shown=reason != "baisse_de_niveau",
+        usage=TokenUsage(),
+    )
 
 
 class TestClassify:
     def test_suggestions(self) -> None:
-        assert classify(_suggestion("R9"), GAIN).verdict == "gain"  # lacune possible
-        assert classify(_suggestion("R9"), GAIN).source_expected is True  # Velmaris, puce 1
+        gain = classify(_suggestion("R9"), GAIN)
+        assert (gain.verdict, gain.source_expected, gain.term_expected) == ("gain", True, True)
         assert classify(_suggestion("R9", bullet=2), GAIN).source_expected is False
-        assert classify(_suggestion("R4"), GAIN).verdict == "invention"  # lacune impossible
-        assert classify(_suggestion("R9", after="solide"), GAIN).verdict == "invention"  # au-delà du maximum
-        assert classify(_suggestion("R1"), GAIN).verdict == "deja_prouve_acceptable"
+        assert classify(_suggestion("R10", after="Pipeline sur GitLab."), GAIN).term_expected is False
+        assert classify(_suggestion("R8"), GAIN).verdict == "invention"  # cible annotée impossible
+        assert classify(_suggestion("R1"), GAIN).verdict == "non_annotee"
 
     def test_refusals(self) -> None:
-        assert classify(_refusal("R4", "rien_dans_le_cv"), GAIN).verdict == "refus_juste"
-        assert classify(_refusal("R4", "sans_effet"), GAIN).verdict == "refus_juste"
-        assert classify(_refusal("R9", "rien_dans_le_cv"), GAIN).verdict == "faux_refus"
-        assert classify(_refusal("R9", "aucune_reformulation_fidele"), GAIN).verdict == "faux_refus"
-        # Déjà prouvé : jamais faux refus.
-        assert classify(_refusal("R1", "deja_prouve"), GAIN).verdict == "deja_prouve_acceptable"
-        assert classify(_refusal("R1", "rien_dans_le_cv"), GAIN).verdict == "deja_prouve_acceptable"
+        assert classify(_refusal("R8", "aucune_puce"), GAIN).verdict == "refus_juste"
+        assert classify(_refusal("R8", "aucune_reformulation_fidele"), GAIN).verdict == "refus_juste"
+        assert classify(_refusal("R9", "aucune_puce"), GAIN).verdict == "faux_refus"
+        assert classify(_refusal("R9", "deja_explicite"), GAIN).verdict == "faux_refus"
+        assert classify(_refusal("R9", "baisse_de_niveau"), GAIN).verdict == "baisse_de_niveau"
         assert classify(_refusal("R9", "reevaluation_impossible"), GAIN).verdict == "reevaluation_impossible"
         assert classify(_refusal("R9", "non_traitee"), GAIN).verdict == "non_concluant"
+        assert classify(_refusal("R9", "erreur"), GAIN).verdict == "non_concluant"
+        card = classify(_refusal("R4", "a_decrire"), GAIN)
+        assert (card.kind, card.verdict) == ("lacune", "carte")
 
 
-def test_measure_splits_grounding_and_judge_rejections() -> None:
-    from app.suggestions import AgentStep
-
+def test_measure_splits_rejections_by_cause() -> None:
     events = [
+        AgentStarted(targets=[], skipped=2, limits={}),
+        AgentStep(requirement_id="R9", kind="verify", status="rejected", attempt=1, detail="Terme absent : …"),
         AgentStep(
             requirement_id="R9", kind="verify", status="rejected", attempt=1, detail="Contrôle d'ancrage : « cloud »"
         ),
         AgentStep(requirement_id="R9", kind="verify", status="rejected", attempt=2, detail="Juge : verbe renforcé"),
-        _refusal("R9", "sans_effet"),
+        AgentStep(requirement_id="R9", kind="reevaluate", status="rejected", attempt=2, detail="Baisse de niveau"),
+        _refusal("R9", "baisse_de_niveau"),
     ]
 
-    result = measure(GAIN_CASE, "rapport", events, GAIN, 1.0)
+    result = measure(GAIN_CASE, GAIN["implicit_report"], events, GAIN, 1.0)
 
-    assert len(result.grounding_rejections) == 1 and len(result.judge_rejections) == 1
-    assert result.hidden_no_gain == 1
-    assert [o.verdict for o in result.outcomes] == ["faux_refus"]
+    assert [len(x) for x in (result.term_rejections, result.grounding_rejections, result.judge_rejections)] == [1] * 3
+    assert len(result.level_drops) == 1 and result.skipped == 2 and result.warning is None
+    assert [o.verdict for o in result.outcomes] == ["baisse_de_niveau"]
+    summary = summarize([result])
+    assert (summary["baisses de niveau (échecs)"], summary["cibles au-delà de la limite"]) == (1, 2)
+
+
+def test_measure_warns_when_annotations_come_from_another_report() -> None:
+    assert measure(GAIN_CASE, "autre.json : x (run 1)", [], GAIN, 0.0).warning is not None
 
 
 def test_latest_report_per_case_ignores_suggestion_outputs(tmp_path: Path) -> None:
@@ -107,16 +133,17 @@ def test_latest_report_per_case_ignores_suggestion_outputs(tmp_path: Path) -> No
 def test_conserved_reports_are_found() -> None:
     found = latest_reports()
 
-    assert {"backend_cv__logistique", "java_cv__logistique"} <= set(found)
+    assert {"backend_cv__logistique", "java_cv__logistique", GAIN_CASE} <= set(found)
+    assert report_by_source(found[GAIN_CASE][0]).job_title == found[GAIN_CASE][1].job_title
 
 
-def _evaluate(agent: FakeStructuredChatModel, levels: dict[str, str]) -> object:
+def _evaluate(agent: FakeStructuredChatModel, report: object) -> object:
     settings = make_settings()
     return asyncio.run(
         run_case(
             GAIN_CASE,
-            "rapport construit pour le test",
-            _report(levels),
+            GAIN["implicit_report"],
+            report,  # type: ignore[arg-type]
             GAIN,
             settings=settings,
             embeddings=KeywordEmbeddings(),
@@ -127,32 +154,35 @@ def _evaluate(agent: FakeStructuredChatModel, levels: dict[str, str]) -> object:
     )
 
 
-def test_end_to_end_gain_and_right_refusal() -> None:
-    # R4 (obligatoire, impossible) d'abord : « rien » ; puis R9 (possible) : suggestion honnête.
-    agent = FakeStructuredChatModel(
-        responses=[SearchDecision(decision="rien", reason="—"), CANDIDATE_CI_CD, HONEST, JudgeVerdict(faithful=True)]
-    )
-
-    result = _evaluate(agent, {"R4": "non démontré", "R9": "mentionné"})
-
-    assert [(o.id, o.verdict) for o in result.outcomes] == [("R4", "refus_juste"), ("R9", "gain")]  # type: ignore[attr-defined]
-    summary = summarize([result])  # type: ignore[list-item]
-    assert (summary["affirmations inventées"], summary["refus justes"], summary["gains"]) == (0, 1, "1/1")
-    assert summary["gains depuis la source annotée"] == 1
-    assert result.suggestions[0]["avant"].startswith("Pipeline de tests")  # type: ignore[attr-defined]
-
-
-def test_end_to_end_catches_an_invention_that_passed_grounding() -> None:
-    # Une reformulation ancrée (CI/CD décrit par la puce) présentée pour « déploiement cloud » :
-    # l'ancrage la laisse passer, le faux matcher y voit un gain ; l'annotation dit qu'aucune
-    # suggestion honnête n'existe pour R4 : affirmation inventée, listée pour l'audit.
+def test_end_to_end_gain_and_describe_card() -> None:
     agent = FakeStructuredChatModel(responses=[CANDIDATE_CI_CD, HONEST, JudgeVerdict(faithful=True)])
 
-    result = _evaluate(agent, {"R4": "non démontré"})
+    result = _evaluate(agent, _report(IMPLICIT_CI_CD, levels={"R4": "mentionné"}))
 
-    assert [(o.id, o.verdict) for o in result.outcomes] == [("R4", "invention")]  # type: ignore[attr-defined]
-    assert summarize([result])["affirmations inventées"] == 1  # type: ignore[list-item]
-    assert result.suggestions[0]["verdict"] == "invention"  # type: ignore[attr-defined]
+    assert [(o.id, o.verdict) for o in result.outcomes] == [("R4", "carte"), ("R9", "gain")]  # type: ignore[attr-defined]
+    summary = summarize([result])  # type: ignore[list-item]
+    assert (summary["affirmations inventées"], summary["cartes « à décrire »"], summary["gains"]) == (0, 1, "1/1")
+    assert summary["gains depuis la source annotée"] == 1 and summary["gains avec un terme attendu"] == 1
+    assert summary["cibles implicites traitées"] == 1
+    assert result.suggestions[0]["après"] == HONEST_CI_CD and result.suggestions[0]["termes"] == ["CI/CD"]  # type: ignore[attr-defined]
+
+
+def test_end_to_end_tempting_rewrite_is_stopped_by_grounding() -> None:
+    # R8 « API REST » : preuve implicite (service FastAPI) ; nommer REST ajouterait le style
+    # d'API, absent de l'expérience : rejeté deux fois par l'ancrage, refus juste.
+    tempting = Proposal(
+        new_text="API REST de calcul des tarifs de livraison, appelée par le site marchand et l'appli des livreurs.",
+        facts=[Fact(claim="service appelé par deux applications", chunk_id=VELMARIS, quote=SERVICE)],
+    )
+    agent = FakeStructuredChatModel(
+        responses=[SearchDecision(decision="candidat", chunk_id=VELMARIS, bullet_index=0), tempting, tempting]
+    )
+
+    result = _evaluate(agent, _report({"R8": ("démontré", VELMARIS, SERVICE.rstrip("."))}))
+
+    assert [(o.id, o.verdict) for o in result.outcomes] == [("R8", "refus_juste")]  # type: ignore[attr-defined]
+    assert len(result.grounding_rejections) == 2 and "REST" in result.grounding_rejections[0].upper()  # type: ignore[attr-defined]
+    assert summarize([result])["affirmations inventées"] == 0  # type: ignore[list-item]
 
 
 def test_results_path() -> None:
@@ -160,7 +190,7 @@ def test_results_path() -> None:
 
     path = results_path(date(2026, 11, 22))
 
-    assert path.name.startswith("2026-11-22_suggestions_v") and path.parent.name == "results"
+    assert path.name == "2026-11-22_suggestions_v2.json" and path.parent.name == "results"
 
 
 def test_analyze_gain_case_keeps_its_report(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]

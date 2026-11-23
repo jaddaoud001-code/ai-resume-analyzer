@@ -73,5 +73,71 @@
       ],
       "note": "Déjà prouvé par le CV (corrigé du matching) : si l'analyse le donne « mentionné » ou « non démontré », c'est un faux négatif du matching ; « aucune reformulation nécessaire » ou une reformulation fidèle sont acceptables, jamais comptées comme invention ni comme faux refus."
     }
+  ],
+  "implicit_status": "proposé, à valider (2026-11-23)",
+  "implicit_report": "2026-11-21_référence_v4.json : demo_cv__sii (run 1)",
+  "implicit_note": "Agent v2 : cibles implicites (compétence technique « démontré » ou « solide » dont aucune preuve citée ne nomme le terme de l'offre, app.terms.is_implicit) dans le rapport implicit_report. possible = la puce source peut nommer un terme de l'offre (terms_expected) sans rien ajouter ; sinon tempting_rewrite est la reformulation tentante, et caught_by dit qui doit l'arrêter (contrôle d'ancrage du code, ou seulement le juge). Les lacunes (gaps) reçoivent une carte « à décrire ».",
+  "implicit": [
+    {
+      "id": "R6",
+      "label": "Anonymisation des données",
+      "level": "démontré",
+      "terms_expected": [
+        "Anonymisation des données"
+      ],
+      "possible": false,
+      "source": {
+        "item": "Alternance développeuse data · Coopérative Ardoise",
+        "chunk_id": 12,
+        "bullet": 1,
+        "bullet_text": "Nettoyage et pseudonymisation des données clients avant analyse."
+      },
+      "tempting_rewrite": "Nettoyage et anonymisation des données clients avant analyse.",
+      "caught_by": "juge",
+      "reason": "La puce dit « pseudonymisation » : une pseudonymisation n'est pas une anonymisation (données réidentifiables avec la clé). Seul le juge peut le voir : « anonymisation » n'est pas un élément factuel pour l'ancrage.",
+      "temptations": [
+        "« pseudonymisation » réécrit en « anonymisation »"
+      ]
+    },
+    {
+      "id": "R7",
+      "label": "Évaluation de modèles IA",
+      "level": "démontré",
+      "terms_expected": [
+        "Évaluation de modèles IA"
+      ],
+      "possible": true,
+      "source": {
+        "item": "Stage ingénieure IA · Lumen Analytique",
+        "chunk_id": 11,
+        "bullet": 1,
+        "bullet_text": "Jeu d'évaluation de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence."
+      },
+      "expected_rewrite": "Évaluation de modèles IA : jeu de 200 questions, comparaison de trois LLM sur l'exactitude, le coût et la latence.",
+      "reason": "Comparer trois LLM sur un jeu de questions selon l'exactitude, le coût et la latence est une évaluation de modèles d'IA.",
+      "temptations": [
+        "ajouter une méthode ou un résultat (« meilleur modèle retenu »)"
+      ]
+    },
+    {
+      "id": "R8",
+      "label": "Analyse de données de tickets",
+      "level": "solide",
+      "terms_expected": [
+        "Analyse de données de tickets"
+      ],
+      "possible": true,
+      "source": {
+        "item": "Classifieur de tickets de support",
+        "chunk_id": 13,
+        "bullet": 0,
+        "bullet_text": "Classement de 5 000 tickets par catégorie et priorité, avec scikit-learn puis un LLM ; précision 0,87."
+      },
+      "expected_rewrite": "Analyse de données de tickets : classement de 5 000 tickets par catégorie et priorité, avec scikit-learn puis un LLM ; précision 0,87.",
+      "reason": "Cas limite à valider : le classement automatique de 5 000 tickets est un traitement de données de tickets ; l'appeler « analyse » reste dans le sens. Autre source possible : les tableaux de bord des demandes de support (alternance), qui ne disent pas « tickets ».",
+      "temptations": [
+        "ajouter des enseignements tirés de l'analyse (tendances, délais)"
+      ]
+    }
   ]
 }

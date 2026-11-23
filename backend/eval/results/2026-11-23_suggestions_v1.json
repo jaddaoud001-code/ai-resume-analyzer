@@ -1,0 +1,238 @@
+{
+ "gain_cv__logistique": {
+  "case": "gain_cv__logistique",
+  "report_source": "2026-11-23_gain_v4.json : gain_cv__logistique (run 1)",
+  "outcomes": [
+   {
+    "id": "R6",
+    "label": "Message queue (RabbitMQ, Kafka)",
+    "kind": "impossible",
+    "verdict": "refus_juste",
+    "reason": "rien_dans_le_cv",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "detail": "Aucun bullet ne mentionne RabbitMQ, Kafka ou tout autre système de message queue, ni ne décrit une pratique liée à ces technologies."
+   },
+   {
+    "id": "R4",
+    "label": "Déploiement cloud",
+    "kind": "impossible",
+    "verdict": "non_concluant",
+    "reason": "erreur",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "detail": "BadRequestError"
+   },
+   {
+    "id": "R5",
+    "label": "Anglais professionnel",
+    "kind": "impossible",
+    "verdict": "non_concluant",
+    "reason": "erreur",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "detail": "BadRequestError"
+   }
+  ],
+  "suggestions": [],
+  "grounding_rejections": [],
+  "judge_rejections": [],
+  "hidden_no_gain": 0,
+  "usage": {
+   "calls": 1,
+   "input_tokens": 846,
+   "output_tokens": 142,
+   "reasoning_tokens": 81,
+   "total_tokens": 988
+  },
+  "seconds": 99.49234687400167,
+  "error": null,
+  "events": [
+   {
+    "type": "agent_started",
+    "targets": [
+     {
+      "id": "R6",
+      "label": "Message queue (RabbitMQ, Kafka)",
+      "level": "non démontré",
+      "weight": 1.0
+     },
+     {
+      "id": "R4",
+      "label": "Déploiement cloud",
+      "level": "mentionné",
+      "weight": 2.0
+     },
+     {
+      "id": "R5",
+      "label": "Anglais professionnel",
+      "level": "mentionné",
+      "weight": 2.0
+     }
+    ],
+    "skipped": 0,
+    "limits": {
+     "max_requirements": 3,
+     "max_attempts": 2,
+     "max_tokens_per_requirement": 15000,
+     "max_tokens_per_run": 45000
+    }
+   },
+   {
+    "type": "target_started",
+    "requirement": {
+     "id": "R6",
+     "label": "Message queue (RabbitMQ, Kafka)",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": 1,
+     "search_queries": [
+      "RabbitMQ",
+      "Kafka",
+      "message queue"
+     ]
+    },
+    "level": "non démontré",
+    "rank": 1
+   },
+   {
+    "type": "step",
+    "requirement_id": "R6",
+    "kind": "search",
+    "status": "rejected",
+    "attempt": 1,
+    "detail": "Aucun bullet ne mentionne RabbitMQ, Kafka ou tout autre système de message queue, ni ne décrit une pratique liée à ces technologies."
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R6",
+     "label": "Message queue (RabbitMQ, Kafka)",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": 1,
+     "search_queries": [
+      "RabbitMQ",
+      "Kafka",
+      "message queue"
+     ]
+    },
+    "reason": "rien_dans_le_cv",
+    "message": "Rien dans le CV ne permet de le prouver.",
+    "shown": true,
+    "detail": "Aucun bullet ne mentionne RabbitMQ, Kafka ou tout autre système de message queue, ni ne décrit une pratique liée à ces technologies.",
+    "usage": {
+     "calls": 1,
+     "input_tokens": 846,
+     "output_tokens": 142,
+     "reasoning_tokens": 81,
+     "total_tokens": 988
+    }
+   },
+   {
+    "type": "target_started",
+    "requirement": {
+     "id": "R4",
+     "label": "Déploiement cloud",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "déploiement cloud",
+      "cloud deployment",
+      "AWS Azure GCP"
+     ]
+    },
+    "level": "mentionné",
+    "rank": 2
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R4",
+     "label": "Déploiement cloud",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "déploiement cloud",
+      "cloud deployment",
+      "AWS Azure GCP"
+     ]
+    },
+    "reason": "erreur",
+    "message": "Le fournisseur LLM n'a pas répondu correctement pour cette exigence.",
+    "shown": true,
+    "detail": "BadRequestError",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "target_started",
+    "requirement": {
+     "id": "R5",
+     "label": "Anglais professionnel",
+     "category": "langue",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "anglais professionnel",
+      "anglais courant",
+      "anglais technique"
+     ]
+    },
+    "level": "mentionné",
+    "rank": 3
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R5",
+     "label": "Anglais professionnel",
+     "category": "langue",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "anglais professionnel",
+      "anglais courant",
+      "anglais technique"
+     ]
+    },
+    "reason": "erreur",
+    "message": "Le fournisseur LLM n'a pas répondu correctement pour cette exigence.",
+    "shown": true,
+    "detail": "BadRequestError",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "done",
+    "suggestions": 0,
+    "refusals": 3,
+    "hidden": 0,
+    "untreated": 0,
+    "reevaluation_failed": 0,
+    "usage": {
+     "calls": 1,
+     "input_tokens": 846,
+     "output_tokens": 142,
+     "reasoning_tokens": 81,
+     "total_tokens": 988
+    }
+   }
+  ]
+ }
+}

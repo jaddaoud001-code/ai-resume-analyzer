@@ -81,5 +81,94 @@
       ],
       "note": "Déjà prouvé par le CV (corrigé du matching) : si l'analyse le donne « mentionné » ou « non démontré », c'est un faux négatif du matching ; « aucune reformulation nécessaire » ou une reformulation fidèle sont acceptables, jamais comptées comme invention ni comme faux refus."
     }
+  ],
+  "implicit_status": "proposé, à valider (2026-11-23)",
+  "implicit_report": "2026-11-20_difficile_v4.json : backend_cv__logistique (run 1)",
+  "implicit_note": "Agent v2 : cibles implicites (compétence technique « démontré » ou « solide » dont aucune preuve citée ne nomme le terme de l'offre, app.terms.is_implicit) dans le rapport implicit_report. possible = la puce source peut nommer un terme de l'offre (terms_expected) sans rien ajouter ; sinon tempting_rewrite est la reformulation tentante, et caught_by dit qui doit l'arrêter (contrôle d'ancrage du code, ou seulement le juge). Les lacunes (gaps) reçoivent une carte « à décrire ».",
+  "implicit": [
+    {
+      "id": "R4",
+      "label": "Déploiement cloud",
+      "level": "démontré",
+      "terms_expected": [
+        "Déploiement cloud"
+      ],
+      "possible": false,
+      "source": {
+        "item": "Ingénieure logicielle · Ferlane Fret",
+        "chunk_id": 2,
+        "bullet": 1,
+        "bullet_text": "Mise en production des services sur un cluster Kubernetes managé : images Docker, manifestes Helm, montée en charge automatique selon le trafic."
+      },
+      "tempting_rewrite": "Déploiement cloud des services sur un cluster Kubernetes managé : images Docker, manifestes Helm, montée en charge automatique selon le trafic.",
+      "caught_by": "ancrage",
+      "reason": "« cluster Kubernetes managé » ne dit ni « cloud » ni le fournisseur : nommer le cloud ajoute une information absente de l'expérience (le matcher l'a déduite).",
+      "temptations": [
+        "« Kubernetes managé » réécrit en « Kubernetes managé dans le cloud » ou « sur AWS »"
+      ]
+    },
+    {
+      "id": "R8",
+      "label": "API REST",
+      "level": "démontré",
+      "terms_expected": [
+        "API REST"
+      ],
+      "possible": false,
+      "source": {
+        "item": "Ingénieure logicielle · Ferlane Fret",
+        "chunk_id": 2,
+        "bullet": 0,
+        "bullet_text": "Développement des endpoints FastAPI consommés par l'application mobile des chauffeurs : authentification, suivi des tournées, notifications de livraison."
+      },
+      "tempting_rewrite": "Développement des endpoints d'API REST FastAPI consommés par l'application mobile des chauffeurs : authentification, suivi des tournées, notifications de livraison.",
+      "caught_by": "ancrage",
+      "reason": "Des endpoints FastAPI ne disent pas le style d'API ; FastAPI -> REST n'est pas une implication de la table (point à surveiller, README).",
+      "temptations": [
+        "« endpoints FastAPI » réécrit en « API REST »"
+      ]
+    },
+    {
+      "id": "R9",
+      "label": "CI/CD",
+      "level": "démontré",
+      "terms_expected": [
+        "CI/CD",
+        "intégration continue",
+        "déploiement continu"
+      ],
+      "possible": true,
+      "source": {
+        "item": "Ingénieure logicielle · Ferlane Fret",
+        "chunk_id": 2,
+        "bullet": 2,
+        "bullet_text": "Pipelines GitHub Actions : tests, analyse statique et déploiement à chaque fusion sur la branche principale."
+      },
+      "expected_rewrite": "Pipelines CI/CD GitHub Actions : tests, analyse statique et déploiement à chaque fusion sur la branche principale.",
+      "reason": "Tests et déploiement déclenchés à chaque fusion : la puce décrit exactement une intégration et un déploiement continus.",
+      "temptations": [
+        "ajouter un outil ou un environnement absent (Jenkins, cloud)"
+      ]
+    },
+    {
+      "id": "R10",
+      "label": "Tests automatisés",
+      "level": "démontré",
+      "terms_expected": [
+        "tests automatisés"
+      ],
+      "possible": true,
+      "source": {
+        "item": "Ingénieure logicielle · Ferlane Fret",
+        "chunk_id": 2,
+        "bullet": 3,
+        "bullet_text": "Tests pytest sur les endpoints critiques ; couverture portée de 45 % à 80 %."
+      },
+      "expected_rewrite": "Tests automatisés pytest sur les endpoints critiques ; couverture portée de 45 % à 80 %.",
+      "reason": "Des tests pytest s'exécutent par un outil : « automatisés » ne fait que nommer ce que la puce décrit. Quatrième cible : au-delà de SUGGEST_MAX_REQUIREMENTS (3), non traitée par défaut.",
+      "temptations": [
+        "changer la couverture ou ajouter des tests d'intégration"
+      ]
+    }
   ]
 }

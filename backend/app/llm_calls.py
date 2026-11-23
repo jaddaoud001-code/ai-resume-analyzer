@@ -7,6 +7,7 @@ minute, quota journalier).
 
 import asyncio
 import email.utils
+import json
 import logging
 import re
 import time
@@ -17,9 +18,9 @@ from typing import Any, TypeVar
 
 from langchain_core.exceptions import OutputParserException
 from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import BaseMessage
+from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_core.runnables import RunnableLambda
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from app.config import Settings
 from app.schemas import TokenUsage
@@ -267,6 +268,8 @@ async def call_with_retry(
             async with limiter.slot():
                 return await call()
         except Exception as error:
+            if isinstance(error, ToolUseFailedError):
+                raise  # même requête, même texte : jamais réessayée à l'identique
             status, retry_after = rate_limit_info(error)
             if status in (401, 403):
                 logger.warning("%d : accès refusé par le fournisseur LLM (modèle %s)", status, model)
@@ -407,9 +410,68 @@ def rate_limit_headers(error: BaseException) -> dict[str, str]:
 
 
 def describe_error(error: BaseException) -> str:
-    """Type de l'erreur et code HTTP éventuel, sans le message du fournisseur."""
+    """Type de l'erreur et code HTTP éventuel, sans le message du fournisseur ; pour un
+    tool_use_failed, le message du fournisseur (tronqué), qui ne nomme pas le compte."""
+    if isinstance(error, ToolUseFailedError):
+        return f"{type(error).__name__} : {error}"
     status = _http_response(error)[0]
     return f"{type(error).__name__} {status}" if status else type(error).__name__
+
+
+# --- Le modèle répond en texte au lieu d'appeler l'outil ------------------------------------
+
+_PROVIDER_MESSAGE_MAX = 200
+_FENCE = re.compile(r"^```(?:json)?\s*(.*?)\s*```$", re.DOTALL)
+TOOL_REMINDER = (
+    "Réponds uniquement en appelant l'outil {tool}, avec des arguments conformes à son schéma : aucun texte "
+    "hors de l'appel."
+)
+
+
+class ToolUseFailedError(RuntimeError):
+    """Le modèle a répondu en texte au lieu d'appeler l'outil de la sortie structurée (400
+    `tool_use_failed` chez Groq). Jamais réessayé à l'identique (à température 0 et graine
+    fixe, la même requête redonne le même texte) : `invoke_structured` fait une seule nouvelle
+    tentative avec un message de rappel. Message : celui du fournisseur, tronqué."""
+
+    def __init__(self, message: str, generation: str | None = None) -> None:
+        super().__init__(message)
+        self.generation = generation
+
+
+def tool_use_failure(error: BaseException) -> ToolUseFailedError | None:
+    """Le 400 `tool_use_failed` de la chaîne d'exceptions (corps JSON de l'erreur d'API), avec
+    le texte renvoyé par le modèle (`failed_generation`) ; None pour toute autre erreur."""
+    if isinstance(error, ToolUseFailedError):
+        return error
+    seen: set[int] = set()
+    current: BaseException | None = error
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        body = getattr(current, "body", None)
+        detail = body.get("error", body) if isinstance(body, dict) else None
+        if isinstance(detail, dict) and detail.get("code") == "tool_use_failed":
+            message = str(detail.get("message") or "tool_use_failed")[:_PROVIDER_MESSAGE_MAX]
+            generation = detail.get("failed_generation")
+            return ToolUseFailedError(
+                f"400 tool_use_failed : {message}", generation if isinstance(generation, str) else None
+            )
+        current = current.__cause__ or current.__context__
+    return None
+
+
+def parse_generation(text: str | None, schema: type[ModelT]) -> ModelT | None:
+    """Le texte renvoyé à la place de l'appel d'outil, s'il est un JSON valide pour `schema`
+    (validation Pydantic complète ; bloc ```json``` accepté) ; sinon None."""
+    if not text:
+        return None
+    stripped = text.strip()
+    fenced = _FENCE.match(stripped)
+    try:
+        data = json.loads(fenced.group(1) if fenced else stripped)
+        return schema.model_validate(data) if isinstance(data, dict) else None
+    except (ValueError, ValidationError):
+        return None
 
 
 def _parse_retry_after(value: str | None) -> float | None:
@@ -436,7 +498,12 @@ async def invoke_structured(
     """Sortie structurée (function calling) validée par `schema`, avec la politique de
     nouvelles tentatives ci-dessus. Une réponse sans sortie structurée compte comme invalide.
     La réponse brute (include_raw) donne l'usage de tokens, ajouté au compteur du contexte
-    (`current_usage`) même quand la sortie est invalide : ces tokens sont consommés aussi."""
+    (`current_usage`) même quand la sortie est invalide : ces tokens sont consommés aussi.
+
+    Le modèle répond en texte au lieu d'appeler l'outil (400 `tool_use_failed`) : si ce texte
+    (`failed_generation`) est un JSON valide pour `schema`, il est accepté après validation
+    Pydantic ; sinon une seule nouvelle tentative, avec un message de rappel ajouté à la fin ;
+    puis ToolUseFailedError (message du fournisseur, tronqué). Le 400 ne donne pas d'usage."""
 
     def require_parsed(output: Any) -> ModelT:
         raw = output.get("raw") if isinstance(output, dict) else None
@@ -449,13 +516,34 @@ async def invoke_structured(
     chain = llm.with_structured_output(schema, method="function_calling", include_raw=True) | RunnableLambda(
         require_parsed
     )
-    return await call_with_retry(
-        lambda: chain.ainvoke(messages),
-        limiter,
-        rate_limit_retries=settings.llm_rate_limit_retries,
-        backoff_s=settings.llm_rate_limit_backoff_s,
-        model=_model_name(llm),
-    )
+
+    async def attempt(prompt: list[BaseMessage]) -> ModelT:
+        try:
+            return await chain.ainvoke(prompt)
+        except Exception as error:
+            failure = tool_use_failure(error)
+            if failure is None:
+                raise
+            parsed = parse_generation(failure.generation, schema)
+            if parsed is None:
+                raise failure from error
+            logger.info("tool_use_failed : texte renvoyé accepté, JSON valide pour %s", schema.__name__)
+            return parsed
+
+    def run(prompt: list[BaseMessage]) -> Awaitable[ModelT]:
+        return call_with_retry(
+            lambda: attempt(prompt),
+            limiter,
+            rate_limit_retries=settings.llm_rate_limit_retries,
+            backoff_s=settings.llm_rate_limit_backoff_s,
+            model=_model_name(llm),
+        )
+
+    try:
+        return await run(messages)
+    except ToolUseFailedError:
+        logger.warning("tool_use_failed : nouvelle tentative avec un rappel (%s)", schema.__name__)
+        return await run([*messages, HumanMessage(TOOL_REMINDER.format(tool=schema.__name__))])
 
 
 def _model_name(llm: BaseChatModel) -> str | None:
