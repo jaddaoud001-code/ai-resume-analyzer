@@ -131,6 +131,9 @@ class AgentStep(BaseModel):
     status: Literal["ok", "rejected"]
     attempt: int
     detail: str | None = None
+    # Étape propose : faits cités et compétences déclarées par la proposition (audit).
+    facts: list[Fact] = Field(default_factory=list)
+    implied_skills: list[ImpliedSkill] = Field(default_factory=list)
 
 
 class Suggestion(BaseModel):
@@ -147,6 +150,7 @@ class Suggestion(BaseModel):
     level_before: str
     level_after: str
     justification: str
+    judge: str = Field(default="", description="Raison donnée par le juge (fidèle).")
     usage: TokenUsage
 
 
@@ -248,6 +252,7 @@ class AgentState(TypedDict, total=False):
     attempt: int
     candidate: tuple[int, int] | None  # (chunk_id, bullet_index)
     proposal: Proposal | None
+    judge: str  # raison du juge pour la proposition acceptée
     feedback: list[str]
     target_usage: TokenUsage
     run_usage: TokenUsage
@@ -586,7 +591,12 @@ def build_graph(deps: AgentDeps) -> Any:
             "proposal": proposal,
             "target_usage": target_usage,
             "run_usage": run_usage,
-            "events": [*drain_waits(), step(state, "propose", "ok", proposal.new_text)],
+            "events": [
+                *drain_waits(),
+                step(state, "propose", "ok", proposal.new_text).model_copy(
+                    update={"facts": proposal.facts, "implied_skills": proposal.implied_skills}
+                ),
+            ],
             "route": "verify",
         }
 
@@ -640,7 +650,13 @@ def build_graph(deps: AgentDeps) -> Any:
             return retry_or_refuse(
                 {**state, **usage}, "verify", f"Juge : {verdict.reason}", "aucune_reformulation_fidele", **usage
             )
-        return {**usage, "events": [*drain_waits(), step(state, "verify", "ok")], "route": "reevaluate"}
+        verdict_detail = f"Juge : fidèle — {verdict.reason}" if verdict.reason else "Juge : fidèle"
+        return {
+            **usage,
+            "judge": verdict.reason,
+            "events": [*drain_waits(), step(state, "verify", "ok", verdict_detail)],
+            "route": "reevaluate",
+        }
 
     async def node_reevaluate(state: AgentState) -> dict:  # type: ignore[type-arg]
         current = target(state)
@@ -705,6 +721,7 @@ def build_graph(deps: AgentDeps) -> Any:
             level_before=current.level or "",
             level_after=result.level or "",
             justification=proposal.justification,
+            judge=state.get("judge", ""),
             usage=target_usage,
         )
         return {

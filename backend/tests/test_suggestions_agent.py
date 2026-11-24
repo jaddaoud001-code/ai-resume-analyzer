@@ -173,7 +173,9 @@ NO_TERM = Proposal(
 
 
 def test_honest_suggestion_names_the_offer_term() -> None:
-    agent = FakeStructuredChatModel(responses=[CANDIDATE_CI_CD, HONEST, JudgeVerdict(faithful=True)], usage=USAGE)
+    agent = FakeStructuredChatModel(
+        responses=[CANDIDATE_CI_CD, HONEST, JudgeVerdict(faithful=True, reason="pratique décrite")], usage=USAGE
+    )
     matcher = _matcher()
 
     events = _run(_report(IMPLICIT_CI_CD), agent, matcher)
@@ -191,6 +193,12 @@ def test_honest_suggestion_names_the_offer_term() -> None:
     # Gain v2 : le niveau ne baisse pas (il n'a pas à monter).
     assert (suggestion.level_before, suggestion.level_after) == ("démontré", "démontré")
     assert suggestion.item == "Développeuse backend · Transports Velmaris"
+    # Audit : faits et compétences déclarées gardés dans l'étape propose ; verdict du juge.
+    [propose] = [e for e in events if isinstance(e, AgentStep) and e.kind == "propose"]
+    assert propose.facts == HONEST.facts and propose.implied_skills == HONEST.implied_skills
+    [verify] = [e for e in events if isinstance(e, AgentStep) and e.kind == "verify"]
+    assert verify.detail == "Juge : fidèle — pratique décrite"
+    assert suggestion.judge == "pratique décrite"
     done = events[-1]
     assert isinstance(done, AgentDone) and (done.suggestions, done.refusals, done.hidden) == (1, 0, 0)
     # Tokens : 3 appels de l'agent (recherche, proposition, juge) + 1 réévaluation.

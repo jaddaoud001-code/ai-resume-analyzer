@@ -79,6 +79,15 @@ _LETTERS = re.compile(r"[A-Za-zÀ-ÿ]+")
 _FILLERS = frozenset({"les", "des", "une", "aux", "pour", "avec", "sur", "dans", "par", "the"})
 
 
+_BULLET_LABEL = re.compile(r"^\[puce \d+\]\s*")
+
+
+def strip_bullet_label(quote: str) -> str:
+    """Retire l'étiquette « [puce N] » (numérotation des puces montrée au LLM, absente du CV) en
+    début de citation, au format exact."""
+    return _BULLET_LABEL.sub("", quote, count=1)
+
+
 _ROOT_LENGTH = 6
 # Motif du rejet par la règle du premier mot, repéré par l'évaluation (rejets comptés à part).
 ACTION_LOST = "(ce que décrit la puce d'origine) doit rester dans la reformulation"
@@ -247,21 +256,25 @@ def check_grounding(
             issue("fait_hors_experience", f"« {fact.claim} » : la source n'est pas une expérience ou un projet.")
         elif items.get(source.index) != item:
             issue("fait_autre_item", f"« {fact.claim} » vient d'une autre expérience ou d'un autre projet.")
-        elif not quote_in_chunk(fact.quote, source.text):
+        elif not quote_in_chunk(strip_bullet_label(fact.quote), source.text):
             issue("citation_introuvable", f"« {fact.quote} » ne figure pas mot pour mot dans le chunk {source.index}.")
     if not rewrite.facts:
         issue("aucun_fait", "Chaque affirmation de la puce doit citer sa source dans le CV.")
 
+    # Compétences déclarées : elles ne peuvent qu'accorder une permission (implication valide de
+    # la table, citation exacte du même item), jamais provoquer un rejet à elles seules ; une
+    # déclaration non valide est ignorée, et le texte est vérifié comme si rien n'était déclaré
+    # (« REST » déclaré d'après « FastAPI » reste un élément nouveau).
     allowed_skills: set[str] = set()
     for implied in rewrite.implied_skills:
         source = by_id.get(implied.chunk_id)
-        if source is None or items.get(source.index) != item or not quote_in_chunk(implied.quote, source.text):
-            issue("implication_sans_source", f"« {implied.skill} » : citation source absente de cet item.")
-        elif implication_for(implied.skill, implied.quote) is None:
-            issue(
-                "implication_non_autorisee", f"« {implied.skill} » ne découle pas directement de « {implied.quote} »."
-            )
-        else:
+        quote = strip_bullet_label(implied.quote)
+        if (
+            source is not None
+            and items.get(source.index) == item
+            and quote_in_chunk(quote, source.text)
+            and implication_for(implied.skill, quote) is not None
+        ):
             allowed_skills.add(normalize(implied.skill))
 
     # Noms plus larges autorisés à sens unique (« LLM » cité dans l'item -> « IA générative ») :

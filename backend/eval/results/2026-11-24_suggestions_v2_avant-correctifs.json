@@ -1,0 +1,527 @@
+{
+ "gain_cv__logistique": {
+  "case": "gain_cv__logistique",
+  "report_source": "2026-11-23_gain_v4.json : gain_cv__logistique (run 1)",
+  "outcomes": [
+   {
+    "id": "R4",
+    "label": "Déploiement cloud",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : mentionné"
+   },
+   {
+    "id": "R5",
+    "label": "Anglais professionnel",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : mentionné"
+   },
+   {
+    "id": "R6",
+    "label": "Message queue (RabbitMQ, Kafka)",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : non démontré"
+   },
+   {
+    "id": "R8",
+    "label": "API REST",
+    "kind": "impossible",
+    "verdict": "refus_juste",
+    "reason": "aucune_reformulation_fidele",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "Contrôle d'ancrage : « [puce 0] Service de calcul des tarifs de livraison, appelé par le site marchand et l'application des livreurs. » ne figure pas mot pour mot dans le chunk 2. ; « API REST » ne découle pas directement de « FastAPI ». ; « Service » (ce que décrit la puce d'origine) doit rester dans la reformulation (même racine acceptée). ; « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience."
+   },
+   {
+    "id": "R9",
+    "label": "CI/CD",
+    "kind": "possible",
+    "verdict": "faux_refus",
+    "reason": "aucune_reformulation_fidele",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "Contrôle d'ancrage : « CI/CD » ne découle pas directement de « GitLab »."
+   },
+   {
+    "id": "R10",
+    "label": "Tests automatisés",
+    "kind": "possible",
+    "verdict": "faux_refus",
+    "reason": "aucune_reformulation_fidele",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "Contrôle d'ancrage : « Intégration continue » ne découle pas directement de « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. »."
+   }
+  ],
+  "suggestions": [],
+  "grounding_rejections": [
+   "R8 (tentative 1) : Contrôle d'ancrage : « FastAPI » ne découle pas directement de « FastAPI ». ; « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience.",
+   "R8 (tentative 2) : Contrôle d'ancrage : « [puce 0] Service de calcul des tarifs de livraison, appelé par le site marchand et l'application des livreurs. » ne figure pas mot pour mot dans le chunk 2. ; « API REST » ne découle pas directement de « FastAPI ». ; « Service » (ce que décrit la puce d'origine) doit rester dans la reformulation (même racine acceptée). ; « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience.",
+   "R9 (tentative 1) : Contrôle d'ancrage : « CI/CD » ne découle pas directement de « GitLab ».",
+   "R9 (tentative 2) : Contrôle d'ancrage : « CI/CD » ne découle pas directement de « GitLab ».",
+   "R10 (tentative 1) : Contrôle d'ancrage : « intégration continue » ne découle pas directement de « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. ».",
+   "R10 (tentative 2) : Contrôle d'ancrage : « Intégration continue » ne découle pas directement de « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. »."
+  ],
+  "action_rejections": [],
+  "action_with_other_issues": 1,
+  "judge_rejections": [],
+  "term_rejections": [],
+  "level_drops": [],
+  "skipped": 0,
+  "usage": {
+   "calls": 9,
+   "input_tokens": 8669,
+   "output_tokens": 4472,
+   "reasoning_tokens": 3113,
+   "total_tokens": 13141
+  },
+  "seconds": 161.58548070999996,
+  "error": null,
+  "warning": null,
+  "events": [
+   {
+    "type": "agent_started",
+    "targets": [
+     {
+      "id": "R8",
+      "label": "API REST",
+      "level": "démontré",
+      "weight": 1.0,
+      "terms": [
+       "API REST",
+       "REST",
+       "RESTful"
+      ]
+     },
+     {
+      "id": "R9",
+      "label": "CI/CD",
+      "level": "démontré",
+      "weight": 1.0,
+      "terms": [
+       "CI/CD",
+       "intégration continue",
+       "déploiement continu"
+      ]
+     },
+     {
+      "id": "R10",
+      "label": "Tests automatisés",
+      "level": "démontré",
+      "weight": 1.0,
+      "terms": [
+       "Tests automatisés",
+       "tests automatiques"
+      ]
+     }
+    ],
+    "skipped": 0,
+    "to_describe": [
+     {
+      "id": "R4",
+      "label": "Déploiement cloud",
+      "level": "mentionné",
+      "weight": 2.0,
+      "terms": [
+       "Déploiement cloud"
+      ]
+     },
+     {
+      "id": "R5",
+      "label": "Anglais professionnel",
+      "level": "mentionné",
+      "weight": 2.0,
+      "terms": [
+       "Anglais professionnel"
+      ]
+     },
+     {
+      "id": "R6",
+      "label": "Message queue (RabbitMQ, Kafka)",
+      "level": "non démontré",
+      "weight": 1.0,
+      "terms": [
+       "Message queue",
+       "RabbitMQ",
+       "Kafka",
+       "file de messages",
+       "message broker"
+      ]
+     }
+    ],
+    "limits": {
+     "max_requirements": 3,
+     "max_attempts": 2,
+     "max_tokens_per_requirement": 15000,
+     "max_tokens_per_run": 45000
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R4",
+     "label": "Déploiement cloud",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "déploiement cloud",
+      "cloud deployment",
+      "AWS Azure GCP"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : mentionné",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R5",
+     "label": "Anglais professionnel",
+     "category": "langue",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "anglais professionnel",
+      "anglais courant",
+      "anglais technique"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : mentionné",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R6",
+     "label": "Message queue (RabbitMQ, Kafka)",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": 1,
+     "search_queries": [
+      "RabbitMQ",
+      "Kafka",
+      "message queue"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : non démontré",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "target_started",
+    "requirement": {
+     "id": "R8",
+     "label": "API REST",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "API REST",
+      "endpoints HTTP",
+      "services web"
+     ]
+    },
+    "level": "démontré",
+    "rank": 1
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "search",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "chunk 2, puce 0"
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "Service de calcul des tarifs de livraison exposé via une API REST, appelé par le site marchand et l'application des livreurs."
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "verify",
+    "status": "rejected",
+    "attempt": 1,
+    "detail": "Contrôle d'ancrage : « FastAPI » ne découle pas directement de « FastAPI ». ; « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience."
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 2,
+    "detail": "API REST de calcul des tarifs de livraison, appelée par le site marchand et l'application des livreurs."
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "verify",
+    "status": "rejected",
+    "attempt": 2,
+    "detail": "Contrôle d'ancrage : « [puce 0] Service de calcul des tarifs de livraison, appelé par le site marchand et l'application des livreurs. » ne figure pas mot pour mot dans le chunk 2. ; « API REST » ne découle pas directement de « FastAPI ». ; « Service » (ce que décrit la puce d'origine) doit rester dans la reformulation (même racine acceptée). ; « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience."
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R8",
+     "label": "API REST",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "API REST",
+      "endpoints HTTP",
+      "services web"
+     ]
+    },
+    "reason": "aucune_reformulation_fidele",
+    "message": "Aucune reformulation fidèle au CV n'a été trouvée.",
+    "shown": true,
+    "detail": "Contrôle d'ancrage : « [puce 0] Service de calcul des tarifs de livraison, appelé par le site marchand et l'application des livreurs. » ne figure pas mot pour mot dans le chunk 2. ; « API REST » ne découle pas directement de « FastAPI ». ; « Service » (ce que décrit la puce d'origine) doit rester dans la reformulation (même racine acceptée). ; « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience.",
+    "usage": {
+     "calls": 3,
+     "input_tokens": 2932,
+     "output_tokens": 1626,
+     "reasoning_tokens": 1141,
+     "total_tokens": 4558
+    }
+   },
+   {
+    "type": "target_started",
+    "requirement": {
+     "id": "R9",
+     "label": "CI/CD",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "CI/CD",
+      "intégration continue",
+      "pipelines de déploiement"
+     ]
+    },
+    "level": "démontré",
+    "rank": 2
+   },
+   {
+    "type": "step",
+    "requirement_id": "R9",
+    "kind": "search",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "chunk 2, puce 1"
+   },
+   {
+    "type": "step",
+    "requirement_id": "R9",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "Pipeline CI/CD de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+   },
+   {
+    "type": "step",
+    "requirement_id": "R9",
+    "kind": "verify",
+    "status": "rejected",
+    "attempt": 1,
+    "detail": "Contrôle d'ancrage : « CI/CD » ne découle pas directement de « GitLab »."
+   },
+   {
+    "type": "step",
+    "requirement_id": "R9",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 2,
+    "detail": "Intégration continue et déploiement continu : pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+   },
+   {
+    "type": "step",
+    "requirement_id": "R9",
+    "kind": "verify",
+    "status": "rejected",
+    "attempt": 2,
+    "detail": "Contrôle d'ancrage : « CI/CD » ne découle pas directement de « GitLab »."
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R9",
+     "label": "CI/CD",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "CI/CD",
+      "intégration continue",
+      "pipelines de déploiement"
+     ]
+    },
+    "reason": "aucune_reformulation_fidele",
+    "message": "Aucune reformulation fidèle au CV n'a été trouvée.",
+    "shown": true,
+    "detail": "Contrôle d'ancrage : « CI/CD » ne découle pas directement de « GitLab ».",
+    "usage": {
+     "calls": 3,
+     "input_tokens": 2860,
+     "output_tokens": 1543,
+     "reasoning_tokens": 1134,
+     "total_tokens": 4403
+    }
+   },
+   {
+    "type": "target_started",
+    "requirement": {
+     "id": "R10",
+     "label": "Tests automatisés",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "tests automatisés",
+      "tests unitaires",
+      "couverture de tests"
+     ]
+    },
+    "level": "démontré",
+    "rank": 3
+   },
+   {
+    "type": "step",
+    "requirement_id": "R10",
+    "kind": "search",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "chunk 2, puce 1"
+   },
+   {
+    "type": "step",
+    "requirement_id": "R10",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "Pipeline de tests automatisés et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+   },
+   {
+    "type": "step",
+    "requirement_id": "R10",
+    "kind": "verify",
+    "status": "rejected",
+    "attempt": 1,
+    "detail": "Contrôle d'ancrage : « intégration continue » ne découle pas directement de « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. »."
+   },
+   {
+    "type": "step",
+    "requirement_id": "R10",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 2,
+    "detail": "Pipeline de Tests automatisés et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+   },
+   {
+    "type": "step",
+    "requirement_id": "R10",
+    "kind": "verify",
+    "status": "rejected",
+    "attempt": 2,
+    "detail": "Contrôle d'ancrage : « Intégration continue » ne découle pas directement de « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. »."
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R10",
+     "label": "Tests automatisés",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "tests automatisés",
+      "tests unitaires",
+      "couverture de tests"
+     ]
+    },
+    "reason": "aucune_reformulation_fidele",
+    "message": "Aucune reformulation fidèle au CV n'a été trouvée.",
+    "shown": true,
+    "detail": "Contrôle d'ancrage : « Intégration continue » ne découle pas directement de « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. ».",
+    "usage": {
+     "calls": 3,
+     "input_tokens": 2877,
+     "output_tokens": 1303,
+     "reasoning_tokens": 838,
+     "total_tokens": 4180
+    }
+   },
+   {
+    "type": "done",
+    "suggestions": 0,
+    "refusals": 6,
+    "to_describe": 3,
+    "hidden": 0,
+    "untreated": 0,
+    "reevaluation_failed": 0,
+    "usage": {
+     "calls": 9,
+     "input_tokens": 8669,
+     "output_tokens": 4472,
+     "reasoning_tokens": 3113,
+     "total_tokens": 13141
+    }
+   }
+  ]
+ }
+}

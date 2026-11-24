@@ -235,6 +235,7 @@ def measure(case: str, report_source: str, events: list[Any], annotation: dict[s
                         "implications": [f"{s.skill} <- « {s.quote} »" for s in event.implied_skills],
                         "niveaux": f"{event.level_before} -> {event.level_after}",
                         "justification": event.justification,
+                        "juge": event.judge,
                     }
                 )
         elif isinstance(event, AgentStarted):
@@ -410,6 +411,14 @@ def results_path(day: date, results_dir: Path = RESULTS_DIR) -> Path:
     return results_dir / f"{day.isoformat()}_suggestions_v{SUGGEST_PROMPT_VERSION}.json"
 
 
+def save_results(path: Path, results: list[CaseResult]) -> None:
+    """Écrit les résultats par cas dans `path`, en gardant les autres cas déjà présents (plusieurs
+    runs d'un même jour, un cas chacun) ; un cas relancé remplace le précédent."""
+    existing = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    existing.update({r.case: asdict(r) for r in results})
+    path.write_text(json.dumps(existing, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+
+
 def print_report(results: list[CaseResult], settings: Settings) -> None:
     agent = suggest_settings(settings)
     print(
@@ -453,6 +462,7 @@ def print_report(results: list[CaseResult], settings: Settings) -> None:
             for line in s["faits"] + s["implications"]:
                 print(f"      {line}")
             print(f"      justification : {s['justification']}")
+            print(f"      juge : {s['juge'] or 'fidèle (sans motif)'}")
     print("\n=== Synthèse")
     for key, value in summarize(results).items():
         print(f"  {key} : {value}")
@@ -473,9 +483,7 @@ def main() -> None:
     results = asyncio.run(evaluate(args.case, args.analyze_gain, settings))
     if args.save:
         target = results_path(date.today()) if args.save == RESULTS_DIR else args.save
-        target.write_text(
-            json.dumps({r.case: asdict(r) for r in results}, ensure_ascii=False, indent=1) + "\n", encoding="utf-8"
-        )
+        save_results(target, results)
         print(f"Événements bruts : {target}", file=sys.stderr)
     if args.json:
         print(

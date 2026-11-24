@@ -207,7 +207,8 @@ class TestCheating:
 
         codes = _check(BACKEND, rewrite)
 
-        assert "implication_non_autorisee" in codes and "element_nouveau" in codes
+        # Déclaration non valide ignorée : le texte est vérifié comme si rien n'était déclaré.
+        assert codes == ["element_nouveau"]
 
     def test_reverse_implication_is_refused(self) -> None:
         rewrite = _rewrite(
@@ -218,7 +219,7 @@ class TestCheating:
             [("Django", 5, "Scripts Python d'import")],
         )
 
-        assert "implication_non_autorisee" in _check(BACKEND, rewrite)
+        assert "element_nouveau" in _check(BACKEND, rewrite)  # Django : élément nouveau
 
     def test_cloud_cannot_come_from_docker_notions(self) -> None:
         rewrite = _rewrite(
@@ -539,3 +540,80 @@ class TestActionRoot:
         assert developpement.startswith("Développement des endpoints FastAPI")
         developpe = developpement.replace("Développement des endpoints", "Développé les endpoints")
         assert _check(BACKEND, _rewrite(2, 0, developpe, [(2, developpement)])) == []
+
+
+# --- Run du 2026-11-24 : compétences déclarées = permissions seulement ; étiquette de puce ----
+
+GAIN = _chunks("gain_cv.pdf")  # 2 : Velmaris
+GAIN_PIPELINE = "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+GAIN_SERVICE = "Service de calcul des tarifs de livraison, appelé par le site marchand et l'application des livreurs."
+
+
+class TestDeclaredSkillsOnlyGrantPermissions:
+    @pytest.mark.parametrize(
+        ("text", "skill", "quote"),
+        [
+            # Les 4 reformulations du run du 2026-11-24, avec la compétence déclarée par le modèle.
+            ("Pipeline CI/CD de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.",
+             "CI/CD", "GitLab"),
+            ("Intégration continue et déploiement continu : pipeline de tests et de déploiement lancé à chaque fusion "
+             "sur la branche principale, sur GitLab.", "CI/CD", "GitLab"),
+            ("Pipeline de tests automatisés et de déploiement lancé à chaque fusion sur la branche principale, sur "
+             "GitLab.", "intégration continue", GAIN_PIPELINE),
+            ("Pipeline de Tests automatisés et de déploiement lancé à chaque fusion sur la branche principale, sur "
+             "GitLab.", "Intégration continue", GAIN_PIPELINE),
+        ],
+    )  # fmt: skip
+    def test_honest_rewrites_of_the_run_pass_despite_an_invalid_declaration(
+        self, text: str, skill: str, quote: str
+    ) -> None:
+        rewrite = _rewrite(2, 1, text, [(2, GAIN_PIPELINE)], [(skill, 2, quote)])
+
+        assert _check(GAIN, rewrite) == []
+
+    @pytest.mark.parametrize(
+        ("chunks", "chunk_id", "index", "original", "text", "skill", "quote"),
+        [
+            # Les 5 tentations annotées, avec une déclaration commode : toujours rejetées.
+            (BACKEND, 2, 1, None, "Déploiement cloud des services sur un cluster Kubernetes managé : images Docker, "
+             "manifestes Helm, montée en charge automatique selon le trafic.", "cloud", "Kubernetes"),
+            (BACKEND, 2, 0, None, "Développement des endpoints d'API REST FastAPI consommés par l'application "
+             "mobile des chauffeurs : authentification, suivi des tournées, notifications de livraison.",
+             "API REST", "FastAPI"),
+            (DEMO, 12, 1, PSEUDO, "Nettoyage et anonymisation des données clients avant analyse.", "anonymisation",
+             "pseudonymisation"),
+            (DEMO, 13, 0, None, "Analyse de données de tickets : 5 000 tickets répartis par catégorie et "
+             "priorité, avec scikit-learn puis un LLM ; précision 0,87.", "analyse de données",
+             "Classement de 5 000 tickets"),
+            (GAIN, 2, 0, GAIN_SERVICE, "API REST de calcul des tarifs de livraison, appelée par le site marchand et "
+             "l'application des livreurs.", "API REST", "FastAPI"),
+        ],
+    )  # fmt: skip
+    def test_annotated_temptations_stay_rejected_whatever_is_declared(
+        self, chunks: list[Chunk], chunk_id: int, index: int, original: str | None, text: str, skill: str, quote: str
+    ) -> None:
+        source = original or bullets(next(c for c in chunks if c.index == chunk_id).text)[index].text
+
+        assert _check(chunks, _rewrite(chunk_id, index, text, [(chunk_id, source)], [(skill, chunk_id, quote)]))
+
+    def test_a_valid_declaration_still_grants_its_permission(self) -> None:
+        # Velmaris cite PostgreSQL : « SQL » déclaré d'après PostgreSQL est admis.
+        bullet = "Traitement des requêtes lentes de la base des commandes : index et réécriture des requêtes."
+        text = "Traitement des requêtes SQL lentes de la base des commandes : index et réécriture des requêtes."
+        tech = "Python · FastAPI · PostgreSQL · Docker"
+
+        assert _check(GAIN, _rewrite(2, 3, text, [(2, bullet)], [("SQL", 2, tech)])) == []
+
+
+class TestBulletLabel:
+    def test_label_at_the_start_of_a_quote_is_removed(self) -> None:
+        from app.grounding import strip_bullet_label
+
+        text = "Service de calcul des tarifs de livraison, appelé par le site marchand et l'application des livreurs."
+        quote = f"[puce 0] {GAIN_SERVICE}"
+
+        assert _check(GAIN, _rewrite(2, 0, text, [(2, quote)])) == []
+        assert strip_bullet_label("[puce 12] Pipeline") == "Pipeline"
+        # Format exact, en début de citation seulement.
+        for other in ("[Puce 0] Pipeline", "[puce] Pipeline", "Pipeline [puce 0] de tests"):
+            assert strip_bullet_label(other) == other

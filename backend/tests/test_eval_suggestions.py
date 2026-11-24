@@ -254,3 +254,15 @@ def test_analyze_gain_case_keeps_its_report(tmp_path: Path, monkeypatch) -> None
     assert list(found) == [GAIN_CASE]
     report = found[GAIN_CASE][1]
     assert report.requirements_source == "provided" and len(report.requirements) == len(JOB.requirements)
+
+
+def test_save_results_keeps_the_other_cases_of_the_day(tmp_path: Path) -> None:
+    from eval.eval_suggestions import CaseResult, save_results
+
+    path = tmp_path / "2026-11-24_suggestions_v2.json"
+    save_results(path, [CaseResult(case="a", report_source="r", seconds=1.0)])
+    save_results(path, [CaseResult(case="b", report_source="r")])
+    save_results(path, [CaseResult(case="a", report_source="r", seconds=2.0)])
+
+    saved = json.loads(path.read_text())
+    assert list(saved) == ["a", "b"] and saved["a"]["seconds"] == 2.0

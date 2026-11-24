@@ -44,61 +44,99 @@
     "label": "API REST",
     "kind": "impossible",
     "verdict": "refus_juste",
-    "reason": "aucune_reformulation_fidele",
+    "reason": "aucune_puce",
     "level_before": null,
     "level_after": null,
     "source_expected": null,
     "term_expected": null,
-    "detail": "Contrôle d'ancrage : « [puce 0] Service de calcul des tarifs de livraison, appelé par le site marchand et l'application des livreurs. » ne figure pas mot pour mot dans le chunk 2. ; « API REST » ne découle pas directement de « FastAPI ». ; « Service » (ce que décrit la puce d'origine) doit rester dans la reformulation (même racine acceptée). ; « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience."
+    "detail": "Aucune puce ne mentionne explicitement 'API REST', 'REST' ou 'RESTful'; les puces décrivent le service et les outils, mais le terme n'est pas présent, donc l'ajout serait une information non fournie."
    },
    {
     "id": "R9",
     "label": "CI/CD",
     "kind": "possible",
-    "verdict": "faux_refus",
-    "reason": "aucune_reformulation_fidele",
-    "level_before": null,
-    "level_after": null,
-    "source_expected": null,
-    "term_expected": null,
-    "detail": "Contrôle d'ancrage : « CI/CD » ne découle pas directement de « GitLab »."
+    "verdict": "gain",
+    "reason": null,
+    "level_before": "démontré",
+    "level_after": "démontré",
+    "source_expected": true,
+    "term_expected": true,
+    "detail": null
    },
    {
     "id": "R10",
     "label": "Tests automatisés",
     "kind": "possible",
-    "verdict": "faux_refus",
-    "reason": "aucune_reformulation_fidele",
-    "level_before": null,
-    "level_after": null,
-    "source_expected": null,
-    "term_expected": null,
-    "detail": "Contrôle d'ancrage : « Intégration continue » ne découle pas directement de « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. »."
+    "verdict": "gain",
+    "reason": null,
+    "level_before": "démontré",
+    "level_after": "démontré",
+    "source_expected": true,
+    "term_expected": true,
+    "detail": null
    }
   ],
-  "suggestions": [],
-  "grounding_rejections": [
-   "R8 (tentative 1) : Contrôle d'ancrage : « FastAPI » ne découle pas directement de « FastAPI ». ; « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience.",
-   "R8 (tentative 2) : Contrôle d'ancrage : « [puce 0] Service de calcul des tarifs de livraison, appelé par le site marchand et l'application des livreurs. » ne figure pas mot pour mot dans le chunk 2. ; « API REST » ne découle pas directement de « FastAPI ». ; « Service » (ce que décrit la puce d'origine) doit rester dans la reformulation (même racine acceptée). ; « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience.",
-   "R9 (tentative 1) : Contrôle d'ancrage : « CI/CD » ne découle pas directement de « GitLab ».",
-   "R9 (tentative 2) : Contrôle d'ancrage : « CI/CD » ne découle pas directement de « GitLab ».",
-   "R10 (tentative 1) : Contrôle d'ancrage : « intégration continue » ne découle pas directement de « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. ».",
-   "R10 (tentative 2) : Contrôle d'ancrage : « Intégration continue » ne découle pas directement de « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. »."
+  "suggestions": [
+   {
+    "id": "R9",
+    "exigence": "CI/CD",
+    "verdict": "gain",
+    "item": "Développeuse backend · Transports Velmaris",
+    "chunk": 2,
+    "puce": 1,
+    "avant": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.",
+    "après": "Mise en place d’un pipeline CI/CD de tests et de déploiement déclenché à chaque fusion sur la branche principale, sur GitLab.",
+    "termes": [
+     "CI/CD"
+    ],
+    "faits": [
+     "[2] « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. » -> Mise en place d’un pipeline CI/CD de tests et de déploiement déclenché à chaque fusion sur la branche principale, sur GitLab."
+    ],
+    "implications": [
+     "CI/CD <- « GitLab »"
+    ],
+    "niveaux": "démontré -> démontré",
+    "justification": "",
+    "juge": "La reformulation ne fait qu’ajouter le terme CI/CD et précise la mise en place, sans élargir la portée, ajouter de nouveaux résultats ou changer le sens."
+   },
+   {
+    "id": "R10",
+    "exigence": "Tests automatisés",
+    "verdict": "gain",
+    "item": "Développeuse backend · Transports Velmaris",
+    "chunk": 2,
+    "puce": 1,
+    "avant": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.",
+    "après": "Pipeline de tests automatisés et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.",
+    "termes": [
+     "Tests automatisés"
+    ],
+    "faits": [
+     "[2] « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. » -> Mise en place d'un pipeline de tests automatisés et de déploiement déclenché à chaque fusion sur la branche principale, sur GitLab."
+    ],
+    "implications": [
+     "intégration continue <- « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. »"
+    ],
+    "niveaux": "démontré -> démontré",
+    "justification": "",
+    "juge": "La reformulation ne fait qu'ajouter le qualificatif « automatisés » aux tests, ce qui précise mais ne change pas le sens ou la portée de la puce originale."
+   }
   ],
+  "grounding_rejections": [],
   "action_rejections": [],
-  "action_with_other_issues": 1,
+  "action_with_other_issues": 0,
   "judge_rejections": [],
   "term_rejections": [],
   "level_drops": [],
   "skipped": 0,
   "usage": {
    "calls": 9,
-   "input_tokens": 8669,
-   "output_tokens": 4472,
-   "reasoning_tokens": 3113,
-   "total_tokens": 13141
+   "input_tokens": 9214,
+   "output_tokens": 2938,
+   "reasoning_tokens": 1897,
+   "total_tokens": 12152
   },
-  "seconds": 161.58548070999996,
+  "seconds": 161.0307771529997,
   "error": null,
   "warning": null,
   "events": [
@@ -278,41 +316,11 @@
     "type": "step",
     "requirement_id": "R8",
     "kind": "search",
-    "status": "ok",
-    "attempt": 1,
-    "detail": "chunk 2, puce 0"
-   },
-   {
-    "type": "step",
-    "requirement_id": "R8",
-    "kind": "propose",
-    "status": "ok",
-    "attempt": 1,
-    "detail": "Service de calcul des tarifs de livraison exposé via une API REST, appelé par le site marchand et l'application des livreurs."
-   },
-   {
-    "type": "step",
-    "requirement_id": "R8",
-    "kind": "verify",
     "status": "rejected",
     "attempt": 1,
-    "detail": "Contrôle d'ancrage : « FastAPI » ne découle pas directement de « FastAPI ». ; « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience."
-   },
-   {
-    "type": "step",
-    "requirement_id": "R8",
-    "kind": "propose",
-    "status": "ok",
-    "attempt": 2,
-    "detail": "API REST de calcul des tarifs de livraison, appelée par le site marchand et l'application des livreurs."
-   },
-   {
-    "type": "step",
-    "requirement_id": "R8",
-    "kind": "verify",
-    "status": "rejected",
-    "attempt": 2,
-    "detail": "Contrôle d'ancrage : « [puce 0] Service de calcul des tarifs de livraison, appelé par le site marchand et l'application des livreurs. » ne figure pas mot pour mot dans le chunk 2. ; « API REST » ne découle pas directement de « FastAPI ». ; « Service » (ce que décrit la puce d'origine) doit rester dans la reformulation (même racine acceptée). ; « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience."
+    "detail": "Aucune puce ne mentionne explicitement 'API REST', 'REST' ou 'RESTful'; les puces décrivent le service et les outils, mais le terme n'est pas présent, donc l'ajout serait une information non fournie.",
+    "facts": [],
+    "implied_skills": []
    },
    {
     "type": "refusal",
@@ -328,16 +336,16 @@
       "services web"
      ]
     },
-    "reason": "aucune_reformulation_fidele",
-    "message": "Aucune reformulation fidèle au CV n'a été trouvée.",
+    "reason": "aucune_puce",
+    "message": "Aucune puce d'expérience ou de projet ne permet de nommer ce terme sans rien inventer.",
     "shown": true,
-    "detail": "Contrôle d'ancrage : « [puce 0] Service de calcul des tarifs de livraison, appelé par le site marchand et l'application des livreurs. » ne figure pas mot pour mot dans le chunk 2. ; « API REST » ne découle pas directement de « FastAPI ». ; « Service » (ce que décrit la puce d'origine) doit rester dans la reformulation (même racine acceptée). ; « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience.",
+    "detail": "Aucune puce ne mentionne explicitement 'API REST', 'REST' ou 'RESTful'; les puces décrivent le service et les outils, mais le terme n'est pas présent, donc l'ajout serait une information non fournie.",
     "usage": {
-     "calls": 3,
-     "input_tokens": 2932,
-     "output_tokens": 1626,
-     "reasoning_tokens": 1141,
-     "total_tokens": 4558
+     "calls": 1,
+     "input_tokens": 866,
+     "output_tokens": 269,
+     "reasoning_tokens": 183,
+     "total_tokens": 1135
     }
    },
    {
@@ -363,7 +371,9 @@
     "kind": "search",
     "status": "ok",
     "attempt": 1,
-    "detail": "chunk 2, puce 1"
+    "detail": "chunk 2, puce 1",
+    "facts": [],
+    "implied_skills": []
    },
    {
     "type": "step",
@@ -371,34 +381,44 @@
     "kind": "propose",
     "status": "ok",
     "attempt": 1,
-    "detail": "Pipeline CI/CD de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+    "detail": "Mise en place d’un pipeline CI/CD de tests et de déploiement déclenché à chaque fusion sur la branche principale, sur GitLab.",
+    "facts": [
+     {
+      "claim": "Mise en place d’un pipeline CI/CD de tests et de déploiement déclenché à chaque fusion sur la branche principale, sur GitLab.",
+      "chunk_id": 2,
+      "quote": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "CI/CD",
+      "chunk_id": 2,
+      "quote": "GitLab"
+     }
+    ]
    },
    {
     "type": "step",
     "requirement_id": "R9",
     "kind": "verify",
-    "status": "rejected",
-    "attempt": 1,
-    "detail": "Contrôle d'ancrage : « CI/CD » ne découle pas directement de « GitLab »."
-   },
-   {
-    "type": "step",
-    "requirement_id": "R9",
-    "kind": "propose",
     "status": "ok",
-    "attempt": 2,
-    "detail": "Intégration continue et déploiement continu : pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+    "attempt": 1,
+    "detail": "Juge : fidèle — La reformulation ne fait qu’ajouter le terme CI/CD et précise la mise en place, sans élargir la portée, ajouter de nouveaux résultats ou changer le sens.",
+    "facts": [],
+    "implied_skills": []
    },
    {
     "type": "step",
     "requirement_id": "R9",
-    "kind": "verify",
-    "status": "rejected",
-    "attempt": 2,
-    "detail": "Contrôle d'ancrage : « CI/CD » ne découle pas directement de « GitLab »."
+    "kind": "reevaluate",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "démontré -> démontré",
+    "facts": [],
+    "implied_skills": []
    },
    {
-    "type": "refusal",
+    "type": "suggestion",
     "requirement": {
      "id": "R9",
      "label": "CI/CD",
@@ -411,16 +431,38 @@
       "pipelines de déploiement"
      ]
     },
-    "reason": "aucune_reformulation_fidele",
-    "message": "Aucune reformulation fidèle au CV n'a été trouvée.",
-    "shown": true,
-    "detail": "Contrôle d'ancrage : « CI/CD » ne découle pas directement de « GitLab ».",
+    "item": "Développeuse backend · Transports Velmaris",
+    "chunk_id": 2,
+    "bullet_index": 1,
+    "before": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.",
+    "after": "Mise en place d’un pipeline CI/CD de tests et de déploiement déclenché à chaque fusion sur la branche principale, sur GitLab.",
+    "terms": [
+     "CI/CD"
+    ],
+    "facts": [
+     {
+      "claim": "Mise en place d’un pipeline CI/CD de tests et de déploiement déclenché à chaque fusion sur la branche principale, sur GitLab.",
+      "chunk_id": 2,
+      "quote": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "CI/CD",
+      "chunk_id": 2,
+      "quote": "GitLab"
+     }
+    ],
+    "level_before": "démontré",
+    "level_after": "démontré",
+    "justification": "",
+    "judge": "La reformulation ne fait qu’ajouter le terme CI/CD et précise la mise en place, sans élargir la portée, ajouter de nouveaux résultats ou changer le sens.",
     "usage": {
-     "calls": 3,
-     "input_tokens": 2860,
-     "output_tokens": 1543,
-     "reasoning_tokens": 1134,
-     "total_tokens": 4403
+     "calls": 4,
+     "input_tokens": 4189,
+     "output_tokens": 1328,
+     "reasoning_tokens": 855,
+     "total_tokens": 5517
     }
    },
    {
@@ -446,7 +488,9 @@
     "kind": "search",
     "status": "ok",
     "attempt": 1,
-    "detail": "chunk 2, puce 1"
+    "detail": "chunk 2, puce 1",
+    "facts": [],
+    "implied_skills": []
    },
    {
     "type": "step",
@@ -454,34 +498,44 @@
     "kind": "propose",
     "status": "ok",
     "attempt": 1,
-    "detail": "Pipeline de tests automatisés et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+    "detail": "Pipeline de tests automatisés et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.",
+    "facts": [
+     {
+      "claim": "Mise en place d'un pipeline de tests automatisés et de déploiement déclenché à chaque fusion sur la branche principale, sur GitLab.",
+      "chunk_id": 2,
+      "quote": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "intégration continue",
+      "chunk_id": 2,
+      "quote": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+     }
+    ]
    },
    {
     "type": "step",
     "requirement_id": "R10",
     "kind": "verify",
-    "status": "rejected",
-    "attempt": 1,
-    "detail": "Contrôle d'ancrage : « intégration continue » ne découle pas directement de « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. »."
-   },
-   {
-    "type": "step",
-    "requirement_id": "R10",
-    "kind": "propose",
     "status": "ok",
-    "attempt": 2,
-    "detail": "Pipeline de Tests automatisés et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+    "attempt": 1,
+    "detail": "Juge : fidèle — La reformulation ne fait qu'ajouter le qualificatif « automatisés » aux tests, ce qui précise mais ne change pas le sens ou la portée de la puce originale.",
+    "facts": [],
+    "implied_skills": []
    },
    {
     "type": "step",
     "requirement_id": "R10",
-    "kind": "verify",
-    "status": "rejected",
-    "attempt": 2,
-    "detail": "Contrôle d'ancrage : « Intégration continue » ne découle pas directement de « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. »."
+    "kind": "reevaluate",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "démontré -> démontré",
+    "facts": [],
+    "implied_skills": []
    },
    {
-    "type": "refusal",
+    "type": "suggestion",
     "requirement": {
      "id": "R10",
      "label": "Tests automatisés",
@@ -494,32 +548,653 @@
       "couverture de tests"
      ]
     },
-    "reason": "aucune_reformulation_fidele",
-    "message": "Aucune reformulation fidèle au CV n'a été trouvée.",
-    "shown": true,
-    "detail": "Contrôle d'ancrage : « Intégration continue » ne découle pas directement de « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. ».",
+    "item": "Développeuse backend · Transports Velmaris",
+    "chunk_id": 2,
+    "bullet_index": 1,
+    "before": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.",
+    "after": "Pipeline de tests automatisés et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.",
+    "terms": [
+     "Tests automatisés"
+    ],
+    "facts": [
+     {
+      "claim": "Mise en place d'un pipeline de tests automatisés et de déploiement déclenché à chaque fusion sur la branche principale, sur GitLab.",
+      "chunk_id": 2,
+      "quote": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "intégration continue",
+      "chunk_id": 2,
+      "quote": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+     }
+    ],
+    "level_before": "démontré",
+    "level_after": "démontré",
+    "justification": "",
+    "judge": "La reformulation ne fait qu'ajouter le qualificatif « automatisés » aux tests, ce qui précise mais ne change pas le sens ou la portée de la puce originale.",
     "usage": {
-     "calls": 3,
-     "input_tokens": 2877,
-     "output_tokens": 1303,
-     "reasoning_tokens": 838,
-     "total_tokens": 4180
+     "calls": 4,
+     "input_tokens": 4159,
+     "output_tokens": 1341,
+     "reasoning_tokens": 859,
+     "total_tokens": 5500
     }
    },
    {
     "type": "done",
-    "suggestions": 0,
-    "refusals": 6,
+    "suggestions": 2,
+    "refusals": 4,
     "to_describe": 3,
     "hidden": 0,
     "untreated": 0,
     "reevaluation_failed": 0,
     "usage": {
      "calls": 9,
-     "input_tokens": 8669,
-     "output_tokens": 4472,
-     "reasoning_tokens": 3113,
-     "total_tokens": 13141
+     "input_tokens": 9214,
+     "output_tokens": 2938,
+     "reasoning_tokens": 1897,
+     "total_tokens": 12152
+    }
+   }
+  ]
+ },
+ "demo_cv__sii": {
+  "case": "demo_cv__sii",
+  "report_source": "2026-11-21_référence_v4.json : demo_cv__sii (run 1)",
+  "outcomes": [
+   {
+    "id": "R5",
+    "label": "Intégration d'un outil ITSM",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : non démontré"
+   },
+   {
+    "id": "R6",
+    "label": "Anonymisation des données",
+    "kind": "impossible",
+    "verdict": "refus_juste",
+    "reason": "aucune_reformulation_fidele",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "Contrôle d'ancrage : « anonymisation » n'apparaît pas dans cette expérience."
+   },
+   {
+    "id": "R7",
+    "label": "Évaluation de modèles IA",
+    "kind": "possible",
+    "verdict": "gain",
+    "reason": null,
+    "level_before": "démontré",
+    "level_after": "démontré",
+    "source_expected": true,
+    "term_expected": true,
+    "detail": null
+   },
+   {
+    "id": "R8",
+    "label": "Analyse de données de tickets",
+    "kind": "possible",
+    "verdict": "gain",
+    "reason": null,
+    "level_before": "solide",
+    "level_after": "solide",
+    "source_expected": true,
+    "term_expected": true,
+    "detail": null
+   }
+  ],
+  "suggestions": [
+   {
+    "id": "R7",
+    "exigence": "Évaluation de modèles IA",
+    "verdict": "gain",
+    "item": "Stage ingénieure IA · Lumen Analytique",
+    "chunk": 11,
+    "puce": 1,
+    "avant": "Jeu d'évaluation de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence.",
+    "après": "Évaluation de modèles IA via un jeu de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence.",
+    "termes": [
+     "Évaluation de modèles IA"
+    ],
+    "faits": [
+     "[11] « Jeu d'évaluation de 200 questions » -> Évaluation de modèles IA via un jeu de 200 questions",
+     "[11] « comparaison de trois LLM sur l'exactitude, le coût et la latence » -> comparaison de trois LLM sur l'exactitude, le coût et la latence"
+    ],
+    "implications": [],
+    "niveaux": "démontré -> démontré",
+    "justification": "",
+    "juge": "La reformulation ne fait qu reformuler le même fait (jeu de 200 questions pour évaluer les modèles IA) sans ajouter, élargir ou modifier le sens."
+   },
+   {
+    "id": "R8",
+    "exigence": "Analyse de données de tickets",
+    "verdict": "gain",
+    "item": "Classifieur de tickets de support",
+    "chunk": 13,
+    "puce": 0,
+    "avant": "Classement de 5 000 tickets par catégorie et priorité, avec scikit-learn puis un LLM ; précision 0,87.",
+    "après": "Analyse de données de tickets : classement de 5 000 tickets par catégorie et priorité avec scikit-learn puis un LLM, précision 0,87.",
+    "termes": [
+     "Analyse de données de tickets"
+    ],
+    "faits": [
+     "[13] « Classement de 5 000 tickets par catégorie et priorité, avec scikit-learn puis un LLM ; précision 0,87. » -> Classement de 5 000 tickets par catégorie et priorité avec scikit-learn puis un LLM, précision 0,87"
+    ],
+    "implications": [
+     "Python <- « Python · scikit-learn · LLM »",
+     "scikit-learn <- « Python · scikit-learn · LLM »",
+     "LLM <- « Python · scikit-learn · LLM »"
+    ],
+    "niveaux": "solide -> solide",
+    "justification": "",
+    "juge": "La reformulation ne change ni le verbe, ni la portée, ni les faits ; elle ajoute seulement une introduction générique."
+   }
+  ],
+  "grounding_rejections": [
+   "R6 (tentative 1) : Contrôle d'ancrage : « anonymisation » n'apparaît pas dans cette expérience.",
+   "R6 (tentative 2) : Contrôle d'ancrage : « anonymisation » n'apparaît pas dans cette expérience."
+  ],
+  "action_rejections": [],
+  "action_with_other_issues": 0,
+  "judge_rejections": [],
+  "term_rejections": [],
+  "level_drops": [],
+  "skipped": 0,
+  "usage": {
+   "calls": 11,
+   "input_tokens": 11127,
+   "output_tokens": 4132,
+   "reasoning_tokens": 2582,
+   "total_tokens": 15259
+  },
+  "seconds": 201.21367505299986,
+  "error": null,
+  "warning": null,
+  "events": [
+   {
+    "type": "agent_started",
+    "targets": [
+     {
+      "id": "R6",
+      "label": "Anonymisation des données",
+      "level": "démontré",
+      "weight": 1.0,
+      "terms": [
+       "Anonymisation des données"
+      ]
+     },
+     {
+      "id": "R7",
+      "label": "Évaluation de modèles IA",
+      "level": "démontré",
+      "weight": 1.0,
+      "terms": [
+       "Évaluation de modèles IA"
+      ]
+     },
+     {
+      "id": "R8",
+      "label": "Analyse de données de tickets",
+      "level": "solide",
+      "weight": 1.0,
+      "terms": [
+       "Analyse de données de tickets"
+      ]
+     }
+    ],
+    "skipped": 0,
+    "to_describe": [
+     {
+      "id": "R5",
+      "label": "Intégration d'un outil ITSM",
+      "level": "non démontré",
+      "weight": 1.0,
+      "terms": [
+       "Intégration d'un outil ITSM"
+      ]
+     }
+    ],
+    "limits": {
+     "max_requirements": 3,
+     "max_attempts": 2,
+     "max_tokens_per_requirement": 15000,
+     "max_tokens_per_run": 45000
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R5",
+     "label": "Intégration d'un outil ITSM",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "ITSM",
+      "outil de gestion des tickets",
+      "ServiceNow"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : non démontré",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "target_started",
+    "requirement": {
+     "id": "R6",
+     "label": "Anonymisation des données",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "anonymisation données",
+      "data anonymisation",
+      "privacy data"
+     ]
+    },
+    "level": "démontré",
+    "rank": 1
+   },
+   {
+    "type": "step",
+    "requirement_id": "R6",
+    "kind": "search",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "chunk 12, puce 1",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R6",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "Anonymisation des données clients par nettoyage et pseudonymisation avant analyse.",
+    "facts": [
+     {
+      "claim": "Nettoyage et pseudonymisation des données clients avant analyse",
+      "chunk_id": 12,
+      "quote": "Nettoyage et pseudonymisation des données clients avant analyse."
+     },
+     {
+      "claim": "Anonymisation des données clients",
+      "chunk_id": 12,
+      "quote": "Nettoyage et pseudonymisation des données clients avant analyse."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "SQL",
+      "chunk_id": 12,
+      "quote": "SQL · Pandas · PostgreSQL"
+     },
+     {
+      "skill": "Pandas",
+      "chunk_id": 12,
+      "quote": "SQL · Pandas · PostgreSQL"
+     },
+     {
+      "skill": "PostgreSQL",
+      "chunk_id": 12,
+      "quote": "SQL · Pandas · PostgreSQL"
+     }
+    ]
+   },
+   {
+    "type": "step",
+    "requirement_id": "R6",
+    "kind": "verify",
+    "status": "rejected",
+    "attempt": 1,
+    "detail": "Contrôle d'ancrage : « anonymisation » n'apparaît pas dans cette expérience.",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R6",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 2,
+    "detail": "Nettoyage et anonymisation des données clients avant analyse.",
+    "facts": [
+     {
+      "claim": "Nettoyage et anonymisation des données clients avant analyse.",
+      "chunk_id": 12,
+      "quote": "Nettoyage et pseudonymisation des données clients avant analyse."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "Data cleaning",
+      "chunk_id": 12,
+      "quote": "Nettoyage et pseudonymisation des données clients avant analyse."
+     }
+    ]
+   },
+   {
+    "type": "step",
+    "requirement_id": "R6",
+    "kind": "verify",
+    "status": "rejected",
+    "attempt": 2,
+    "detail": "Contrôle d'ancrage : « anonymisation » n'apparaît pas dans cette expérience.",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R6",
+     "label": "Anonymisation des données",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "anonymisation données",
+      "data anonymisation",
+      "privacy data"
+     ]
+    },
+    "reason": "aucune_reformulation_fidele",
+    "message": "Aucune reformulation fidèle au CV n'a été trouvée.",
+    "shown": true,
+    "detail": "Contrôle d'ancrage : « anonymisation » n'apparaît pas dans cette expérience.",
+    "usage": {
+     "calls": 3,
+     "input_tokens": 2640,
+     "output_tokens": 1579,
+     "reasoning_tokens": 1074,
+     "total_tokens": 4219
+    }
+   },
+   {
+    "type": "target_started",
+    "requirement": {
+     "id": "R7",
+     "label": "Évaluation de modèles IA",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "évaluation IA",
+      "benchmark modèles IA",
+      "qualité modèle IA"
+     ]
+    },
+    "level": "démontré",
+    "rank": 2
+   },
+   {
+    "type": "step",
+    "requirement_id": "R7",
+    "kind": "search",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "chunk 11, puce 1",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R7",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "Évaluation de modèles IA via un jeu de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence.",
+    "facts": [
+     {
+      "claim": "Évaluation de modèles IA via un jeu de 200 questions",
+      "chunk_id": 11,
+      "quote": "Jeu d'évaluation de 200 questions"
+     },
+     {
+      "claim": "comparaison de trois LLM sur l'exactitude, le coût et la latence",
+      "chunk_id": 11,
+      "quote": "comparaison de trois LLM sur l'exactitude, le coût et la latence"
+     }
+    ],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R7",
+    "kind": "verify",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "Juge : fidèle — La reformulation ne fait qu reformuler le même fait (jeu de 200 questions pour évaluer les modèles IA) sans ajouter, élargir ou modifier le sens.",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R7",
+    "kind": "reevaluate",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "démontré -> démontré",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "suggestion",
+    "requirement": {
+     "id": "R7",
+     "label": "Évaluation de modèles IA",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "évaluation IA",
+      "benchmark modèles IA",
+      "qualité modèle IA"
+     ]
+    },
+    "item": "Stage ingénieure IA · Lumen Analytique",
+    "chunk_id": 11,
+    "bullet_index": 1,
+    "before": "Jeu d'évaluation de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence.",
+    "after": "Évaluation de modèles IA via un jeu de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence.",
+    "terms": [
+     "Évaluation de modèles IA"
+    ],
+    "facts": [
+     {
+      "claim": "Évaluation de modèles IA via un jeu de 200 questions",
+      "chunk_id": 11,
+      "quote": "Jeu d'évaluation de 200 questions"
+     },
+     {
+      "claim": "comparaison de trois LLM sur l'exactitude, le coût et la latence",
+      "chunk_id": 11,
+      "quote": "comparaison de trois LLM sur l'exactitude, le coût et la latence"
+     }
+    ],
+    "implied_skills": [],
+    "level_before": "démontré",
+    "level_after": "démontré",
+    "justification": "",
+    "judge": "La reformulation ne fait qu reformuler le même fait (jeu de 200 questions pour évaluer les modèles IA) sans ajouter, élargir ou modifier le sens.",
+    "usage": {
+     "calls": 4,
+     "input_tokens": 4297,
+     "output_tokens": 1265,
+     "reasoning_tokens": 797,
+     "total_tokens": 5562
+    }
+   },
+   {
+    "type": "target_started",
+    "requirement": {
+     "id": "R8",
+     "label": "Analyse de données de tickets",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "analyse de tickets",
+      "historique des tickets",
+      "analyse des demandes de support"
+     ]
+    },
+    "level": "solide",
+    "rank": 3
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "search",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "chunk 13, puce 0",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "Analyse de données de tickets : classement de 5 000 tickets par catégorie et priorité avec scikit-learn puis un LLM, précision 0,87.",
+    "facts": [
+     {
+      "claim": "Classement de 5 000 tickets par catégorie et priorité avec scikit-learn puis un LLM, précision 0,87",
+      "chunk_id": 13,
+      "quote": "Classement de 5 000 tickets par catégorie et priorité, avec scikit-learn puis un LLM ; précision 0,87."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "Python",
+      "chunk_id": 13,
+      "quote": "Python · scikit-learn · LLM"
+     },
+     {
+      "skill": "scikit-learn",
+      "chunk_id": 13,
+      "quote": "Python · scikit-learn · LLM"
+     },
+     {
+      "skill": "LLM",
+      "chunk_id": 13,
+      "quote": "Python · scikit-learn · LLM"
+     }
+    ]
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "verify",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "Juge : fidèle — La reformulation ne change ni le verbe, ni la portée, ni les faits ; elle ajoute seulement une introduction générique.",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "reevaluate",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "solide -> solide",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "suggestion",
+    "requirement": {
+     "id": "R8",
+     "label": "Analyse de données de tickets",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "analyse de tickets",
+      "historique des tickets",
+      "analyse des demandes de support"
+     ]
+    },
+    "item": "Classifieur de tickets de support",
+    "chunk_id": 13,
+    "bullet_index": 0,
+    "before": "Classement de 5 000 tickets par catégorie et priorité, avec scikit-learn puis un LLM ; précision 0,87.",
+    "after": "Analyse de données de tickets : classement de 5 000 tickets par catégorie et priorité avec scikit-learn puis un LLM, précision 0,87.",
+    "terms": [
+     "Analyse de données de tickets"
+    ],
+    "facts": [
+     {
+      "claim": "Classement de 5 000 tickets par catégorie et priorité avec scikit-learn puis un LLM, précision 0,87",
+      "chunk_id": 13,
+      "quote": "Classement de 5 000 tickets par catégorie et priorité, avec scikit-learn puis un LLM ; précision 0,87."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "Python",
+      "chunk_id": 13,
+      "quote": "Python · scikit-learn · LLM"
+     },
+     {
+      "skill": "scikit-learn",
+      "chunk_id": 13,
+      "quote": "Python · scikit-learn · LLM"
+     },
+     {
+      "skill": "LLM",
+      "chunk_id": 13,
+      "quote": "Python · scikit-learn · LLM"
+     }
+    ],
+    "level_before": "solide",
+    "level_after": "solide",
+    "justification": "",
+    "judge": "La reformulation ne change ni le verbe, ni la portée, ni les faits ; elle ajoute seulement une introduction générique.",
+    "usage": {
+     "calls": 4,
+     "input_tokens": 4190,
+     "output_tokens": 1288,
+     "reasoning_tokens": 711,
+     "total_tokens": 5478
+    }
+   },
+   {
+    "type": "done",
+    "suggestions": 2,
+    "refusals": 2,
+    "to_describe": 1,
+    "hidden": 0,
+    "untreated": 0,
+    "reevaluation_failed": 0,
+    "usage": {
+     "calls": 11,
+     "input_tokens": 11127,
+     "output_tokens": 4132,
+     "reasoning_tokens": 2582,
+     "total_tokens": 15259
     }
    }
   ]
