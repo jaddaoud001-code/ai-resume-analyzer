@@ -154,6 +154,7 @@ Une exigence en erreur n'est comptée ni exacte ni fausse (colonne « erreur »)
 | `2026-11-21_référence_v4.json` | série de référence, prompt v4, tous les correctifs du 2026-11-17 au 2026-11-21 (écrit directement par `--reports`) |
 | `2026-11-23_gain_v4.json` | analyse du cas de gain (`gain_cv` × logistique, exigences figées), écrite par `eval_suggestions.py --analyze-gain` |
 | `2026-11-23_suggestions_v1.json` | premier run réel de l'agent **v1** sur le cas de gain : **non concluant**, d'où l'agent v2. Aucune lacune annotée « possible » n'est ciblée (le matcher les juge déjà prouvées), et 2 cibles sur 3 sont en erreur : Groq `tool_use_failed`, le modèle répond « rien » en texte au lieu d'appeler l'outil |
+| `2026-11-24_suggestions_v2.json` | premier run de l'agent **v2** sur le cas de gain : 3 cartes (R4, R5, R6), R8 refus juste, R9 et R10 **faux refus**. Les 4 reformulations proposées étaient honnêtes, mais l'ancrage les a rejetées à cause des compétences déclarées dans `implied_skills` (« CI/CD » <- « GitLab », « intégration continue » <- la puce), absentes de la table des implications ; sans ces déclarations, les 4 passent. 13 141 tokens, 162 s |
 
 ## Agent de suggestions : évaluation (`eval/suggestions/`)
 
