@@ -617,3 +617,87 @@ class TestBulletLabel:
         # Format exact, en début de citation seulement.
         for other in ("[Puce 0] Pipeline", "[puce] Pipeline", "Pipeline [puce 0] de tests"):
             assert strip_bullet_label(other) == other
+
+
+# --- Audit du 2026-11-24 : responsabilité ou initiative ajoutée -------------------------------
+
+STAGE_EVAL_BULLET = (
+    "Jeu d'évaluation de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence."
+)
+TICKETS_BULLET = (
+    "Classement de 5 000 tickets par catégorie et priorité, avec scikit-learn puis un LLM ; précision 0,87."
+)
+
+
+class TestAddedResponsibility:
+    def test_r9_of_the_run_is_rejected(self) -> None:
+        text = (
+            "Mise en place d’un pipeline CI/CD de tests et de déploiement déclenché à chaque fusion sur la branche "
+            "principale, sur GitLab."
+        )
+        rewrite = _rewrite(2, 1, text, [(2, GAIN_PIPELINE)], [("CI/CD", 2, "GitLab")])
+
+        assert _check(GAIN, rewrite) == ["responsabilite_ajoutee"]
+
+    @pytest.mark.parametrize(
+        ("chunks", "chunk_id", "index", "source", "text", "terms"),
+        [
+            # R10, R7 et R8 du run, jugées fidèles à l'audit : toujours acceptées.
+            (GAIN, 2, 1, GAIN_PIPELINE, "Pipeline de tests automatisés et de déploiement lancé à chaque fusion sur la "
+             "branche principale, sur GitLab.", ["tests automatisés"]),
+            (DEMO, 11, 1, STAGE_EVAL_BULLET, "Évaluation de modèles IA via un jeu de 200 questions ; comparaison de "
+             "trois LLM sur l'exactitude, le coût et la latence.", ["Évaluation de modèles IA"]),
+            (DEMO, 13, 0, TICKETS_BULLET, "Analyse de données de tickets : classement de 5 000 tickets par catégorie "
+             "et priorité avec scikit-learn puis un LLM, précision 0,87.", ["Analyse de données de tickets"]),
+        ],
+    )  # fmt: skip
+    def test_faithful_rewrites_of_the_run_still_pass(
+        self, chunks: list[Chunk], chunk_id: int, index: int, source: str, text: str, terms: list[str]
+    ) -> None:
+        rewrite = _rewrite(chunk_id, index, text, [(chunk_id, source)])
+
+        assert check_grounding(rewrite, chunks, SECTIONS, offer_terms=terms).codes() == []
+        assert _check(chunks, rewrite) == []  # aucun marqueur, avec ou sans termes de l'offre
+
+    @pytest.mark.parametrize(
+        "prefix",
+        [
+            "Conception du",
+            "Pipeline conçu :",
+            "Création du",
+            "Pipeline créé :",
+            "Pilotage du",
+            "Pipeline piloté :",
+            "Direction du",
+            "Responsable du",
+            "Encadrement du",
+            "Tech lead du",
+            "Mis en place :",
+        ],
+    )
+    def test_variants_are_detected(self, prefix: str) -> None:
+        text = f"{prefix} pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale."
+
+        assert "responsabilite_ajoutee" in _check(GAIN, _rewrite(2, 1, text, [(2, GAIN_PIPELINE)]))
+
+    def test_allowed_when_the_item_already_says_it(self) -> None:
+        chunks = _with_text(GAIN, 2, "Pipeline de tests", "Mise en place du pipeline de tests")
+        original = GAIN_PIPELINE.replace("Pipeline de tests", "Mise en place du pipeline de tests")
+        text = "Mise en place du pipeline CI/CD de tests et de déploiement lancé à chaque fusion sur la branche."
+
+        assert _check(chunks, _rewrite(2, 1, text, [(2, original)])) == []
+
+    def test_an_offer_term_heading_is_not_targeted(self) -> None:
+        # Une offre qui demande « Conception d'API » : l'intitulé qui reprend son terme est admis ;
+        # le même marqueur hors du terme ne l'est pas.
+        bullet = "Service de calcul des tarifs de livraison, appelé par le site marchand et l'application des livreurs."
+        heading = (
+            "Conception d'API : service de calcul des tarifs de livraison, appelé par le site marchand et l'appli."
+        )
+        rewrite = _rewrite(2, 0, heading, [(2, bullet)])
+
+        assert (
+            "responsabilite_ajoutee"
+            not in check_grounding(rewrite, GAIN, SECTIONS, offer_terms=["Conception d'API"]).codes()
+        )
+        assert "responsabilite_ajoutee" in _check(GAIN, rewrite)

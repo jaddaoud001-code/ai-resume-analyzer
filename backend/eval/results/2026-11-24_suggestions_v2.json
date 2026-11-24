@@ -97,7 +97,11 @@
     ],
     "niveaux": "démontré -> démontré",
     "justification": "",
-    "juge": "La reformulation ne fait qu’ajouter le terme CI/CD et précise la mise en place, sans élargir la portée, ajouter de nouveaux résultats ou changer le sens."
+    "juge": "La reformulation ne fait qu’ajouter le terme CI/CD et précise la mise en place, sans élargir la portée, ajouter de nouveaux résultats ou changer le sens.",
+    "audit": {
+     "verdict": "invention",
+     "raison": "« Mise en place d'un » ajoute une responsabilité que la puce ne dit pas (elle dit seulement qu'un pipeline est lancé à chaque fusion) ; laissée passer par le juge"
+    }
    },
    {
     "id": "R10",
@@ -119,7 +123,11 @@
     ],
     "niveaux": "démontré -> démontré",
     "justification": "",
-    "juge": "La reformulation ne fait qu'ajouter le qualificatif « automatisés » aux tests, ce qui précise mais ne change pas le sens ou la portée de la puce originale."
+    "juge": "La reformulation ne fait qu'ajouter le qualificatif « automatisés » aux tests, ce qui précise mais ne change pas le sens ou la portée de la puce originale.",
+    "audit": {
+     "verdict": "fidèle",
+     "raison": "« automatisés » nomme ce que la puce décrit (tests lancés à chaque fusion par un pipeline)"
+    }
    }
   ],
   "grounding_rejections": [],
@@ -673,7 +681,11 @@
     "implications": [],
     "niveaux": "démontré -> démontré",
     "justification": "",
-    "juge": "La reformulation ne fait qu reformuler le même fait (jeu de 200 questions pour évaluer les modèles IA) sans ajouter, élargir ou modifier le sens."
+    "juge": "La reformulation ne fait qu reformuler le même fait (jeu de 200 questions pour évaluer les modèles IA) sans ajouter, élargir ou modifier le sens.",
+    "audit": {
+     "verdict": "fidèle",
+     "raison": "reformule le même fait : jeu de 200 questions et comparaison de trois LLM = évaluation de modèles IA"
+    }
    },
    {
     "id": "R8",
@@ -697,7 +709,11 @@
     ],
     "niveaux": "solide -> solide",
     "justification": "",
-    "juge": "La reformulation ne change ni le verbe, ni la portée, ni les faits ; elle ajoute seulement une introduction générique."
+    "juge": "La reformulation ne change ni le verbe, ni la portée, ni les faits ; elle ajoute seulement une introduction générique.",
+    "audit": {
+     "verdict": "fidèle",
+     "raison": "intitulé qui reprend le terme de l'offre, « classement » gardé"
+    }
    }
   ],
   "grounding_rejections": [
@@ -1195,6 +1211,265 @@
      "output_tokens": 4132,
      "reasoning_tokens": 2582,
      "total_tokens": 15259
+    }
+   }
+  ]
+ },
+ "gain_cv__logistique [R9]": {
+  "case": "gain_cv__logistique",
+  "report_source": "2026-11-23_gain_v4.json : gain_cv__logistique (run 1)",
+  "outcomes": [
+   {
+    "id": "R9",
+    "label": "CI/CD",
+    "kind": "possible",
+    "verdict": "gain",
+    "reason": null,
+    "level_before": "démontré",
+    "level_after": "démontré",
+    "source_expected": true,
+    "term_expected": true,
+    "detail": null
+   }
+  ],
+  "suggestions": [
+   {
+    "id": "R9",
+    "exigence": "CI/CD",
+    "verdict": "gain",
+    "item": "Développeuse backend · Transports Velmaris",
+    "chunk": 2,
+    "puce": 1,
+    "avant": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.",
+    "après": "Pipeline CI/CD de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.",
+    "termes": [
+     "CI/CD"
+    ],
+    "faits": [
+     "[2] « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. » -> Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+    ],
+    "implications": [
+     "CI/CD <- « Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab. »"
+    ],
+    "niveaux": "démontré -> démontré",
+    "justification": "",
+    "juge": "La reformulation n'ajoute que le terme « CI/CD », une désignation technologique équivalente, sans modifier la portée ou le sens de la puce originale.",
+    "audit": {
+     "verdict": "fidèle",
+     "raison": "Puce d'origine avec seulement CI/CD ajouté, sans responsabilité ajoutée"
+    }
+   }
+  ],
+  "grounding_rejections": [
+   "R9 (tentative 1) : Contrôle d'ancrage : « mise en place » ajoute une responsabilité ou une initiative que cette expérience ne mentionne pas."
+  ],
+  "action_rejections": [],
+  "action_with_other_issues": 0,
+  "judge_rejections": [],
+  "term_rejections": [],
+  "level_drops": [],
+  "skipped": 0,
+  "usage": {
+   "calls": 5,
+   "input_tokens": 5199,
+   "output_tokens": 1662,
+   "reasoning_tokens": 1003,
+   "total_tokens": 6861
+  },
+  "seconds": 80.78411237599994,
+  "error": null,
+  "warning": null,
+  "requirements_filter": [
+   "R9"
+  ],
+  "events": [
+   {
+    "type": "agent_started",
+    "targets": [
+     {
+      "id": "R9",
+      "label": "CI/CD",
+      "level": "démontré",
+      "weight": 1.0,
+      "terms": [
+       "CI/CD",
+       "intégration continue",
+       "déploiement continu"
+      ]
+     }
+    ],
+    "skipped": 0,
+    "to_describe": [],
+    "limits": {
+     "max_requirements": 3,
+     "max_attempts": 2,
+     "max_tokens_per_requirement": 15000,
+     "max_tokens_per_run": 45000
+    }
+   },
+   {
+    "type": "target_started",
+    "requirement": {
+     "id": "R9",
+     "label": "CI/CD",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "CI/CD",
+      "intégration continue",
+      "pipelines de déploiement"
+     ]
+    },
+    "level": "démontré",
+    "rank": 1
+   },
+   {
+    "type": "step",
+    "requirement_id": "R9",
+    "kind": "search",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "chunk 2, puce 1",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R9",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "Mise en place d’un pipeline CI/CD de tests et de déploiement déclenché à chaque fusion sur la branche principale, sur GitLab.",
+    "facts": [
+     {
+      "claim": "Mise en place d’un pipeline CI/CD de tests et de déploiement déclenché à chaque fusion sur la branche principale, sur GitLab.",
+      "chunk_id": 2,
+      "quote": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "CI/CD",
+      "chunk_id": 2,
+      "quote": "GitLab"
+     }
+    ]
+   },
+   {
+    "type": "step",
+    "requirement_id": "R9",
+    "kind": "verify",
+    "status": "rejected",
+    "attempt": 1,
+    "detail": "Contrôle d'ancrage : « mise en place » ajoute une responsabilité ou une initiative que cette expérience ne mentionne pas.",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R9",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 2,
+    "detail": "Pipeline CI/CD de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.",
+    "facts": [
+     {
+      "claim": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.",
+      "chunk_id": 2,
+      "quote": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "CI/CD",
+      "chunk_id": 2,
+      "quote": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+     }
+    ]
+   },
+   {
+    "type": "step",
+    "requirement_id": "R9",
+    "kind": "verify",
+    "status": "ok",
+    "attempt": 2,
+    "detail": "Juge : fidèle — La reformulation n'ajoute que le terme « CI/CD », une désignation technologique équivalente, sans modifier la portée ou le sens de la puce originale.",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R9",
+    "kind": "reevaluate",
+    "status": "ok",
+    "attempt": 2,
+    "detail": "démontré -> démontré",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "suggestion",
+    "requirement": {
+     "id": "R9",
+     "label": "CI/CD",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "CI/CD",
+      "intégration continue",
+      "pipelines de déploiement"
+     ]
+    },
+    "item": "Développeuse backend · Transports Velmaris",
+    "chunk_id": 2,
+    "bullet_index": 1,
+    "before": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.",
+    "after": "Pipeline CI/CD de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.",
+    "terms": [
+     "CI/CD"
+    ],
+    "facts": [
+     {
+      "claim": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab.",
+      "chunk_id": 2,
+      "quote": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "CI/CD",
+      "chunk_id": 2,
+      "quote": "Pipeline de tests et de déploiement lancé à chaque fusion sur la branche principale, sur GitLab."
+     }
+    ],
+    "level_before": "démontré",
+    "level_after": "démontré",
+    "justification": "",
+    "judge": "La reformulation n'ajoute que le terme « CI/CD », une désignation technologique équivalente, sans modifier la portée ou le sens de la puce originale.",
+    "usage": {
+     "calls": 5,
+     "input_tokens": 5199,
+     "output_tokens": 1662,
+     "reasoning_tokens": 1003,
+     "total_tokens": 6861
+    }
+   },
+   {
+    "type": "done",
+    "suggestions": 1,
+    "refusals": 0,
+    "to_describe": 0,
+    "hidden": 0,
+    "untreated": 0,
+    "reevaluation_failed": 0,
+    "usage": {
+     "calls": 5,
+     "input_tokens": 5199,
+     "output_tokens": 1662,
+     "reasoning_tokens": 1003,
+     "total_tokens": 6861
     }
    }
   ]

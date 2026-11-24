@@ -207,7 +207,11 @@ def test_end_to_end_gain_and_describe_card() -> None:
 
     assert [(o.id, o.verdict) for o in result.outcomes] == [("R4", "carte"), ("R9", "gain")]  # type: ignore[attr-defined]
     summary = summarize([result])  # type: ignore[list-item]
-    assert (summary["affirmations inventées"], summary["cartes « à décrire »"], summary["gains"]) == (0, 1, "1/1")
+    assert (summary["inventions détectées par les annotations"], summary["cartes « à décrire »"], summary["gains"]) == (
+        0,
+        1,
+        "1/1",
+    )
     assert summary["gains depuis la source annotée"] == 1 and summary["gains avec un terme attendu"] == 1
     assert summary["cibles implicites traitées"] == 1
     assert result.suggestions[0]["après"] == HONEST_CI_CD and result.suggestions[0]["termes"] == ["CI/CD"]  # type: ignore[attr-defined]
@@ -228,7 +232,7 @@ def test_end_to_end_tempting_rewrite_is_stopped_by_grounding() -> None:
 
     assert [(o.id, o.verdict) for o in result.outcomes] == [("R8", "refus_juste")]  # type: ignore[attr-defined]
     assert len(result.grounding_rejections) == 2 and "REST" in result.grounding_rejections[0].upper()  # type: ignore[attr-defined]
-    assert summarize([result])["affirmations inventées"] == 0  # type: ignore[list-item]
+    assert summarize([result])["inventions détectées par les annotations"] == 0  # type: ignore[list-item]
 
 
 def test_results_path() -> None:
@@ -266,3 +270,51 @@ def test_save_results_keeps_the_other_cases_of_the_day(tmp_path: Path) -> None:
 
     saved = json.loads(path.read_text())
     assert list(saved) == ["a", "b"] and saved["a"]["seconds"] == 2.0
+
+
+def test_human_audit_is_recorded_kept_and_counted(tmp_path: Path) -> None:
+    from eval.eval_suggestions import load_results, record_audit, save_results
+
+    agent = FakeStructuredChatModel(responses=[CANDIDATE_CI_CD, HONEST, JudgeVerdict(faithful=True)])
+    result = _evaluate(agent, _report(IMPLICIT_CI_CD))
+    path = tmp_path / "résultats.json"
+    save_results(path, [result])  # type: ignore[list-item]
+    assert result.suggestions[0]["audit"] is None  # type: ignore[attr-defined]
+
+    record_audit(path, GAIN_CASE, "R9", "invention", "responsabilité ajoutée")
+
+    loaded = load_results(path)
+    summary = summarize(loaded)
+    assert summary["inventions trouvées à l'audit"] == 1 and summary["suggestions auditées"] == "1/1"
+    assert summary["inventions détectées par les annotations"] == 0
+    # Un nouvel enregistrement de la même suggestion garde l'audit.
+    save_results(path, loaded)
+    assert load_results(path)[0].suggestions[0]["audit"]["verdict"] == "invention"
+
+
+def test_targeted_run_keeps_only_the_requirement_and_its_own_key(tmp_path: Path) -> None:
+    from eval.eval_suggestions import save_results
+
+    agent = FakeStructuredChatModel(responses=[CANDIDATE_CI_CD, HONEST, JudgeVerdict(faithful=True)])
+    settings = make_settings()
+    report = _report({**IMPLICIT_CI_CD, "R10": ("démontré", VELMARIS, "Pipeline de tests")}, levels={"R4": "mentionné"})
+    result = asyncio.run(
+        run_case(
+            GAIN_CASE,
+            GAIN["implicit_report"],
+            report,
+            GAIN,
+            settings=settings,
+            embeddings=KeywordEmbeddings(),
+            agent_llm=agent,
+            match_llm=_matcher(),
+            limiter=RateLimiter.from_settings(settings),
+            only=["R9"],
+        )
+    )
+
+    assert [(o.id, o.verdict) for o in result.outcomes] == [("R9", "gain")]  # ni R10, ni la carte R4
+    assert result.key == f"{GAIN_CASE} [R9]"
+    path = tmp_path / "r.json"
+    save_results(path, [result])
+    assert list(json.loads(path.read_text())) == [f"{GAIN_CASE} [R9]"]

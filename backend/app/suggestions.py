@@ -17,7 +17,7 @@ Le graphe produit des événements typés (`AgentEvent`), destinés au flux SSE.
 
 import asyncio
 import operator
-from collections.abc import AsyncIterator, Callable
+from collections.abc import AsyncIterator, Callable, Iterable
 from dataclasses import dataclass, field
 from datetime import date
 from typing import Annotated, Any, Literal, TypedDict
@@ -273,6 +273,7 @@ class AgentDeps:
     limiter: RateLimiter
     today: date
     waits: list[AnalysisStatus] = field(default_factory=list)
+    only: list[str] | None = None
 
 
 class _BudgetExceeded(Exception):
@@ -299,15 +300,18 @@ class Selection:
     to_describe: list[RequirementMatch]  # cartes « si vous l'avez réellement pratiqué, décrivez-le »
 
 
-def select_targets(report: MatchReport, settings: Settings) -> Selection:
+def select_targets(report: MatchReport, settings: Settings, only: Iterable[str] | None = None) -> Selection:
     """Cibles implicites (app.terms.is_implicit), obligatoires d'abord (poids, puis ordre du
-    rapport), au plus suggest_max_requirements ; et compétences techniques à décrire."""
-    implicit = sorted((r for r in report.requirements if is_implicit(r)), key=lambda r: -r.weight)
+    rapport), au plus suggest_max_requirements ; et compétences à décrire. `only` : identifiants
+    des exigences à traiter (évaluation ciblée), les autres sont ignorées."""
+    wanted = set(only) if only is not None else None
+    results = [r for r in report.requirements if wanted is None or r.requirement.id in wanted]
+    implicit = sorted((r for r in results if is_implicit(r)), key=lambda r: -r.weight)
     limit = settings.suggest_max_requirements
     return Selection(
         targets=implicit[:limit],
         skipped=max(0, len(implicit) - limit),
-        to_describe=[r for r in report.requirements if to_describe(r)],
+        to_describe=[r for r in results if to_describe(r)],
     )
 
 
@@ -432,7 +436,7 @@ def build_graph(deps: AgentDeps) -> Any:
     # --- nœuds ----------------------------------------------------------------------------------
 
     def node_select(state: AgentState) -> dict:  # type: ignore[type-arg]
-        selection = select_targets(deps.report, settings)
+        selection = select_targets(deps.report, settings, deps.only)
         started = AgentStarted(
             targets=[_agent_target(t) for t in selection.targets],
             skipped=selection.skipped,
@@ -628,7 +632,13 @@ def build_graph(deps: AgentDeps) -> Any:
             terms = ", ".join(f"« {t} »" for t in offer_terms(target(state).requirement))
             reason = f"Terme absent : la puce doit nommer l'un des termes de l'offre ({terms})."
             return retry_or_refuse(state, "verify", reason, "aucune_reformulation_fidele")
-        grounding = check_grounding(rewrite, deps.chunks, sections, settings.suggest_max_length_ratio)
+        grounding = check_grounding(
+            rewrite,
+            deps.chunks,
+            sections,
+            settings.suggest_max_length_ratio,
+            offer_terms(target(state).requirement),
+        )
         if not grounding.ok:
             reason = GROUNDING_PREFIX + " ; ".join(i.message for i in grounding.issues)
             return retry_or_refuse(state, "verify", reason, "aucune_reformulation_fidele")
@@ -791,10 +801,12 @@ async def suggest(
     match_llm: BaseChatModel,
     limiter: RateLimiter,
     today: date | None = None,
+    only: Iterable[str] | None = None,
 ) -> AsyncIterator[Any]:
     """Exécute le graphe et produit ses événements au fil de l'eau (agent_started … done ou
     error). `chunks` : chunks anonymisés du CV renvoyé par le client (rien n'est conservé)."""
     deps = AgentDeps(report, chunks, settings, embeddings, agent_llm, match_llm, limiter, today or date.today())
+    deps.only = list(only) if only is not None else None
     monitor = AnalysisMonitor(
         on_wait=lambda seconds: deps.waits.append(
             AnalysisStatus(wait_s=seconds, message=f"En attente du quota du fournisseur, reprise dans {seconds:.0f} s")

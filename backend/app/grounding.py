@@ -88,6 +88,38 @@ def strip_bullet_label(quote: str) -> str:
     return _BULLET_LABEL.sub("", quote, count=1)
 
 
+# Marqueurs de responsabilité ou d'initiative (texte normalisé : minuscules, sans accents) : ils
+# ne peuvent pas être ajoutés s'ils ne figurent pas déjà dans l'item (« Pipeline … » -> « Mise en
+# place d'un pipeline … » ajoute une responsabilité que la puce ne dit pas). Une famille par
+# marqueur, variantes comprises ; présente dans l'item, elle est admise.
+RESPONSIBILITY_MARKERS: dict[str, re.Pattern[str]] = {
+    name: re.compile(rf"(?<![\w-])(?:{pattern})(?![\w-])")
+    for name, pattern in {
+        "mise en place": r"(?:mise?s?|mettre|met|mettent) en place",
+        "conception": r"conception|concevoir|concu(?:e|s|es)?",
+        "création": r"creations?|creer|creee?s?",
+        "pilotage": r"pilotage|piloter|pilote(?:e|s|es)?",
+        "direction": r"direction|diriger|dirige(?:e|s|es)?",
+        "responsable": r"responsables?|responsabilites?",
+        "encadrement": r"encadrement|encadrer|encadre(?:e|s|es)?",
+        "lead": r"lead|leads|leader|leaders|leadership",
+    }.items()
+}
+
+
+def added_responsibilities(new_text: str, item_text: str, exempt: Iterable[str] = ()) -> list[str]:
+    """Familles de marqueurs présentes dans `new_text` mais absentes de l'item. Les termes
+    `exempt` (termes de l'offre, par exemple « Conception d'API ») sont retirés du texte avant :
+    un intitulé qui reprend le terme de l'offre n'est pas visé."""
+    text = normalize(new_text)
+    for term in exempt:
+        text = re.sub(rf"(?<![\w-]){re.escape(normalize(term))}(?![\w-])", " ", text)
+    item = normalize(item_text)
+    return [
+        name for name, pattern in RESPONSIBILITY_MARKERS.items() if pattern.search(text) and not pattern.search(item)
+    ]
+
+
 _ROOT_LENGTH = 6
 # Motif du rejet par la règle du premier mot, repéré par l'évaluation (rejets comptés à part).
 ACTION_LOST = "(ce que décrit la puce d'origine) doit rester dans la reformulation"
@@ -219,10 +251,12 @@ def check_grounding(
     chunks: Iterable[Chunk],
     sections: Iterable[str],
     max_length_ratio: float = 1.6,
+    offer_terms: Iterable[str] = (),
 ) -> GroundingResult:
     """Contrôle d'ancrage d'une reformulation (voir le module). `sections` : mots-clés des
     sections d'expériences (MATCH_RESERVED_SECTIONS) ; les sections reconnues par leur contenu
-    le sont aussi."""
+    le sont aussi. `offer_terms` : termes de l'offre visés, exemptés de la règle des marqueurs de
+    responsabilité (« Conception d'API » nommé par l'offre)."""
     by_id = {c.index: c for c in chunks}
     items = _items(by_id.values(), sections)
     result = GroundingResult()
@@ -282,6 +316,12 @@ def check_grounding(
     for narrow, broad in ONE_WAY_SYNONYMS:
         if contains_term(item_text, narrow) and mentions_term(new_text, broad):
             allowed_skills |= {normalize(e) for e in _entities(broad)}
+
+    for marker in added_responsibilities(new_text, item_text, offer_terms):
+        issue(
+            "responsabilite_ajoutee",
+            f"« {marker} » ajoute une responsabilité ou une initiative que cette expérience ne mentionne pas.",
+        )
 
     lead = lead_word(original)
     if lead is not None and not keeps_root(new_text, lead):

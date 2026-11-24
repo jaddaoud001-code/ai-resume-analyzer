@@ -204,7 +204,13 @@ class CaseResult:
     seconds: float = 0.0
     error: str | None = None
     warning: str | None = None
+    requirements_filter: list[str] = field(default_factory=list)  # --requirement : exigences ciblées
     events: list[dict[str, Any]] = field(default_factory=list, repr=False)
+
+    @property
+    def key(self) -> str:
+        """Clé dans le fichier de résultats : un run ciblé ne remplace pas le run du cas entier."""
+        return f"{self.case} [{', '.join(self.requirements_filter)}]" if self.requirements_filter else self.case
 
 
 def measure(case: str, report_source: str, events: list[Any], annotation: dict[str, Any], seconds: float) -> CaseResult:
@@ -236,6 +242,8 @@ def measure(case: str, report_source: str, events: list[Any], annotation: dict[s
                         "niveaux": f"{event.level_before} -> {event.level_after}",
                         "justification": event.justification,
                         "juge": event.judge,
+                        # Audit humain (record_audit) : {"verdict": "fidèle" | "invention", "raison"}.
+                        "audit": None,
                     }
                 )
         elif isinstance(event, AgentStarted):
@@ -277,7 +285,12 @@ def summarize(results: list[CaseResult]) -> dict[str, Any]:
         "cibles implicites traitées": len(targets),
         "cibles au-delà de la limite": sum(r.skipped for r in results),
         "cartes « à décrire »": verdicts["carte"],
-        "affirmations inventées": verdicts["invention"],
+        "inventions détectées par les annotations": verdicts["invention"],
+        "inventions trouvées à l'audit": sum(
+            1 for r in results for s in r.suggestions if (s.get("audit") or {}).get("verdict") == "invention"
+        ),
+        "suggestions auditées": f"{sum(1 for r in results for s in r.suggestions if s.get('audit'))}"
+        f"/{sum(len(r.suggestions) for r in results)}",
         "gains": f"{len(gains)}/{len(possible)}" if possible else "–",
         "gains depuis la source annotée": sum(1 for o in gains if o.source_expected),
         "gains avec un terme attendu": sum(1 for o in gains if o.term_expected),
@@ -323,6 +336,7 @@ async def run_case(
     match_llm: BaseChatModel,
     limiter: RateLimiter,
     today: date = EVAL_TODAY,
+    only: list[str] | None = None,
 ) -> CaseResult:
     chunks = cv_chunks(EVAL_DIR / "cvs" / annotation["cv"], settings)
     started = time.perf_counter()
@@ -336,11 +350,14 @@ async def run_case(
         match_llm=match_llm,
         limiter=limiter,
         today=today,
+        only=only,
     )
     async with aclosing(stream) as items:
         async for event in items:
             events.append(event)
-    return measure(case, report_source, events, annotation, time.perf_counter() - started)
+    result = measure(case, report_source, events, annotation, time.perf_counter() - started)
+    result.requirements_filter = list(only or [])
+    return result
 
 
 async def analyze_gain_case(settings: Settings, embeddings: Embeddings, limiter: RateLimiter) -> Path:
@@ -371,7 +388,9 @@ async def analyze_gain_case(settings: Settings, embeddings: Embeddings, limiter:
     return path
 
 
-async def evaluate(cases: list[str] | None, analyze_gain: bool, settings: Settings) -> list[CaseResult]:
+async def evaluate(
+    cases: list[str] | None, analyze_gain: bool, settings: Settings, only: list[str] | None = None
+) -> list[CaseResult]:
     limiter = RateLimiter.from_settings(settings)
     embeddings = get_embeddings(settings)
     if analyze_gain:
@@ -397,6 +416,7 @@ async def evaluate(cases: list[str] | None, analyze_gain: bool, settings: Settin
             agent_llm=agent_llm,
             match_llm=match_llm,
             limiter=limiter,
+            only=only,
         )
         results.append(result)
         if result.error:  # refus durable du fournisseur : inutile de continuer
@@ -415,8 +435,37 @@ def save_results(path: Path, results: list[CaseResult]) -> None:
     """Écrit les résultats par cas dans `path`, en gardant les autres cas déjà présents (plusieurs
     runs d'un même jour, un cas chacun) ; un cas relancé remplace le précédent."""
     existing = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
-    existing.update({r.case: asdict(r) for r in results})
+    for r in results:
+        saved = existing.get(r.key, {})
+        audits = {s["id"]: s.get("audit") for s in saved.get("suggestions", [])}
+        entry = asdict(r)
+        for suggestion in entry["suggestions"]:  # un audit déjà fait sur la même suggestion reste
+            previous = next((s for s in saved.get("suggestions", []) if s["id"] == suggestion["id"]), None)
+            if previous and previous.get("après") == suggestion["après"]:
+                suggestion["audit"] = audits.get(suggestion["id"])
+        existing[r.key] = entry
     path.write_text(json.dumps(existing, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+
+
+def load_results(path: Path) -> list[CaseResult]:
+    """Résultats enregistrés par --save (audits compris), pour les réafficher (--show)."""
+    loaded: list[CaseResult] = []
+    for data in json.loads(path.read_text(encoding="utf-8")).values():
+        fields = {k: v for k, v in data.items() if k in CaseResult.__dataclass_fields__ and k != "outcomes"}
+        loaded.append(CaseResult(**fields, outcomes=[TargetOutcome(**o) for o in data["outcomes"]]))
+    return loaded
+
+
+def record_audit(path: Path, key: str, requirement_id: str, verdict: str, reason: str) -> None:
+    """Audit humain d'une suggestion enregistrée : « fidèle » ou « invention », avec la raison."""
+    if verdict not in ("fidèle", "invention"):
+        raise ValueError("verdict : « fidèle » ou « invention »")
+    data = json.loads(path.read_text(encoding="utf-8"))
+    matches = [s for s in data[key]["suggestions"] if s["id"] == requirement_id]
+    if len(matches) != 1:
+        raise KeyError(f"{key} : aucune suggestion unique pour {requirement_id}")
+    matches[0]["audit"] = {"verdict": verdict, "raison": reason}
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
 
 def print_report(results: list[CaseResult], settings: Settings) -> None:
@@ -462,7 +511,10 @@ def print_report(results: list[CaseResult], settings: Settings) -> None:
             for line in s["faits"] + s["implications"]:
                 print(f"      {line}")
             print(f"      justification : {s['justification']}")
-            print(f"      juge : {s['juge'] or 'fidèle (sans motif)'}")
+            print(f"      juge : {s.get('juge') or 'fidèle (sans motif)'}")
+            audit = s.get("audit")
+            audit_text = f"{audit['verdict']} — {audit['raison']}" if audit else "à faire"
+            print(f"      audit : {audit_text}")
     print("\n=== Synthèse")
     for key, value in summarize(results).items():
         print(f"  {key} : {value}")
@@ -478,9 +530,27 @@ def main() -> None:
         "--save", type=Path, nargs="?", const=RESULTS_DIR, help="garder les événements bruts (défaut : eval/results/)"
     )
     parser.add_argument("--json", action="store_true", help="résultats et synthèse au format JSON")
+    parser.add_argument(
+        "--requirement", action="append", help="exigence à traiter seule (répétable), par exemple R9 ; avec --case"
+    )
+    parser.add_argument("--show", type=Path, help="réafficher des résultats enregistrés (audits compris), sans LLM")
+    parser.add_argument(
+        "--audit",
+        nargs=5,
+        metavar=("FICHIER", "CLE", "EXIGENCE", "VERDICT", "RAISON"),
+        help="enregistrer l'audit humain d'une suggestion (VERDICT : fidèle | invention), sans LLM",
+    )
     args = parser.parse_args()
     settings = Settings()
-    results = asyncio.run(evaluate(args.case, args.analyze_gain, settings))
+    if args.audit:
+        path, key, requirement_id, verdict, reason = args.audit
+        record_audit(Path(path), key, requirement_id, verdict, reason)
+        print(f"Audit enregistré : {key} {requirement_id} -> {verdict}", file=sys.stderr)
+        return
+    if args.show:
+        print_report(load_results(args.show), settings)
+        return
+    results = asyncio.run(evaluate(args.case, args.analyze_gain, settings, args.requirement))
     if args.save:
         target = results_path(date.today()) if args.save == RESULTS_DIR else args.save
         save_results(target, results)
