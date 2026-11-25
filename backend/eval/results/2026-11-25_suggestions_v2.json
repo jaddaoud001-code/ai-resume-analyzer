@@ -1,0 +1,1700 @@
+{
+ "backend_cv__logistique": {
+  "case": "backend_cv__logistique",
+  "report_source": "2026-11-20_difficile_v4.json : backend_cv__logistique (run 1)",
+  "outcomes": [
+   {
+    "id": "R6",
+    "label": "Message queue (RabbitMQ, Kafka)",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : mentionné"
+   },
+   {
+    "id": "R4",
+    "label": "Déploiement cloud",
+    "kind": "impossible",
+    "verdict": "refus_juste",
+    "reason": "aucune_reformulation_fidele",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "Contrôle d'ancrage : « cloud » n'apparaît pas dans cette expérience."
+   },
+   {
+    "id": "R8",
+    "label": "API REST",
+    "kind": "impossible",
+    "verdict": "refus_juste",
+    "reason": "aucune_reformulation_fidele",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "Contrôle d'ancrage : « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience."
+   },
+   {
+    "id": "R9",
+    "label": "CI/CD",
+    "kind": "possible",
+    "verdict": "gain",
+    "reason": null,
+    "level_before": "démontré",
+    "level_after": "démontré",
+    "source_expected": true,
+    "term_expected": true,
+    "detail": null
+   }
+  ],
+  "suggestions": [
+   {
+    "id": "R9",
+    "exigence": "CI/CD",
+    "verdict": "gain",
+    "item": "Ingénieure logicielle · Ferlane Fret",
+    "chunk": 2,
+    "puce": 2,
+    "avant": "Pipelines GitHub Actions : tests, analyse statique et déploiement à chaque fusion sur la branche principale.",
+    "après": "CI/CD via pipelines GitHub Actions : tests, analyse statique et déploiement à chaque fusion sur la branche principale.",
+    "termes": [
+     "CI/CD"
+    ],
+    "faits": [
+     "[2] « Pipelines GitHub Actions : tests, analyse statique et déploiement à chaque fusion sur la branche principale. »"
+    ],
+    "implications": [
+     "CI/CD <- « Pipelines GitHub Actions »"
+    ],
+    "niveaux": "démontré -> démontré",
+    "justification": "",
+    "juge": "La reformulation ne fait qu'ajouter le terme générique \"CI/CD\" tout en conservant exactement les mêmes étapes et la même portée décrites dans l'original.",
+    "audit": {
+     "verdict": "fidèle",
+     "raison": "CI/CD nomme la pratique décrite : tests et déploiement à chaque fusion"
+    }
+   }
+  ],
+  "grounding_rejections": [
+   "R4 (tentative 1) : Contrôle d'ancrage : « Mise » (ce que décrit la puce d'origine) doit rester dans la reformulation (même racine acceptée). ; « cloud » n'apparaît pas dans cette expérience.",
+   "R4 (tentative 2) : Contrôle d'ancrage : « cloud » n'apparaît pas dans cette expérience.",
+   "R8 (tentative 1) : Contrôle d'ancrage : « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience.",
+   "R8 (tentative 2) : Contrôle d'ancrage : « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience."
+  ],
+  "action_rejections": [],
+  "action_with_other_issues": 1,
+  "judge_rejections": [],
+  "term_rejections": [],
+  "level_drops": [],
+  "skipped": 1,
+  "usage": {
+   "calls": 10,
+   "input_tokens": 11264,
+   "output_tokens": 4805,
+   "reasoning_tokens": 3112,
+   "total_tokens": 16069
+  },
+  "seconds": 181.80962429299962,
+  "error": null,
+  "warning": null,
+  "requirements_filter": [],
+  "events": [
+   {
+    "type": "agent_started",
+    "targets": [
+     {
+      "id": "R4",
+      "label": "Déploiement cloud",
+      "level": "démontré",
+      "weight": 2.0,
+      "terms": [
+       "Déploiement cloud"
+      ]
+     },
+     {
+      "id": "R8",
+      "label": "API REST",
+      "level": "démontré",
+      "weight": 1.0,
+      "terms": [
+       "API REST",
+       "REST",
+       "RESTful"
+      ]
+     },
+     {
+      "id": "R9",
+      "label": "CI/CD",
+      "level": "démontré",
+      "weight": 1.0,
+      "terms": [
+       "CI/CD",
+       "intégration continue",
+       "déploiement continu"
+      ]
+     }
+    ],
+    "skipped": 1,
+    "to_describe": [
+     {
+      "id": "R6",
+      "label": "Message queue (RabbitMQ, Kafka)",
+      "level": "mentionné",
+      "weight": 1.0,
+      "terms": [
+       "Message queue",
+       "RabbitMQ",
+       "Kafka",
+       "file de messages",
+       "message broker"
+      ]
+     }
+    ],
+    "limits": {
+     "max_requirements": 3,
+     "max_attempts": 2,
+     "max_tokens_per_requirement": 15000,
+     "max_tokens_per_run": 45000
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R6",
+     "label": "Message queue (RabbitMQ, Kafka)",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": 1,
+     "search_queries": [
+      "RabbitMQ",
+      "Kafka",
+      "message queue"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : mentionné",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "target_started",
+    "requirement": {
+     "id": "R4",
+     "label": "Déploiement cloud",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "déploiement cloud",
+      "cloud deployment",
+      "AWS Azure GCP"
+     ]
+    },
+    "level": "démontré",
+    "rank": 1
+   },
+   {
+    "type": "step",
+    "requirement_id": "R4",
+    "kind": "search",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "chunk 2, puce 1",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R4",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "Déploiement cloud des services sur un cluster Kubernetes managé : images Docker, manifestes Helm, montée en charge automatique selon le trafic.",
+    "facts": [
+     {
+      "claim": "Déploiement cloud des services sur un cluster Kubernetes managé : images Docker, manifestes Helm, montée en charge automatique selon le trafic.",
+      "chunk_id": 2,
+      "quote": "Mise en production des services sur un cluster Kubernetes managé : images Docker, manifestes Helm, montée en charge automatique selon le trafic."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "Orchestration de conteneurs (Kubernetes)",
+      "chunk_id": 2,
+      "quote": "cluster Kubernetes managé"
+     },
+     {
+      "skill": "Conteneurisation (Docker)",
+      "chunk_id": 2,
+      "quote": "images Docker"
+     },
+     {
+      "skill": "Gestion de packages Kubernetes (Helm)",
+      "chunk_id": 2,
+      "quote": "manifestes Helm"
+     }
+    ]
+   },
+   {
+    "type": "step",
+    "requirement_id": "R4",
+    "kind": "verify",
+    "status": "rejected",
+    "attempt": 1,
+    "detail": "Contrôle d'ancrage : « Mise » (ce que décrit la puce d'origine) doit rester dans la reformulation (même racine acceptée). ; « cloud » n'apparaît pas dans cette expérience.",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R4",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 2,
+    "detail": "Mise en production des services sur un cluster Kubernetes managé, déploiement cloud : images Docker, manifestes Helm, montée en charge automatique selon le trafic.",
+    "facts": [
+     {
+      "claim": "Mise en production des services sur un cluster Kubernetes managé",
+      "chunk_id": 2,
+      "quote": "Mise en production des services sur un cluster Kubernetes managé : images Docker, manifestes Helm, montée en charge automatique selon le trafic."
+     },
+     {
+      "claim": "images Docker",
+      "chunk_id": 2,
+      "quote": "Mise en production des services sur un cluster Kubernetes managé : images Docker, manifestes Helm, montée en charge automatique selon le trafic."
+     },
+     {
+      "claim": "manifestes Helm",
+      "chunk_id": 2,
+      "quote": "Mise en production des services sur un cluster Kubernetes managé : images Docker, manifestes Helm, montée en charge automatique selon le trafic."
+     },
+     {
+      "claim": "montée en charge automatique selon le trafic",
+      "chunk_id": 2,
+      "quote": "Mise en production des services sur un cluster Kubernetes managé : images Docker, manifestes Helm, montée en charge automatique selon le trafic."
+     },
+     {
+      "claim": "Déploiement cloud",
+      "chunk_id": 2,
+      "quote": "Mise en production des services sur un cluster Kubernetes managé : images Docker, manifestes Helm, montée en charge automatique selon le trafic."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "Kubernetes",
+      "chunk_id": 2,
+      "quote": "cluster Kubernetes managé"
+     },
+     {
+      "skill": "Docker",
+      "chunk_id": 2,
+      "quote": "images Docker"
+     },
+     {
+      "skill": "Helm",
+      "chunk_id": 2,
+      "quote": "manifestes Helm"
+     },
+     {
+      "skill": "autoscaling",
+      "chunk_id": 2,
+      "quote": "montée en charge automatique selon le trafic"
+     }
+    ]
+   },
+   {
+    "type": "step",
+    "requirement_id": "R4",
+    "kind": "verify",
+    "status": "rejected",
+    "attempt": 2,
+    "detail": "Contrôle d'ancrage : « cloud » n'apparaît pas dans cette expérience.",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R4",
+     "label": "Déploiement cloud",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "déploiement cloud",
+      "cloud deployment",
+      "AWS Azure GCP"
+     ]
+    },
+    "reason": "aucune_reformulation_fidele",
+    "message": "Aucune reformulation fidèle au CV n'a été trouvée.",
+    "shown": true,
+    "detail": "Contrôle d'ancrage : « cloud » n'apparaît pas dans cette expérience.",
+    "usage": {
+     "calls": 3,
+     "input_tokens": 3336,
+     "output_tokens": 1903,
+     "reasoning_tokens": 1089,
+     "total_tokens": 5239
+    }
+   },
+   {
+    "type": "target_started",
+    "requirement": {
+     "id": "R8",
+     "label": "API REST",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "API REST",
+      "endpoints HTTP",
+      "services web"
+     ]
+    },
+    "level": "démontré",
+    "rank": 2
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "search",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "chunk 2, puce 0",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "Développement d'API REST (endpoints FastAPI) consommés par l'application mobile des chauffeurs : authentification, suivi des tournées, notifications de livraison.",
+    "facts": [
+     {
+      "claim": "Développement des endpoints FastAPI consommés par l'application mobile des chauffeurs : authentification, suivi des tournées, notifications de livraison.",
+      "chunk_id": 2,
+      "quote": "Développement des endpoints FastAPI consommés par l'application mobile des chauffeurs : authentification, suivi des tournées, notifications de livraison."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "FastAPI",
+      "chunk_id": 2,
+      "quote": "FastAPI"
+     }
+    ]
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "verify",
+    "status": "rejected",
+    "attempt": 1,
+    "detail": "Contrôle d'ancrage : « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience.",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 2,
+    "detail": "Développement d'API REST FastAPI consommés par l'application mobile des chauffeurs : authentification, suivi des tournées, notifications de livraison.",
+    "facts": [
+     {
+      "claim": "Développement d'API REST FastAPI consommés par l'application mobile des chauffeurs : authentification, suivi des tournées, notifications de livraison.",
+      "chunk_id": 2,
+      "quote": "Développement des endpoints FastAPI consommés par l'application mobile des chauffeurs : authentification, suivi des tournées, notifications de livraison."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "Python",
+      "chunk_id": 2,
+      "quote": "FastAPI"
+     }
+    ]
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "verify",
+    "status": "rejected",
+    "attempt": 2,
+    "detail": "Contrôle d'ancrage : « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience.",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R8",
+     "label": "API REST",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "API REST",
+      "endpoints HTTP",
+      "services web"
+     ]
+    },
+    "reason": "aucune_reformulation_fidele",
+    "message": "Aucune reformulation fidèle au CV n'a été trouvée.",
+    "shown": true,
+    "detail": "Contrôle d'ancrage : « rest » n'apparaît pas dans cette expérience. ; « API » n'apparaît pas dans cette expérience.",
+    "usage": {
+     "calls": 3,
+     "input_tokens": 3332,
+     "output_tokens": 1452,
+     "reasoning_tokens": 1005,
+     "total_tokens": 4784
+    }
+   },
+   {
+    "type": "target_started",
+    "requirement": {
+     "id": "R9",
+     "label": "CI/CD",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "CI/CD",
+      "intégration continue",
+      "pipelines de déploiement"
+     ]
+    },
+    "level": "démontré",
+    "rank": 3
+   },
+   {
+    "type": "step",
+    "requirement_id": "R9",
+    "kind": "search",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "chunk 2, puce 2",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R9",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "CI/CD via pipelines GitHub Actions : tests, analyse statique et déploiement à chaque fusion sur la branche principale.",
+    "facts": [
+     {
+      "claim": "Pipelines GitHub Actions : tests, analyse statique et déploiement à chaque fusion sur la branche principale.",
+      "chunk_id": 2,
+      "quote": "Pipelines GitHub Actions : tests, analyse statique et déploiement à chaque fusion sur la branche principale."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "CI/CD",
+      "chunk_id": 2,
+      "quote": "Pipelines GitHub Actions"
+     }
+    ]
+   },
+   {
+    "type": "step",
+    "requirement_id": "R9",
+    "kind": "verify",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "Juge : fidèle — La reformulation ne fait qu'ajouter le terme générique \"CI/CD\" tout en conservant exactement les mêmes étapes et la même portée décrites dans l'original.",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R9",
+    "kind": "reevaluate",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "démontré -> démontré",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "suggestion",
+    "requirement": {
+     "id": "R9",
+     "label": "CI/CD",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "CI/CD",
+      "intégration continue",
+      "pipelines de déploiement"
+     ]
+    },
+    "item": "Ingénieure logicielle · Ferlane Fret",
+    "chunk_id": 2,
+    "bullet_index": 2,
+    "before": "Pipelines GitHub Actions : tests, analyse statique et déploiement à chaque fusion sur la branche principale.",
+    "after": "CI/CD via pipelines GitHub Actions : tests, analyse statique et déploiement à chaque fusion sur la branche principale.",
+    "terms": [
+     "CI/CD"
+    ],
+    "facts": [
+     {
+      "claim": "Pipelines GitHub Actions : tests, analyse statique et déploiement à chaque fusion sur la branche principale.",
+      "chunk_id": 2,
+      "quote": "Pipelines GitHub Actions : tests, analyse statique et déploiement à chaque fusion sur la branche principale."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "CI/CD",
+      "chunk_id": 2,
+      "quote": "Pipelines GitHub Actions"
+     }
+    ],
+    "level_before": "démontré",
+    "level_after": "démontré",
+    "justification": "",
+    "judge": "La reformulation ne fait qu'ajouter le terme générique \"CI/CD\" tout en conservant exactement les mêmes étapes et la même portée décrites dans l'original.",
+    "usage": {
+     "calls": 4,
+     "input_tokens": 4596,
+     "output_tokens": 1450,
+     "reasoning_tokens": 1018,
+     "total_tokens": 6046
+    }
+   },
+   {
+    "type": "done",
+    "suggestions": 1,
+    "refusals": 3,
+    "to_describe": 1,
+    "hidden": 0,
+    "untreated": 0,
+    "reevaluation_failed": 0,
+    "usage": {
+     "calls": 10,
+     "input_tokens": 11264,
+     "output_tokens": 4805,
+     "reasoning_tokens": 3112,
+     "total_tokens": 16069
+    }
+   }
+  ]
+ },
+ "demo_cv__hager": {
+  "case": "demo_cv__hager",
+  "report_source": "2026-11-21_référence_v4.json : demo_cv__hager (run 1)",
+  "outcomes": [
+   {
+    "id": "R3",
+    "label": "Java",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : non démontré"
+   },
+   {
+    "id": "R4",
+    "label": "JSP",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : non démontré"
+   },
+   {
+    "id": "R5",
+    "label": "XML",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : non démontré"
+   },
+   {
+    "id": "R7",
+    "label": "Git",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : mentionné"
+   },
+   {
+    "id": "R9",
+    "label": "PLM Windchill",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : non démontré"
+   },
+   {
+    "id": "R10",
+    "label": "Rétro-ingénierie assistée par IA",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : non démontré"
+   },
+   {
+    "id": "R11",
+    "label": "Documentation technique",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : non démontré"
+   },
+   {
+    "id": "R8",
+    "label": "Outils d'IA générative",
+    "kind": "possible",
+    "verdict": "gain",
+    "reason": null,
+    "level_before": "solide",
+    "level_after": "solide",
+    "source_expected": true,
+    "term_expected": true,
+    "detail": null
+   }
+  ],
+  "suggestions": [
+   {
+    "id": "R8",
+    "exigence": "Outils d'IA générative",
+    "verdict": "gain",
+    "item": "Stage ingénieure IA · Lumen Analytique",
+    "chunk": 11,
+    "puce": 1,
+    "avant": "Jeu d'évaluation de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence.",
+    "après": "Jeu d'évaluation de 200 questions ; comparaison de trois LLM d'IA générative sur l'exactitude, le coût et la latence.",
+    "termes": [
+     "IA générative"
+    ],
+    "faits": [
+     "[11] « Jeu d'évaluation de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence. »",
+     "[11] « Jeu d'évaluation de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence. »"
+    ],
+    "implications": [],
+    "niveaux": "solide -> solide",
+    "justification": "",
+    "juge": "L'ajout de « d'IA générative » précise simplement la nature des LLM sans modifier le sens, la portée ou les faits de la puce originale.",
+    "audit": {
+     "verdict": "fidèle",
+     "raison": "Un LLM est de l'IA générative, rien d'autre n'est ajouté"
+    }
+   }
+  ],
+  "grounding_rejections": [],
+  "action_rejections": [],
+  "action_with_other_issues": 0,
+  "judge_rejections": [],
+  "term_rejections": [],
+  "level_drops": [],
+  "skipped": 0,
+  "usage": {
+   "calls": 4,
+   "input_tokens": 4396,
+   "output_tokens": 1340,
+   "reasoning_tokens": 794,
+   "total_tokens": 5736
+  },
+  "seconds": 63.524121325000124,
+  "error": null,
+  "warning": null,
+  "requirements_filter": [],
+  "events": [
+   {
+    "type": "agent_started",
+    "targets": [
+     {
+      "id": "R8",
+      "label": "Outils d'IA générative",
+      "level": "solide",
+      "weight": 2.0,
+      "terms": [
+       "Outils d'IA générative",
+       "IA générative"
+      ]
+     }
+    ],
+    "skipped": 0,
+    "to_describe": [
+     {
+      "id": "R3",
+      "label": "Java",
+      "level": "non démontré",
+      "weight": 2.0,
+      "terms": [
+       "Java"
+      ]
+     },
+     {
+      "id": "R4",
+      "label": "JSP",
+      "level": "non démontré",
+      "weight": 2.0,
+      "terms": [
+       "JSP"
+      ]
+     },
+     {
+      "id": "R5",
+      "label": "XML",
+      "level": "non démontré",
+      "weight": 2.0,
+      "terms": [
+       "XML"
+      ]
+     },
+     {
+      "id": "R7",
+      "label": "Git",
+      "level": "mentionné",
+      "weight": 2.0,
+      "terms": [
+       "Git"
+      ]
+     },
+     {
+      "id": "R9",
+      "label": "PLM Windchill",
+      "level": "non démontré",
+      "weight": 1.0,
+      "terms": [
+       "PLM Windchill"
+      ]
+     },
+     {
+      "id": "R10",
+      "label": "Rétro-ingénierie assistée par IA",
+      "level": "non démontré",
+      "weight": 1.0,
+      "terms": [
+       "Rétro-ingénierie assistée par IA"
+      ]
+     },
+     {
+      "id": "R11",
+      "label": "Documentation technique",
+      "level": "non démontré",
+      "weight": 1.0,
+      "terms": [
+       "Documentation technique"
+      ]
+     }
+    ],
+    "limits": {
+     "max_requirements": 3,
+     "max_attempts": 2,
+     "max_tokens_per_requirement": 15000,
+     "max_tokens_per_run": 45000
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R3",
+     "label": "Java",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "Java",
+      "développement Java",
+      "programmation Java"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : non démontré",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R4",
+     "label": "JSP",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "JSP",
+      "JavaServer Pages",
+      "développement JSP"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : non démontré",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R5",
+     "label": "XML",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "XML",
+      "format XML",
+      "manipulation XML"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : non démontré",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R7",
+     "label": "Git",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "Git",
+      "gestion de version Git",
+      "contrôle de source Git"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : mentionné",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R9",
+     "label": "PLM Windchill",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "Windchill",
+      "PLM Windchill",
+      "gestion PLM Windchill"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : non démontré",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R10",
+     "label": "Rétro-ingénierie assistée par IA",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "rétro-ingénierie IA",
+      "reverse engineering IA",
+      "analyse rétro IA"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : non démontré",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R11",
+     "label": "Documentation technique",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "documentation technique",
+      "rédaction de documentation",
+      "documenter un système"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : non démontré",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "target_started",
+    "requirement": {
+     "id": "R8",
+     "label": "Outils d'IA générative",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "IA générative",
+      "outils IA générative",
+      "génération IA"
+     ]
+    },
+    "level": "solide",
+    "rank": 1
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "search",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "chunk 11, puce 1",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "Jeu d'évaluation de 200 questions ; comparaison de trois LLM d'IA générative sur l'exactitude, le coût et la latence.",
+    "facts": [
+     {
+      "claim": "Jeu d'évaluation de 200 questions",
+      "chunk_id": 11,
+      "quote": "Jeu d'évaluation de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence."
+     },
+     {
+      "claim": "comparaison de trois LLM sur l'exactitude, le coût et la latence",
+      "chunk_id": 11,
+      "quote": "Jeu d'évaluation de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence."
+     }
+    ],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "verify",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "Juge : fidèle — L'ajout de « d'IA générative » précise simplement la nature des LLM sans modifier le sens, la portée ou les faits de la puce originale.",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R8",
+    "kind": "reevaluate",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "solide -> solide",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "suggestion",
+    "requirement": {
+     "id": "R8",
+     "label": "Outils d'IA générative",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "IA générative",
+      "outils IA générative",
+      "génération IA"
+     ]
+    },
+    "item": "Stage ingénieure IA · Lumen Analytique",
+    "chunk_id": 11,
+    "bullet_index": 1,
+    "before": "Jeu d'évaluation de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence.",
+    "after": "Jeu d'évaluation de 200 questions ; comparaison de trois LLM d'IA générative sur l'exactitude, le coût et la latence.",
+    "terms": [
+     "IA générative"
+    ],
+    "facts": [
+     {
+      "claim": "Jeu d'évaluation de 200 questions",
+      "chunk_id": 11,
+      "quote": "Jeu d'évaluation de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence."
+     },
+     {
+      "claim": "comparaison de trois LLM sur l'exactitude, le coût et la latence",
+      "chunk_id": 11,
+      "quote": "Jeu d'évaluation de 200 questions ; comparaison de trois LLM sur l'exactitude, le coût et la latence."
+     }
+    ],
+    "implied_skills": [],
+    "level_before": "solide",
+    "level_after": "solide",
+    "justification": "",
+    "judge": "L'ajout de « d'IA générative » précise simplement la nature des LLM sans modifier le sens, la portée ou les faits de la puce originale.",
+    "usage": {
+     "calls": 4,
+     "input_tokens": 4396,
+     "output_tokens": 1340,
+     "reasoning_tokens": 794,
+     "total_tokens": 5736
+    }
+   },
+   {
+    "type": "done",
+    "suggestions": 1,
+    "refusals": 7,
+    "to_describe": 7,
+    "hidden": 0,
+    "untreated": 0,
+    "reevaluation_failed": 0,
+    "usage": {
+     "calls": 4,
+     "input_tokens": 4396,
+     "output_tokens": 1340,
+     "reasoning_tokens": 794,
+     "total_tokens": 5736
+    }
+   }
+  ]
+ },
+ "java_cv__logistique": {
+  "case": "java_cv__logistique",
+  "report_source": "2026-11-20_difficile_v4.json : java_cv__logistique (run 1)",
+  "outcomes": [
+   {
+    "id": "R2",
+    "label": "Python",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : mentionné"
+   },
+   {
+    "id": "R4",
+    "label": "Déploiement cloud",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : non démontré"
+   },
+   {
+    "id": "R6",
+    "label": "Message queue (RabbitMQ, Kafka)",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : non démontré"
+   },
+   {
+    "id": "R7",
+    "label": "Observabilité (métriques, tableaux de bord, alertes)",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : non démontré"
+   },
+   {
+    "id": "R9",
+    "label": "CI/CD",
+    "kind": "lacune",
+    "verdict": "carte",
+    "reason": "a_decrire",
+    "level_before": null,
+    "level_after": null,
+    "source_expected": null,
+    "term_expected": null,
+    "detail": "niveau actuel : non démontré"
+   },
+   {
+    "id": "R10",
+    "label": "Tests automatisés",
+    "kind": "possible",
+    "verdict": "gain",
+    "reason": null,
+    "level_before": "démontré",
+    "level_after": "démontré",
+    "source_expected": true,
+    "term_expected": true,
+    "detail": null
+   }
+  ],
+  "suggestions": [
+   {
+    "id": "R10",
+    "exigence": "Tests automatisés",
+    "verdict": "gain",
+    "item": "Stage développeur · Atelier Numérique Brisecôte",
+    "chunk": 3,
+    "puce": 0,
+    "avant": "Maintenance d'une application Java EE : correction d'anomalies et tests JUnit.",
+    "après": "Maintenance d'une application Java EE : correction d'anomalies et tests automatisés JUnit.",
+    "termes": [
+     "Tests automatisés"
+    ],
+    "faits": [
+     "[3] « Maintenance d'une application Java EE : correction d'anomalies et tests JUnit. »",
+     "[3] « Maintenance d'une application Java EE : correction d'anomalies et tests JUnit. »",
+     "[3] « Maintenance d'une application Java EE : correction d'anomalies et tests JUnit. »"
+    ],
+    "implications": [
+     "Java <- « Java »",
+     "JUnit <- « JUnit »"
+    ],
+    "niveaux": "démontré -> démontré",
+    "justification": "",
+    "juge": "Ajout du mot 'automatisés' précise simplement la nature des tests JUnit sans changer le sens ni la portée.",
+    "audit": {
+     "verdict": "fidèle",
+     "raison": "Des tests JUnit sont automatisés par nature"
+    }
+   }
+  ],
+  "grounding_rejections": [
+   "R10 (tentative 1) : Contrôle d'ancrage : « mise en place » ajoute une responsabilité ou une initiative que cette expérience ne mentionne pas."
+  ],
+  "action_rejections": [],
+  "action_with_other_issues": 0,
+  "judge_rejections": [],
+  "term_rejections": [],
+  "level_drops": [],
+  "skipped": 0,
+  "usage": {
+   "calls": 5,
+   "input_tokens": 5064,
+   "output_tokens": 1984,
+   "reasoning_tokens": 1240,
+   "total_tokens": 7048
+  },
+  "seconds": 82.69020117399987,
+  "error": null,
+  "warning": null,
+  "requirements_filter": [],
+  "events": [
+   {
+    "type": "agent_started",
+    "targets": [
+     {
+      "id": "R10",
+      "label": "Tests automatisés",
+      "level": "démontré",
+      "weight": 1.0,
+      "terms": [
+       "Tests automatisés",
+       "tests automatiques"
+      ]
+     }
+    ],
+    "skipped": 0,
+    "to_describe": [
+     {
+      "id": "R2",
+      "label": "Python",
+      "level": "mentionné",
+      "weight": 2.0,
+      "terms": [
+       "Python"
+      ]
+     },
+     {
+      "id": "R4",
+      "label": "Déploiement cloud",
+      "level": "non démontré",
+      "weight": 2.0,
+      "terms": [
+       "Déploiement cloud"
+      ]
+     },
+     {
+      "id": "R6",
+      "label": "Message queue (RabbitMQ, Kafka)",
+      "level": "non démontré",
+      "weight": 1.0,
+      "terms": [
+       "Message queue",
+       "RabbitMQ",
+       "Kafka",
+       "file de messages",
+       "message broker"
+      ]
+     },
+     {
+      "id": "R7",
+      "label": "Observabilité (métriques, tableaux de bord, alertes)",
+      "level": "non démontré",
+      "weight": 1.0,
+      "terms": [
+       "Observabilité",
+       "métriques",
+       "tableaux de bord",
+       "alertes",
+       "supervision",
+       "monitoring"
+      ]
+     },
+     {
+      "id": "R9",
+      "label": "CI/CD",
+      "level": "non démontré",
+      "weight": 1.0,
+      "terms": [
+       "CI/CD",
+       "intégration continue",
+       "déploiement continu"
+      ]
+     }
+    ],
+    "limits": {
+     "max_requirements": 3,
+     "max_attempts": 2,
+     "max_tokens_per_requirement": 15000,
+     "max_tokens_per_run": 45000
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R2",
+     "label": "Python",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": 3,
+     "search_queries": [
+      "Python",
+      "développement Python",
+      "Python 3 ans"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : mentionné",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R4",
+     "label": "Déploiement cloud",
+     "category": "compétence technique",
+     "importance": "obligatoire",
+     "min_years": null,
+     "search_queries": [
+      "déploiement cloud",
+      "cloud deployment",
+      "AWS Azure GCP"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : non démontré",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R6",
+     "label": "Message queue (RabbitMQ, Kafka)",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": 1,
+     "search_queries": [
+      "RabbitMQ",
+      "Kafka",
+      "message queue"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : non démontré",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R7",
+     "label": "Observabilité (métriques, tableaux de bord, alertes)",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "observabilité",
+      "métriques",
+      "tableaux de bord"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : non démontré",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "refusal",
+    "requirement": {
+     "id": "R9",
+     "label": "CI/CD",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "CI/CD",
+      "intégration continue",
+      "pipelines de déploiement"
+     ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le (contexte, ce que vous avez fait, certification éventuelle).",
+    "shown": true,
+    "detail": "niveau actuel : non démontré",
+    "usage": {
+     "calls": 0,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "reasoning_tokens": 0,
+     "total_tokens": 0
+    }
+   },
+   {
+    "type": "target_started",
+    "requirement": {
+     "id": "R10",
+     "label": "Tests automatisés",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "tests automatisés",
+      "tests unitaires",
+      "couverture de tests"
+     ]
+    },
+    "level": "démontré",
+    "rank": 1
+   },
+   {
+    "type": "step",
+    "requirement_id": "R10",
+    "kind": "search",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "chunk 3, puce 0",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R10",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "Maintenance d'une application Java EE : correction d'anomalies et mise en place de tests automatisés JUnit.",
+    "facts": [
+     {
+      "claim": "Maintenance d'une application Java EE",
+      "chunk_id": 3,
+      "quote": "Maintenance d'une application Java EE : correction d'anomalies et tests JUnit."
+     },
+     {
+      "claim": "correction d'anomalies",
+      "chunk_id": 3,
+      "quote": "Maintenance d'une application Java EE : correction d'anomalies et tests JUnit."
+     },
+     {
+      "claim": "tests JUnit",
+      "chunk_id": 3,
+      "quote": "Maintenance d'une application Java EE : correction d'anomalies et tests JUnit."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "Tests automatisés",
+      "chunk_id": 3,
+      "quote": "JUnit"
+     }
+    ]
+   },
+   {
+    "type": "step",
+    "requirement_id": "R10",
+    "kind": "verify",
+    "status": "rejected",
+    "attempt": 1,
+    "detail": "Contrôle d'ancrage : « mise en place » ajoute une responsabilité ou une initiative que cette expérience ne mentionne pas.",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R10",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 2,
+    "detail": "Maintenance d'une application Java EE : correction d'anomalies et tests automatisés JUnit.",
+    "facts": [
+     {
+      "claim": "Maintenance d'une application Java EE",
+      "chunk_id": 3,
+      "quote": "Maintenance d'une application Java EE : correction d'anomalies et tests JUnit."
+     },
+     {
+      "claim": "correction d'anomalies",
+      "chunk_id": 3,
+      "quote": "Maintenance d'une application Java EE : correction d'anomalies et tests JUnit."
+     },
+     {
+      "claim": "tests automatisés JUnit",
+      "chunk_id": 3,
+      "quote": "Maintenance d'une application Java EE : correction d'anomalies et tests JUnit."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "Java",
+      "chunk_id": 3,
+      "quote": "Java"
+     },
+     {
+      "skill": "JUnit",
+      "chunk_id": 3,
+      "quote": "JUnit"
+     }
+    ]
+   },
+   {
+    "type": "step",
+    "requirement_id": "R10",
+    "kind": "verify",
+    "status": "ok",
+    "attempt": 2,
+    "detail": "Juge : fidèle — Ajout du mot 'automatisés' précise simplement la nature des tests JUnit sans changer le sens ni la portée.",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "step",
+    "requirement_id": "R10",
+    "kind": "reevaluate",
+    "status": "ok",
+    "attempt": 2,
+    "detail": "démontré -> démontré",
+    "facts": [],
+    "implied_skills": []
+   },
+   {
+    "type": "suggestion",
+    "requirement": {
+     "id": "R10",
+     "label": "Tests automatisés",
+     "category": "compétence technique",
+     "importance": "souhaitée",
+     "min_years": null,
+     "search_queries": [
+      "tests automatisés",
+      "tests unitaires",
+      "couverture de tests"
+     ]
+    },
+    "item": "Stage développeur · Atelier Numérique Brisecôte",
+    "chunk_id": 3,
+    "bullet_index": 0,
+    "before": "Maintenance d'une application Java EE : correction d'anomalies et tests JUnit.",
+    "after": "Maintenance d'une application Java EE : correction d'anomalies et tests automatisés JUnit.",
+    "terms": [
+     "Tests automatisés"
+    ],
+    "facts": [
+     {
+      "claim": "Maintenance d'une application Java EE",
+      "chunk_id": 3,
+      "quote": "Maintenance d'une application Java EE : correction d'anomalies et tests JUnit."
+     },
+     {
+      "claim": "correction d'anomalies",
+      "chunk_id": 3,
+      "quote": "Maintenance d'une application Java EE : correction d'anomalies et tests JUnit."
+     },
+     {
+      "claim": "tests automatisés JUnit",
+      "chunk_id": 3,
+      "quote": "Maintenance d'une application Java EE : correction d'anomalies et tests JUnit."
+     }
+    ],
+    "implied_skills": [
+     {
+      "skill": "Java",
+      "chunk_id": 3,
+      "quote": "Java"
+     },
+     {
+      "skill": "JUnit",
+      "chunk_id": 3,
+      "quote": "JUnit"
+     }
+    ],
+    "level_before": "démontré",
+    "level_after": "démontré",
+    "justification": "",
+    "judge": "Ajout du mot 'automatisés' précise simplement la nature des tests JUnit sans changer le sens ni la portée.",
+    "usage": {
+     "calls": 5,
+     "input_tokens": 5064,
+     "output_tokens": 1984,
+     "reasoning_tokens": 1240,
+     "total_tokens": 7048
+    }
+   },
+   {
+    "type": "done",
+    "suggestions": 1,
+    "refusals": 5,
+    "to_describe": 5,
+    "hidden": 0,
+    "untreated": 0,
+    "reevaluation_failed": 0,
+    "usage": {
+     "calls": 5,
+     "input_tokens": 5064,
+     "output_tokens": 1984,
+     "reasoning_tokens": 1240,
+     "total_tokens": 7048
+    }
+   }
+  ]
+ }
+}

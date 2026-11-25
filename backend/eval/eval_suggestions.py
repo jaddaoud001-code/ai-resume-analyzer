@@ -31,6 +31,7 @@ eval/results/<date>_gain_v<prompt du matching>.json.
 import argparse
 import asyncio
 import json
+import re
 import sys
 import time
 from collections import Counter
@@ -237,7 +238,9 @@ def measure(case: str, report_source: str, events: list[Any], annotation: dict[s
                         "avant": event.before,
                         "après": event.after,
                         "termes": event.terms,
-                        "faits": [f"[{f.chunk_id}] « {f.quote} » -> {f.claim}" for f in event.facts],
+                        # Citation source exacte seulement : la paraphrase du modèle (`claim`) peut dire
+                        # autre chose que la puce finale ; elle reste dans les événements bruts.
+                        "faits": [source_quote(f.chunk_id, f.quote) for f in event.facts],
                         "implications": [f"{s.skill} <- « {s.quote} »" for s in event.implied_skills],
                         "niveaux": f"{event.level_before} -> {event.level_after}",
                         "justification": event.justification,
@@ -279,7 +282,18 @@ def summarize(results: list[CaseResult]) -> dict[str, Any]:
     targets = [o for o in outcomes if o.verdict != "carte"]
     verdicts = Counter(o.verdict for o in outcomes)
     possible = [o for o in targets if o.kind == "possible"]
-    gains = [o for o in possible if o.verdict == "gain"]
+    # Une suggestion auditée « invention » n'est pas un gain : gains fidèles et inventions à part.
+    invented = {
+        (r.key, s["id"]) for r in results for s in r.suggestions if (s.get("audit") or {}).get("verdict") == "invention"
+    }
+    unaudited = {(r.key, s["id"]) for r in results for s in r.suggestions if not s.get("audit")}
+    gains = [
+        o
+        for r in results
+        for o in r.outcomes
+        if o.kind == "possible" and o.verdict == "gain" and (r.key, o.id) not in invented
+    ]
+    gains_unaudited = sum(1 for r in results for o in r.outcomes if o.verdict == "gain" and (r.key, o.id) in unaudited)
     tokens = sum(r.usage.get("total_tokens", 0) for r in results)
     return {
         "cibles implicites traitées": len(targets),
@@ -291,7 +305,8 @@ def summarize(results: list[CaseResult]) -> dict[str, Any]:
         ),
         "suggestions auditées": f"{sum(1 for r in results for s in r.suggestions if s.get('audit'))}"
         f"/{sum(len(r.suggestions) for r in results)}",
-        "gains": f"{len(gains)}/{len(possible)}" if possible else "–",
+        "gains fidèles": f"{len(gains)}/{len(possible)}" if possible else "–",
+        "dont non audités": gains_unaudited,
         "gains depuis la source annotée": sum(1 for o in gains if o.source_expected),
         "gains avec un terme attendu": sum(1 for o in gains if o.term_expected),
         "refus justes": verdicts["refus_juste"],
@@ -447,6 +462,21 @@ def save_results(path: Path, results: list[CaseResult]) -> None:
     path.write_text(json.dumps(existing, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
 
+_FACT_PARAPHRASE = re.compile(r"^(\[\d+\] « .*? ») -> .*$", re.DOTALL)
+
+
+def source_quote(chunk_id: int, quote: str) -> str:
+    """Un fait affiché : sa citation source exacte, jamais la paraphrase du modèle."""
+    return f"[{chunk_id}] « {quote} »"
+
+
+def without_paraphrase(fact: str) -> str:
+    """Fait d'un fichier enregistré avant le 2026-11-25 (« [id] « citation » -> paraphrase ») :
+    seule la citation est gardée."""
+    match = _FACT_PARAPHRASE.match(fact)
+    return match.group(1) if match else fact
+
+
 def load_results(path: Path) -> list[CaseResult]:
     """Résultats enregistrés par --save (audits compris), pour les réafficher (--show)."""
     loaded: list[CaseResult] = []
@@ -508,7 +538,7 @@ def print_report(results: list[CaseResult], settings: Settings) -> None:
                 f" — {s['item']}, chunk {s['chunk']}, puce {s['puce']} ; termes : {', '.join(s['termes'])}"
             )
             print(f"      avant : {s['avant']}\n      après : {s['après']}")
-            for line in s["faits"] + s["implications"]:
+            for line in [without_paraphrase(f) for f in s["faits"]] + s["implications"]:
                 print(f"      {line}")
             print(f"      justification : {s['justification']}")
             print(f"      juge : {s.get('juge') or 'fidèle (sans motif)'}")

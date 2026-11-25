@@ -207,7 +207,11 @@ def test_end_to_end_gain_and_describe_card() -> None:
 
     assert [(o.id, o.verdict) for o in result.outcomes] == [("R4", "carte"), ("R9", "gain")]  # type: ignore[attr-defined]
     summary = summarize([result])  # type: ignore[list-item]
-    assert (summary["inventions détectées par les annotations"], summary["cartes « à décrire »"], summary["gains"]) == (
+    assert (
+        summary["inventions détectées par les annotations"],
+        summary["cartes « à décrire »"],
+        summary["gains fidèles"],
+    ) == (
         0,
         1,
         "1/1",
@@ -318,3 +322,28 @@ def test_targeted_run_keeps_only_the_requirement_and_its_own_key(tmp_path: Path)
     path = tmp_path / "r.json"
     save_results(path, [result])
     assert list(json.loads(path.read_text())) == [f"{GAIN_CASE} [R9]"]
+
+
+def test_audited_invention_is_not_a_gain_and_facts_show_only_the_source_quote(tmp_path: Path) -> None:
+    from eval.eval_suggestions import load_results, record_audit, save_results, without_paraphrase
+
+    agent = FakeStructuredChatModel(responses=[CANDIDATE_CI_CD, HONEST, JudgeVerdict(faithful=True)])
+    result = _evaluate(agent, _report(IMPLICIT_CI_CD))
+    # Faits : citation source exacte, sans la paraphrase du modèle (HONEST.facts[0].claim).
+    assert result.suggestions[0]["faits"] == [f"[{VELMARIS}] « {HONEST.facts[0].quote} »"]  # type: ignore[attr-defined]
+    assert without_paraphrase("[2] « Pipeline de tests » -> Mise en place d'un pipeline") == "[2] « Pipeline de tests »"
+    path = tmp_path / "r.json"
+    save_results(path, [result])  # type: ignore[list-item]
+    assert (summarize(load_results(path))["gains fidèles"], summarize(load_results(path))["dont non audités"]) == (
+        "1/1",
+        1,
+    )
+
+    record_audit(path, GAIN_CASE, "R9", "invention", "responsabilité ajoutée")
+
+    summary = summarize(load_results(path))
+    assert (summary["gains fidèles"], summary["inventions trouvées à l'audit"], summary["dont non audités"]) == (
+        "0/1",
+        1,
+        0,
+    )
