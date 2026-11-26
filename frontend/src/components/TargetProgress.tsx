@@ -1,5 +1,6 @@
 import type { AgentStepKind } from '../api/types'
 import { STEP_ORDER, type StepState, type TargetPanel } from '../state/suggestReducer'
+import { distinctTerm } from './labels'
 
 const STEP_LABELS: Record<AgentStepKind, string> = {
   search: 'Recherche',
@@ -26,12 +27,13 @@ const OUTCOME_TEXT: Record<TargetPanel['outcome'], string | null> = {
 /** Une exigence ciblée : frise Recherche → Proposition → Vérification → Réévaluation. */
 export function TargetProgress({ panel }: { panel: TargetPanel }) {
   const outcome = OUTCOME_TEXT[panel.outcome]
+  const term = distinctTerm(panel)
   return (
     <li className="flex flex-col gap-2 rounded-lg border border-slate-200 p-3" aria-label={`Exigence ciblée : ${panel.label}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-medium text-slate-900">
           {panel.label}
-          {panel.terms.length > 0 && <span className="font-normal text-slate-500"> · « {panel.terms[0]} »</span>}
+          {term && <span className="font-normal text-slate-500"> · « {term} »</span>}
         </p>
         {outcome && <p className="text-xs text-slate-500">{outcome}</p>}
       </div>

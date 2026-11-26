@@ -12,8 +12,9 @@ function scoreColor(score: number): string {
 }
 
 export function ResultSummary({ report }: ResultSummaryProps) {
-  const missing = report.missing_mandatory
   const coverage = mandatoryCoverage(report)
+  // Même compte que « x/y démontrées » : non démontrées et seulement mentionnées.
+  const unproven = coverage.notDemonstrated.length + coverage.onlyMentioned.length
   return (
     <section aria-labelledby="result-title" className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -60,24 +61,42 @@ export function ResultSummary({ report }: ResultSummaryProps) {
         Le score varie d’environ ±5 points d’une analyse à l’autre : comparez surtout les exigences.
       </p>
 
-      {missing.length > 0 ? (
+      {unproven > 0 ? (
         <div role="region" aria-labelledby="missing-title" className="rounded-lg border border-red-200 bg-red-50 p-4">
           <h3 id="missing-title" className="text-sm font-semibold text-red-900">
-            Exigences obligatoires non démontrées ({missing.length})
+            Exigences obligatoires non démontrées ({unproven})
           </h3>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-red-900">
-            {missing.map((requirement) => (
-              <li key={requirement.id}>{requirement.label}</li>
-            ))}
-          </ul>
+          {coverage.notDemonstrated.length > 0 && (
+            <div className="mt-2">
+              <p className="text-xs font-semibold text-red-900">Non démontrées : aucune preuve dans le CV</p>
+              <ul aria-label="Obligatoires non démontrées" className="mt-1 list-disc space-y-1 pl-5 text-sm text-red-900">
+                {coverage.notDemonstrated.map((requirement) => (
+                  <li key={requirement.id}>{requirement.label}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {coverage.onlyMentioned.length > 0 && (
+            <div className="mt-2">
+              <p className="text-xs font-semibold text-red-900">Seulement mentionnées : citées sans être prouvées</p>
+              <ul aria-label="Obligatoires seulement mentionnées" className="mt-1 list-disc space-y-1 pl-5 text-sm text-red-900">
+                {coverage.onlyMentioned.map((requirement) => (
+                  <li key={requirement.id}>{requirement.label}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           <p className="mt-2 text-xs text-red-800">
             Si vous les maîtrisez, décrivez-les dans une expérience ou un projet de votre CV.
           </p>
         </div>
       ) : (
-        <p className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
-          Toutes les exigences obligatoires sont au moins mentionnées dans le CV.
-        </p>
+        coverage.total > 0 &&
+        coverage.notEvaluated === 0 && (
+          <p className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+            Toutes les exigences obligatoires sont démontrées par le CV.
+          </p>
+        )
       )}
 
       {report.errors.length > 0 && (

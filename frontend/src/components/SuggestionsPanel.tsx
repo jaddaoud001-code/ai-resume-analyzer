@@ -5,6 +5,9 @@ import { formatDuration } from './labels'
 import { DescribeCard, RefusalCard, SuggestionCard } from './SuggestionCard'
 import { TargetProgress } from './TargetProgress'
 
+export const SUGGESTIONS_EFFECT =
+  'Ces reformulations rendent visibles, pour un recruteur ou un tri par mots-clés, des compétences que votre CV prouve déjà. Elles ne changent pas le score : l’analyse reconnaissait déjà ces compétences.'
+
 export const SUGGESTIONS_NOTICE =
   'Les suggestions reformulent uniquement ce que votre CV contient déjà. Relisez chacune avant de l’utiliser.'
 
@@ -143,7 +146,10 @@ export function SuggestionsPanel({ state, elapsedSeconds, onStart, onCancel, onD
 
       {state.suggestions.length > 0 && (
         <div className="flex flex-col gap-3">
-          <h3 className="text-sm font-semibold text-slate-900">Suggestions</h3>
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900">Suggestions</h3>
+            <p className="text-sm text-slate-600">{SUGGESTIONS_EFFECT}</p>
+          </div>
           {state.suggestions.map((suggestion) => (
             <SuggestionCard
               key={suggestion.requirement.id}

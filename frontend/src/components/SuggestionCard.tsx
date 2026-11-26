@@ -37,10 +37,14 @@ export function SuggestionCard({ suggestion, decision, onDecide }: SuggestionCar
             {suggestion.terms.length > 0 && <> · terme de l’offre : {suggestion.terms.join(', ')}</>}
           </p>
         </div>
-        <p className="text-xs text-slate-600">
-          Niveau {suggestion.level_before} → {suggestion.level_after}{' '}
-          <span className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">indicatif</span>
-        </p>
+        {suggestion.level_before === suggestion.level_after ? (
+          <p className="text-xs text-slate-600">Compétence déjà reconnue · terme de l’offre désormais visible</p>
+        ) : (
+          <p className="text-xs text-slate-600">
+            Niveau {suggestion.level_before} → {suggestion.level_after}{' '}
+            <span className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">indicatif</span>
+          </p>
+        )}
       </div>
 
       <div className="grid gap-2 text-sm sm:grid-cols-2">
@@ -106,9 +110,12 @@ export function SuggestionCard({ suggestion, decision, onDecide }: SuggestionCar
         >
           Refuser
         </button>
-        {decision && (
-          <span className="text-xs text-slate-500">{decision === 'accepted' ? 'Acceptée' : 'Refusée'} (rien n’est envoyé)</span>
+        {decision === 'accepted' && (
+          <span className="text-xs text-emerald-800">
+            Acceptée : copiez-la dans votre CV avec le bouton en bas (rien n’est modifié automatiquement).
+          </span>
         )}
+        {decision === 'refused' && <span className="text-xs text-slate-500">Refusée.</span>}
       </div>
     </article>
   )

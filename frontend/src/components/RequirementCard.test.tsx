@@ -14,6 +14,19 @@ function result(label: string): RequirementMatch {
 }
 
 describe('RequirementCard', () => {
+  it('titre long : le titre passe à la ligne, le badge de niveau reste à droite', () => {
+    const python = result('Python')
+    const long = { ...python.requirement, label: 'Maîtrise des bases de données relationnelles et de leur optimisation en production' }
+    render(<RequirementCard entry={{ requirement: long, result: { ...python, requirement: long } }} />)
+
+    // jsdom ne calcule pas la mise en page : on vérifie les règles qui la garantissent.
+    const header = screen.getByTestId('card-header')
+    expect(header).not.toHaveClass('flex-wrap') // le badge ne passe jamais sous le titre
+    expect(header).toHaveClass('justify-between')
+    expect(screen.getByRole('heading', { name: long.label }).parentElement).toHaveClass('min-w-0', 'flex-1')
+    expect(screen.getByText('Mentionné')).toHaveClass('shrink-0', 'whitespace-nowrap')
+  })
+
   it('passe de « en attente » à évaluée quand le résultat arrive', () => {
     const python = result('Python')
     const { rerender } = render(<RequirementCard entry={{ requirement: python.requirement, result: null }} />)

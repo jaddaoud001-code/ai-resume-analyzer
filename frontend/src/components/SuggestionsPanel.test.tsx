@@ -5,7 +5,8 @@ import { describe, expect, it, vi } from 'vitest'
 import type { SuggestEvent, SuggestionEvent } from '../api/types'
 import { type SuggestState, initialSuggestState, suggestReducer } from '../state/suggestReducer'
 import { AFTER, BEFORE, CI_CD, ENGLISH, GO, done, fullFlow, refusal, started, suggestion } from '../test/suggestFlows'
-import { SUGGESTIONS_NOTICE, SuggestionsPanel } from './SuggestionsPanel'
+import { SUGGESTIONS_EFFECT, SUGGESTIONS_NOTICE, SuggestionsPanel } from './SuggestionsPanel'
+import { distinctTerm } from './labels'
 
 function stateFrom(events: SuggestEvent[]): SuggestState {
   return [{ type: 'submit' as const }, ...events.map((event) => ({ type: 'event' as const, event }))].reduce(
@@ -65,8 +66,28 @@ describe('résultats', () => {
     expect(proposed).toHaveTextContent(AFTER)
     expect([...proposed.querySelectorAll('mark')].map((m) => m.textContent)).toEqual(['CI/CD'])
     expect(within(card).getByText(`« ${BEFORE} »`)).toBeInTheDocument()
+    // Même niveau : la carte dit ce que change la suggestion, sans « niveau X → X ».
+    expect(within(card).getByText('Compétence déjà reconnue · terme de l’offre désormais visible')).toBeInTheDocument()
+    expect(within(card).queryByText(/→/)).not.toBeInTheDocument()
+    expect(screen.getByText(SUGGESTIONS_EFFECT)).toBeInTheDocument()
+  })
+
+  it('un changement de niveau, s’il y en a un, reste affiché comme indicatif', () => {
+    const higher = suggestion(CI_CD, { level_before: 'démontré', level_after: 'solide' })
+    render(<Harness initial={stateFrom([started([CI_CD]), higher, done(1, 0)])} />)
+
+    const card = screen.getByRole('article', { name: 'Suggestion : CI/CD' })
+    expect(within(card).getByText(/Niveau démontré → solide/)).toBeInTheDocument()
     expect(within(card).getByText('indicatif')).toBeInTheDocument()
-    expect(within(card).getByText(/démontré → démontré/)).toBeInTheDocument()
+    expect(within(card).queryByText(/déjà reconnue/)).not.toBeInTheDocument()
+  })
+
+  it('le terme de l’offre n’est affiché que s’il diffère du nom de l’exigence', () => {
+    expect(distinctTerm({ label: 'SQL', terms: ['SQL'] })).toBeNull()
+    expect(distinctTerm({ label: 'Évaluation de modèles IA', terms: ['evaluation de modèles ia'] })).toBeNull()
+    expect(distinctTerm({ label: 'Observabilité (métriques, alertes)', terms: ['Observabilité', 'alertes'] })).toBe('Observabilité')
+    render(<Harness initial={stateFrom(fullFlow().slice(0, 3))} />)
+    expect(screen.getByRole('listitem', { name: 'Exigence ciblée : CI/CD' })).not.toHaveTextContent('«')
   })
 
   it('montre l’implication de la table utilisée, s’il y en a une', () => {
@@ -131,6 +152,9 @@ describe('Accepter / Refuser et copie', () => {
     const ciCd = screen.getByRole('group', { name: 'Décision pour CI/CD' })
     await user.click(within(ciCd).getByRole('button', { name: 'Accepter' }))
     expect(within(ciCd).getByRole('button', { name: 'Accepter' })).toHaveAttribute('aria-pressed', 'true')
+    expect(within(ciCd).getByText(/^Acceptée : copiez-la dans votre CV avec le bouton en bas/)).toHaveTextContent(
+      'rien n’est modifié automatiquement',
+    )
     const go = screen.getByRole('group', { name: 'Décision pour Go' })
     await user.click(within(go).getByRole('button', { name: 'Refuser' }))
     expect(within(go).getByText(/Refusée/)).toBeInTheDocument()

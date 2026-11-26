@@ -23,16 +23,25 @@ describe('mandatoryCoverage', () => {
       ],
     }
 
-    expect(mandatoryCoverage(report)).toEqual({ demonstrated: 2, total: 4, notEvaluated: 0 })
+    const coverage = mandatoryCoverage(report)
+    expect(coverage).toMatchObject({ demonstrated: 2, total: 4, notEvaluated: 0 })
+    // Les deux non prouvées, chacune dans sa liste : la case du résultat les montre toutes.
+    expect(coverage.notDemonstrated.map((r) => r.id)).toEqual(['R4'])
+    expect(coverage.onlyMentioned.map((r) => r.id)).toEqual(['R3'])
   })
 
   it('une obligatoire en erreur est comptée comme non démontrée et signalée', () => {
     const report = { ...sample('report').report, requirements: withLevels(['démontré', 'error']) }
 
-    expect(mandatoryCoverage(report)).toEqual({ demonstrated: 1, total: 2, notEvaluated: 1 })
+    const coverage = mandatoryCoverage(report)
+    expect(coverage).toMatchObject({ demonstrated: 1, total: 2, notEvaluated: 1 })
+    expect([...coverage.notDemonstrated, ...coverage.onlyMentioned]).toEqual([])
   })
 
   it('exemple du contrat : Python « mentionné » et Go « non démontré »', () => {
-    expect(mandatoryCoverage(sample('report').report)).toEqual({ demonstrated: 0, total: 2, notEvaluated: 0 })
+    const coverage = mandatoryCoverage(sample('report').report)
+    expect(coverage).toMatchObject({ demonstrated: 0, total: 2, notEvaluated: 0 })
+    expect(coverage.notDemonstrated.map((r) => r.label)).toEqual(['Go'])
+    expect(coverage.onlyMentioned.map((r) => r.label)).toEqual(['Python'])
   })
 })

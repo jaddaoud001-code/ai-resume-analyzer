@@ -94,3 +94,14 @@ export const REFUSAL_TITLES: Record<Exclude<RefusalReason, 'a_decrire'>, string>
   non_traitee: 'Non traitée',
   erreur: 'Erreur du fournisseur d’IA',
 }
+
+function sameName(a: string, b: string): boolean {
+  const key = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLocaleLowerCase('fr-FR').trim()
+  return key(a) === key(b)
+}
+
+/** Terme de l'offre à afficher à côté du nom de l'exigence, seulement s'il en diffère. */
+export function distinctTerm(panel: { label: string; terms: string[] }): string | null {
+  const term = panel.terms[0]
+  return term !== undefined && !sameName(term, panel.label) ? term : null
+}

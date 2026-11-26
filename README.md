@@ -53,6 +53,50 @@ flowchart LR
 
 Autres garde-fous : l'offre et le CV sont traités comme des **données non fiables** (isolés entre balises, instructions qu'ils contiennent ignorées) ; toute sortie du LLM passe par un modèle Pydantic ; un test de contrat garantit que le frontend comprend chaque événement émis par le backend.
 
+## Agent de suggestions
+
+Après l'analyse, un bouton lance un **agent qui rend explicites des compétences que le CV prouve déjà, sans rien inventer**. Exemple observé lors d'un essai : la puce « Traitement des requêtes lentes de la base des commandes : index et réécriture des requêtes » prouve SQL (l'expérience cite PostgreSQL), mais ne le nomme pas ; un recruteur pressé ou un tri par mots-clés passe à côté. L'agent propose « Traitement des requêtes lentes **SQL** de la base des commandes… », en montrant la citation exacte du CV qui l'appuie et l'implication utilisée (PostgreSQL → SQL). Les compétences que le CV ne prouve pas ne reçoivent **aucun texte** : une carte invite à décrire soi-même une expérience réelle.
+
+![L'agent au travail : une proposition « création » écartée par le contrôle du code, cartes « décrivez-le »](docs/agent-progress.png)
+
+![Fin d'une exécution : la reformulation de SQL écartée parce qu'elle faisait baisser le niveau à la réévaluation, une suggestion pour l'observabilité (mot ajouté surligné, citation exacte du CV) acceptée, cartes « décrivez-le », copie des puces acceptées, tokens et durée](docs/agent-suggestions.png)
+
+Ci-dessus, en fin d'exécution : la reformulation proposée pour SQL a été écartée à la réévaluation (le vrai matcher la jugeait moins probante, « solide → démontré ») et n'est donc pas proposée ; pour l'observabilité, l'agent a ajouté « monitoring », un équivalent direct du terme de l'offre (voir les pistes d'amélioration), et la suggestion a été acceptée puis copiée.
+
+**Pourquoi un agent ici, et pas pour le matching.** Le matching est un appel au LLM par exigence, encadré par des vérifications du code. Sur les cas de référence, il trouve le bon niveau pour **38 exigences techniques sur 38**, sans faux positif ; sur les cas difficiles, 19 sur 20. Les écarts restants viennent d'un jugement du modèle ou de sa variance, qu'une boucle d'agent ne corrigerait pas, alors qu'elle multiplierait les appels (une analyse coûte déjà ~40 000 tokens, pour 200 000 par jour dans l'offre gratuite de Groq). Les suggestions, elles, sont un vrai travail en plusieurs étapes avec retour d'erreur : choisir la puce, reformuler, se faire refuser avec un motif précis, réessayer. Pendant l'évaluation, deux suggestions fidèles sur sept ne sont apparues qu'à la seconde tentative, après un refus motivé du contrôle.
+
+**Le graphe** (LangGraph, `backend/app/suggestions.py`) :
+1. **Cibles, par le code** : les compétences techniques jugées « démontré » ou « solide » dont aucune preuve citée ne nomme le terme de l'offre (preuve par une implication, une ligne de technologies ou une pratique décrite sans son nom). Les compétences et langues non prouvées reçoivent une carte « décrivez-le », sans appel au LLM.
+2. **Recherche** : le LLM choisit, parmi les puces de l'expérience qui porte la preuve, celle qui peut nommer le terme, ou dit qu'aucune ne le peut.
+3. **Proposition** : une seule puce réécrite, avec la citation exacte de chaque fait.
+4. **Vérification** : le contrôle du code, puis un juge LLM qui ne peut que rejeter. Un rejet renvoie à la proposition avec son motif (deux tentatives au plus).
+5. **Réévaluation** : la puce est appliquée en mémoire et le vrai matcher réévalue l'exigence ; si le niveau baisse, la suggestion est écartée.
+
+Budgets de tokens par exigence et par exécution, limiteur de débit partagé avec l'analyse, arrêt propre sur quota épuisé, annulation à la déconnexion.
+
+**Les garde-fous sont dans le code** (`backend/app/grounding.py`, `backend/app/terms.py`) :
+- **Ancrage** : chaque fait cite le CV mot pour mot, dans la même expérience ; aucun nombre, nom, outil ou technologie nouveau, sauf une compétence impliquée par la table des implications (FastAPI → Python, PostgreSQL → SQL) ou un nom de pratique que la puce décrit exactement (« CI/CD » pour des tests et un déploiement lancés à chaque fusion).
+- **Termes contrôlés** : « cloud », « REST », « anonymisation »… ne s'écrivent que s'ils figurent déjà dans l'expérience (une pseudonymisation n'est pas une anonymisation).
+- **Responsabilités ajoutées** : « mise en place », « conception », « création », « pilotage », « responsable »… sont refusés s'ils n'y figurent pas déjà.
+- **Premier mot** : le mot qui ouvre la puce, et qui dit ce qui a été fait, doit rester (« Classement » ne devient pas « Analyse »).
+- **Terme exigé** : la puce proposée doit nommer le terme de l'offre.
+
+**Le juge LLM et sa limite.** Pendant toute l'évaluation, le juge n'a **jamais rejeté** une proposition, et il a laissé passer la seule invention. Toutes les tentations ont été arrêtées par le code. Le juge reste en place comme second filtre, mais c'est le code qu'on étend quand l'audit trouve une invention.
+
+**La validation reste humaine.** Rien n'est appliqué au CV : chaque suggestion est acceptée ou refusée par l'utilisateur, puis copiée. L'interface n'affiche que les citations exactes du CV, jamais les explications rédigées par le modèle, et elle précise que les suggestions ne changent pas le score : l'analyse reconnaissait déjà ces compétences.
+
+**Résultats de l'évaluation** (5 cas avec cibles, 11 exigences traitées, chaque suggestion auditée à la main ; `backend/eval/eval_suggestions.py`, annotations dans `backend/eval/suggestions/`) :
+
+| Mesure | Résultat |
+|---|---|
+| Gains fidèles (terme de l'offre nommé, fait inchangé, niveau maintenu) | **7 sur 7** reformulations possibles |
+| Refus justes (aucune reformulation honnête : « cloud », « REST », « anonymisation ») | **4** |
+| Faux refus | **0** |
+| Inventions | **1**, trouvée à l'audit humain (« **Mise en place d'**un pipeline CI/CD », une responsabilité que la puce ne disait pas), puis **bloquée par une règle du code** : relancé, le modèle l'a proposée de nouveau, le contrôle l'a écartée, et la seconde tentative était fidèle |
+| Coût | ~56 000 tokens pour les 5 cas, soit **~5 100 tokens par exigence traitée** ; une exécution coûte 5 700 à 16 000 tokens et dure 1 à 3,5 minutes |
+
+**Comment l'objectif a changé.** La première version cherchait à faire **monter le niveau** des exigences faibles (« mentionné » → « démontré ») en reformulant le CV. Le premier essai réel a montré que le matcher créditait déjà les faits mal formulés (implications, lignes de technologies, pratiques décrites), et qu'une vraie lacune n'a pas de reformulation honnête : il n'y avait rien à gagner sans inventer. L'objectif est devenu de **rendre visible ce qui est déjà prouvé**, ce qui sert le lecteur du CV sans toucher au score.
+
 ## Évaluation
 
 L'extraction des exigences est évaluée sur deux offres publiques, avec un corrigé par offre (`backend/eval/`), en plusieurs exécutions car le LLM n'est pas déterministe. Résultats mesurés avec `mistral-large-4-0` (prompt d'extraction v2, `--runs 3`), avant le passage à Groq (l'offre gratuite de Mistral n'ayant plus d'accès API) ; ils restent la référence jusqu'à une nouvelle mesure avec `openai/gpt-oss-120b` :
@@ -173,6 +217,10 @@ Exemples des prompts génériques, aucun tiré des cas d'évaluation (vérifié 
 - **L'extraction des exigences n'est pas parfaite** : sur l'offre SII, elle omet parfois une exigence ou en regroupe deux (voir l'évaluation). Le résultat varie aussi d'environ ±5 points d'une analyse à l'autre.
 - **Durée et nombre d'analyses** : avec l'offre gratuite de Groq (8 000 tokens/min et 200 000 tokens/jour par modèle), une analyse dure **5 à 6 minutes** (un appel au LLM par exigence, un toutes les 20 s) et consomme ~40 000 tokens : **4 à 5 analyses par jour**. Au-delà, l'analyse s'arrête avec « Quota journalier du fournisseur LLM atteint : réessayez demain ». Une offre payante raccourcit l'analyse (`LLM_RPS`).
 - **Les offres gratuites changent** : le projet a été mis au point avec l'offre gratuite de Mistral, qui a retiré son accès API en novembre 2026 (403 sur tous les modèles). Le fournisseur se change dans le `.env`, sans toucher au code.
+
+## Pistes d'amélioration
+
+- **Agent de suggestions : préférer le terme exact de l'offre.** L'agent peut nommer un équivalent direct (« monitoring ») plutôt que le terme de l'offre (« observabilité ») : la suggestion reste fidèle et passe tous les contrôles, mais un tri par mots-clés cherche le terme de l'offre. Demander dans le prompt de l'agent le terme exact quand il est possible servirait mieux ce lecteur. C'est une modification du prompt (nouvelle version, test d'empreinte) qu'il faudra **remesurer** avec l'évaluation de l'agent avant de la garder.
 
 ## Confidentialité
 
@@ -319,12 +367,14 @@ Format détaillé de chaque événement, architecture et conventions : [Structur
 
 ```
 backend/
-  app/            API FastAPI, extraction PDF, anonymisation, découpage, embeddings, LLM, matching
+  app/            API FastAPI, extraction PDF, anonymisation, découpage, embeddings, LLM, matching,
+                  agent de suggestions (suggestions.py) et ses garde-fous (grounding.py, terms.py)
   tests/          pytest (hors ligne)
-  eval/           évaluation de l'extraction (offres, corrigés, CV de démonstration)
+  eval/           évaluation de l'extraction, du matching et de l'agent (offres, corrigés, annotations,
+                  CV fictifs, rapports bruts des runs)
 frontend/
-  src/api/        client HTTP, parseur SSE, types alignés sur le backend
-  src/state/      reducer : événements -> état de l'écran
+  src/api/        client HTTP, parseur SSE, types alignés sur le backend (analyse et suggestions)
+  src/state/      reducers : événements -> état de l'écran
   src/components/ interface React
 docker-compose.yml, .github/workflows/ci.yml
 ```

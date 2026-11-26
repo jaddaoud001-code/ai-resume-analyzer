@@ -19,9 +19,10 @@ export function RequirementCard({ entry, interrupted = false }: RequirementCardP
       aria-busy={result === null && !interrupted}
       className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
     >
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="flex min-w-0 flex-col gap-1">
-          <h3 className="font-medium text-slate-900">{requirement.label}</h3>
+      {/* Pas de retour à la ligne du badge : un titre long passe à la ligne, le badge reste à droite. */}
+      <div className="flex items-start justify-between gap-3" data-testid="card-header">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <h3 className="break-words font-medium text-slate-900">{requirement.label}</h3>
           <p className="text-xs text-slate-500">
             <span className={mandatory ? 'font-medium text-slate-700' : ''}>
               {mandatory ? 'Obligatoire' : 'Souhaitée'}
@@ -32,15 +33,15 @@ export function RequirementCard({ entry, interrupted = false }: RequirementCardP
           </p>
         </div>
         {result === null ? (
-          <span className="rounded-full bg-slate-50 px-2.5 py-0.5 text-xs text-slate-500 ring-1 ring-slate-200">
+          <span className="shrink-0 whitespace-nowrap rounded-full bg-slate-50 px-2.5 py-0.5 text-xs text-slate-500 ring-1 ring-slate-200">
             {interrupted ? 'Non évaluée' : 'En attente…'}
           </span>
         ) : result.status === 'error' || result.level === null ? (
-          <span className="rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700 ring-1 ring-red-200">
+          <span className="shrink-0 whitespace-nowrap rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700 ring-1 ring-red-200">
             Erreur
           </span>
         ) : (
-          <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ${LEVEL_STYLES[result.level]}`}>
+          <span className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ${LEVEL_STYLES[result.level]}`}>
             {LEVEL_LABELS[result.level]}
           </span>
         )}

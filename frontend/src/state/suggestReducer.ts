@@ -31,6 +31,8 @@ export interface TargetPanel {
   rejection: string | null
   /** Propositions écartées pour cette exigence (prudence rendue visible). */
   rejections: number
+  /** Étape qui a écarté la dernière proposition (vérification ou réévaluation), ou null. */
+  lastRejected: AgentStepKind | null
   outcome: 'waiting' | 'running' | 'suggestion' | 'refusal' | 'hidden'
 }
 
@@ -86,7 +88,8 @@ function pendingSteps(): Record<AgentStepKind, StepState> {
 
 /** Raison lisible d'une proposition écartée (détail d'une étape « rejected » du backend). */
 export function rejectionReason(detail: string | null): string {
-  const text = (detail ?? '').trim()
+  // Flèches du backend (« solide -> démontré ») affichées en typographie française.
+  const text = (detail ?? '').trim().replaceAll('->', '→')
   if (!text) return 'motif non précisé'
   if (text.startsWith('Contrôle d’ancrage : ') || text.startsWith("Contrôle d'ancrage : ")) {
     return `contrôle du CV — ${text.slice('Contrôle d’ancrage : '.length)}`
@@ -129,15 +132,25 @@ function applyStep(panel: TargetPanel, event: AgentStepEvent): TargetPanel {
     steps,
     rejection: `Proposition écartée : ${rejectionReason(event.detail)}`,
     rejections: panel.rejections + 1,
+    lastRejected: event.kind,
   }
 }
 
-function finishSteps(steps: Record<AgentStepKind, StepState>, lastRejected: boolean): Record<AgentStepKind, StepState> {
-  // Fin d'une cible sans suggestion : rien ne reste « en cours ».
-  const finished = { ...steps }
-  for (const kind of STEP_ORDER) {
-    if (finished[kind] === 'active') finished[kind] = lastRejected && kind === 'propose' ? 'rejected' : 'pending'
+function finishSteps(panel: TargetPanel): Record<AgentStepKind, StepState> {
+  // Fin d'une cible sans suggestion, après une proposition écartée : l'étape qui l'a écartée
+  // passe en rouge (Vérification, ou Réévaluation pour une baisse de niveau), celles d'avant
+  // sont terminées.
+  if (panel.lastRejected === 'verify' || panel.lastRejected === 'reevaluate') {
+    const rejectedAt = STEP_ORDER.indexOf(panel.lastRejected)
+    const finished = { ...panel.steps }
+    STEP_ORDER.forEach((kind, index) => {
+      finished[kind] = index < rejectedAt ? 'done' : index === rejectedAt ? 'rejected' : 'pending'
+    })
+    return finished
   }
+  // Sinon, rien ne reste « en cours ».
+  const finished = { ...panel.steps }
+  for (const kind of STEP_ORDER) if (finished[kind] === 'active') finished[kind] = 'pending'
   return finished
 }
 
@@ -157,6 +170,7 @@ function applyEvent(state: SuggestState, event: SuggestEvent): SuggestState {
           steps: pendingSteps(),
           rejection: null,
           rejections: 0,
+          lastRejected: null,
           outcome: 'waiting',
         })),
       }
@@ -186,7 +200,7 @@ function applyEvent(state: SuggestState, event: SuggestEvent): SuggestState {
       const updated = updateTarget(base, event.requirement.id, (panel) => ({
         ...panel,
         requirement: event.requirement,
-        steps: finishSteps(panel.steps, panel.rejection !== null),
+        steps: finishSteps(panel),
         outcome,
       }))
       return event.shown ? { ...updated, refusals: [...updated.refusals, event] } : updated

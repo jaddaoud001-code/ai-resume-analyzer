@@ -88,7 +88,27 @@ describe('suggestReducer : refus', () => {
 
     expect(state.targets[0]?.outcome).toBe('hidden')
     expect(state.refusals).toEqual([])
-    expect(state.targets[0]?.steps.propose).toBe('rejected') // plus rien « en cours »
+    // Écartée à la réévaluation : c'est cette étape qui passe en rouge, pas la proposition.
+    expect(state.targets[0]?.steps).toEqual({ search: 'done', propose: 'done', verify: 'done', reevaluate: 'rejected' })
+    expect(state.targets[0]?.rejection).toBe('Proposition écartée : Baisse de niveau (démontré → mentionné).')
+  })
+
+  it('écartée deux fois à la vérification : Vérification en rouge', () => {
+    const rejected = 'Contrôle d’ancrage : « cloud » n’apparaît pas dans cette expérience.'
+    const state = run([
+      started([CI_CD]),
+      targetStarted(CI_CD),
+      step(CI_CD, 'search'),
+      step(CI_CD, 'propose'),
+      step(CI_CD, 'verify', 'rejected', rejected),
+      step(CI_CD, 'propose', 'ok', null, 2),
+      step(CI_CD, 'verify', 'rejected', rejected, 2),
+      refusal(CI_CD, 'aucune_reformulation_fidele'),
+      done(0, 1),
+    ])
+
+    expect(state.targets[0]?.steps).toEqual({ search: 'done', propose: 'done', verify: 'rejected', reevaluate: 'pending' })
+    expect(state.targets[0]?.rejections).toBe(2)
   })
 
   it('une cible non traitée (budget) devient un refus montré', () => {
@@ -166,7 +186,8 @@ describe('rejectionReason', () => {
       'contrôle du CV — « cloud » n’apparaît pas dans cette expérience.',
     )
     expect(rejectionReason('Juge : verbe renforcé')).toBe('relecture — verbe renforcé')
-    expect(rejectionReason('Baisse de niveau (solide -> démontré). Garde tous les faits.')).toBe('Baisse de niveau (solide -> démontré).')
+    expect(rejectionReason('Baisse de niveau (solide -> démontré). Garde tous les faits.')).toBe('Baisse de niveau (solide → démontré).')
+    expect(rejectionReason('Contrôle d’ancrage : « A » -> « B »')).not.toContain('->')
     expect(rejectionReason('Terme absent : la puce doit nommer « CI/CD ».')).toBe('Terme absent : la puce doit nommer « CI/CD ».')
     expect(rejectionReason(null)).toBe('motif non précisé')
   })
