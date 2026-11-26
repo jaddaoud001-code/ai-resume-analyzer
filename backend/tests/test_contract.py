@@ -1,6 +1,8 @@
-"""Contrat backend / frontend : un exemple valide de chaque événement du flux SSE, produit à
-partir des modèles Pydantic, dans frontend/src/api/__fixtures__/events.sample.json. Le
-frontend (Vitest) vérifie qu'il reconnaît chaque exemple avec ses champs.
+"""Contrat backend / frontend : un exemple valide de chaque événement des flux SSE, produit à
+partir des modèles Pydantic : POST /analyze dans frontend/src/api/__fixtures__/events.sample.json,
+POST /suggest (agent de suggestions, forme publique : public_json) dans
+suggest_events.sample.json. Le frontend (Vitest) vérifie qu'il reconnaît chaque exemple avec
+ses champs.
 
 Régénérer le fichier après une modification des schémas :
     cd backend && UPDATE_CONTRACT_FIXTURES=1 .venv/bin/pytest tests/test_contract.py
@@ -13,6 +15,7 @@ from typing import get_args
 
 from pydantic import BaseModel
 
+from app.grounding import ImpliedSkill
 from app.matcher import rate_limit_status
 from app.schemas import (
     AnalysisError,
@@ -28,9 +31,25 @@ from app.schemas import (
     RequirementEvaluated,
     RequirementMatch,
     RequirementsExtracted,
+    TokenUsage,
+)
+from app.suggestions import (
+    AgentDone,
+    AgentError,
+    AgentEvent,
+    AgentStarted,
+    AgentStep,
+    AgentTarget,
+    Refusal,
+    SourceQuote,
+    Suggestion,
+    TargetStarted,
+    public_json,
 )
 
-FIXTURE = Path(__file__).resolve().parents[2] / "frontend" / "src" / "api" / "__fixtures__" / "events.sample.json"
+FIXTURES = Path(__file__).resolve().parents[2] / "frontend" / "src" / "api" / "__fixtures__"
+FIXTURE = FIXTURES / "events.sample.json"
+SUGGEST_FIXTURE = FIXTURES / "suggest_events.sample.json"
 UPDATE_ENV = "UPDATE_CONTRACT_FIXTURES"
 
 # Données fictives (aucune donnée d'un vrai CV).
@@ -180,5 +199,96 @@ def test_fixture_is_up_to_date() -> None:
     current = FIXTURE.read_text(encoding="utf-8") if FIXTURE.exists() else ""
     assert current == expected, (
         f"{FIXTURE.name} n'est pas à jour avec les schémas : "
+        f"cd backend && {UPDATE_ENV}=1 .venv/bin/pytest tests/test_contract.py"
+    )
+
+
+# --- POST /suggest : événements de l'agent (forme publique) -----------------------------------
+
+CI_CD = Requirement(
+    id="R5",
+    label="CI/CD",
+    category="compétence technique",
+    importance="souhaitée",
+    search_queries=["CI/CD", "intégration continue"],
+)
+USAGE = TokenUsage(calls=4, input_tokens=4200, output_tokens=1300, reasoning_tokens=700)
+
+
+def sample_agent_events() -> list[BaseModel]:
+    targets = [
+        AgentTarget(id="R5", label="CI/CD", level="démontré", weight=1.0, terms=["CI/CD", "intégration continue"])
+    ]
+    return [
+        AgentStarted(
+            targets=targets,
+            skipped=0,
+            to_describe=[AgentTarget(id="R2", label="Go", level="non démontré", weight=2.0, terms=["Go"])],
+            limits={"max_requirements": 3, "max_attempts": 2},
+        ),
+        Refusal(
+            requirement=GO,
+            reason="a_decrire",
+            message="Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le.",
+            shown=True,
+            detail="niveau actuel : non démontré",
+            usage=TokenUsage(),
+        ),
+        TargetStarted(requirement=CI_CD, level="démontré", rank=1),
+        AgentStep(
+            requirement_id="R5",
+            kind="propose",
+            status="ok",
+            attempt=1,
+            detail="Pipeline CI/CD de tests lancé à chaque fusion.",
+            # Champs d'audit : absents de la forme publique (public_json).
+            facts=[],
+            implied_skills=[ImpliedSkill(skill="Git", chunk_id=3, quote="GitLab CI")],
+        ),
+        rate_limit_status(60),
+        Suggestion(
+            requirement=CI_CD,
+            item="Développeuse backend · Entreprise fictive",
+            chunk_id=3,
+            bullet_index=1,
+            before="Pipeline de tests lancé à chaque fusion.",
+            after="Pipeline CI/CD de tests lancé à chaque fusion.",
+            terms=["CI/CD"],
+            facts=[SourceQuote(chunk_id=3, quote="Pipeline de tests lancé à chaque fusion.")],
+            implied_skills=[],
+            level_before="démontré",
+            level_after="démontré",
+            justification="",
+            judge="Seul le terme est ajouté.",
+            usage=USAGE,
+        ),
+        AgentDone(suggestions=1, refusals=1, to_describe=1, hidden=0, untreated=0, reevaluation_failed=0, usage=USAGE),
+        AgentError(code="timeout", message="Les suggestions ont dépassé la durée maximale de 600 s."),
+    ]
+
+
+def render_public(events: list[BaseModel]) -> str:
+    return json.dumps([json.loads(public_json(e)) for e in events], ensure_ascii=False, indent=2) + "\n"
+
+
+def test_agent_samples_cover_every_agent_event_type() -> None:
+    models = get_args(AgentEvent)
+    assert {e.type for e in sample_agent_events()} == {m.model_fields["type"].default for m in models}  # type: ignore[attr-defined]
+
+
+def test_agent_public_samples_never_expose_model_paraphrase() -> None:
+    for payload in json.loads(render_public(sample_agent_events())):
+        assert "claim" not in json.dumps(payload)
+        if payload["type"] == "step":
+            assert "facts" not in payload and "implied_skills" not in payload
+
+
+def test_agent_fixture_is_up_to_date() -> None:
+    expected = render_public(sample_agent_events())
+    if os.environ.get(UPDATE_ENV) == "1":
+        SUGGEST_FIXTURE.write_text(expected, encoding="utf-8")
+    current = SUGGEST_FIXTURE.read_text(encoding="utf-8") if SUGGEST_FIXTURE.exists() else ""
+    assert current == expected, (
+        f"{SUGGEST_FIXTURE.name} n'est pas à jour avec les schémas : "
         f"cd backend && {UPDATE_ENV}=1 .venv/bin/pytest tests/test_contract.py"
     )

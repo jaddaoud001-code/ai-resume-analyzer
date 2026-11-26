@@ -1,0 +1,149 @@
+[
+  {
+    "type": "agent_started",
+    "targets": [
+      {
+        "id": "R5",
+        "label": "CI/CD",
+        "level": "démontré",
+        "weight": 1.0,
+        "terms": [
+          "CI/CD",
+          "intégration continue"
+        ]
+      }
+    ],
+    "skipped": 0,
+    "to_describe": [
+      {
+        "id": "R2",
+        "label": "Go",
+        "level": "non démontré",
+        "weight": 2.0,
+        "terms": [
+          "Go"
+        ]
+      }
+    ],
+    "limits": {
+      "max_requirements": 3,
+      "max_attempts": 2
+    }
+  },
+  {
+    "type": "refusal",
+    "requirement": {
+      "id": "R2",
+      "label": "Go",
+      "category": "compétence technique",
+      "importance": "obligatoire",
+      "min_years": null,
+      "search_queries": [
+        "Go",
+        "Golang"
+      ]
+    },
+    "reason": "a_decrire",
+    "message": "Le CV ne le prouve pas encore : si vous l'avez réellement pratiqué, décrivez-le.",
+    "shown": true,
+    "detail": "niveau actuel : non démontré",
+    "usage": {
+      "calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0,
+      "total_tokens": 0
+    }
+  },
+  {
+    "type": "target_started",
+    "requirement": {
+      "id": "R5",
+      "label": "CI/CD",
+      "category": "compétence technique",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "CI/CD",
+        "intégration continue"
+      ]
+    },
+    "level": "démontré",
+    "rank": 1
+  },
+  {
+    "type": "step",
+    "requirement_id": "R5",
+    "kind": "propose",
+    "status": "ok",
+    "attempt": 1,
+    "detail": "Pipeline CI/CD de tests lancé à chaque fusion."
+  },
+  {
+    "type": "status",
+    "reason": "rate_limit",
+    "wait_s": 60.0,
+    "message": "En attente du quota du fournisseur, reprise dans 60 s"
+  },
+  {
+    "type": "suggestion",
+    "requirement": {
+      "id": "R5",
+      "label": "CI/CD",
+      "category": "compétence technique",
+      "importance": "souhaitée",
+      "min_years": null,
+      "search_queries": [
+        "CI/CD",
+        "intégration continue"
+      ]
+    },
+    "item": "Développeuse backend · Entreprise fictive",
+    "chunk_id": 3,
+    "bullet_index": 1,
+    "before": "Pipeline de tests lancé à chaque fusion.",
+    "after": "Pipeline CI/CD de tests lancé à chaque fusion.",
+    "terms": [
+      "CI/CD"
+    ],
+    "facts": [
+      {
+        "chunk_id": 3,
+        "quote": "Pipeline de tests lancé à chaque fusion."
+      }
+    ],
+    "implied_skills": [],
+    "level_before": "démontré",
+    "level_after": "démontré",
+    "justification": "",
+    "judge": "Seul le terme est ajouté.",
+    "usage": {
+      "calls": 4,
+      "input_tokens": 4200,
+      "output_tokens": 1300,
+      "reasoning_tokens": 700,
+      "total_tokens": 5500
+    }
+  },
+  {
+    "type": "done",
+    "suggestions": 1,
+    "refusals": 1,
+    "to_describe": 1,
+    "hidden": 0,
+    "untreated": 0,
+    "reevaluation_failed": 0,
+    "usage": {
+      "calls": 4,
+      "input_tokens": 4200,
+      "output_tokens": 1300,
+      "reasoning_tokens": 700,
+      "total_tokens": 5500
+    }
+  },
+  {
+    "type": "error",
+    "code": "timeout",
+    "message": "Les suggestions ont dépassé la durée maximale de 600 s."
+  }
+]

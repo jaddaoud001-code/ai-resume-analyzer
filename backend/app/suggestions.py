@@ -29,7 +29,16 @@ from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, Field
 
 from app.config import Settings
-from app.grounding import BulletRewrite, Fact, ImpliedSkill, apply_rewrite, bullets, check_grounding
+from app.grounding import (
+    BulletRewrite,
+    Fact,
+    ImpliedSkill,
+    apply_rewrite,
+    bullets,
+    check_grounding,
+    granted_skills,
+    strip_bullet_label,
+)
 from app.implications import IMPLICATIONS
 from app.llm_calls import (
     AnalysisMonitor,
@@ -136,6 +145,13 @@ class AgentStep(BaseModel):
     implied_skills: list[ImpliedSkill] = Field(default_factory=list)
 
 
+class SourceQuote(BaseModel):
+    """Citation source exacte d'un fait (jamais la paraphrase du modèle)."""
+
+    chunk_id: int
+    quote: str
+
+
 class Suggestion(BaseModel):
     type: Literal["suggestion"] = "suggestion"
     requirement: Requirement
@@ -145,8 +161,8 @@ class Suggestion(BaseModel):
     before: str
     after: str
     terms: list[str] = Field(description="Termes de l'offre nommés par la nouvelle puce.")
-    facts: list[Fact]
-    implied_skills: list[ImpliedSkill]
+    facts: list[SourceQuote] = Field(description="Citations sources exactes, sans la paraphrase du modèle.")
+    implied_skills: list[ImpliedSkill] = Field(description="Implications de la table réellement utilisées.")
     level_before: str
     level_after: str
     justification: str
@@ -175,9 +191,12 @@ class AgentDone(BaseModel):
     usage: TokenUsage
 
 
+AgentErrorCode = Literal["quota_exceeded", "provider_access_denied", "timeout", "internal_error"]
+
+
 class AgentError(BaseModel):
     type: Literal["error"] = "error"
-    code: Literal["quota_exceeded", "provider_access_denied"]
+    code: AgentErrorCode
     message: str
 
 
@@ -274,6 +293,7 @@ class AgentDeps:
     today: date
     waits: list[AnalysisStatus] = field(default_factory=list)
     only: list[str] | None = None
+    on_blocked: Callable[[ProviderBlockedError], None] | None = None
 
 
 class _BudgetExceeded(Exception):
@@ -423,6 +443,8 @@ def build_graph(deps: AgentDeps) -> Any:
         )
 
     def stopped(error: ProviderBlockedError) -> dict:  # type: ignore[type-arg]
+        if deps.on_blocked is not None:
+            deps.on_blocked(error)  # l'application retient le refus durable (analyses suivantes)
         code = "quota_exceeded" if isinstance(error, ProviderQuotaExceededError) else "provider_access_denied"
         assert isinstance(error, ProviderQuotaExceededError | ProviderAccessDeniedError)
         return {"events": drain_waits(), "stop": (code, str(error)), "route": "finish"}
@@ -726,8 +748,15 @@ def build_graph(deps: AgentDeps) -> Any:
             before=bullets(chunk.text)[rewrite.bullet_index].text,
             after=proposal.new_text,
             terms=[t for t in offer_terms(current.requirement) if mentions_term(proposal.new_text, t)],
-            facts=proposal.facts,
-            implied_skills=proposal.implied_skills,
+            facts=list(
+                {
+                    (f.chunk_id, strip_bullet_label(f.quote)): SourceQuote(
+                        chunk_id=f.chunk_id, quote=strip_bullet_label(f.quote)
+                    )
+                    for f in proposal.facts
+                }.values()
+            ),
+            implied_skills=granted_skills(rewrite, deps.chunks, sections),
             level_before=current.level or "",
             level_after=result.level or "",
             justification=proposal.justification,
@@ -802,11 +831,13 @@ async def suggest(
     limiter: RateLimiter,
     today: date | None = None,
     only: Iterable[str] | None = None,
+    on_blocked: Callable[[ProviderBlockedError], None] | None = None,
 ) -> AsyncIterator[Any]:
     """Exécute le graphe et produit ses événements au fil de l'eau (agent_started … done ou
     error). `chunks` : chunks anonymisés du CV renvoyé par le client (rien n'est conservé)."""
     deps = AgentDeps(report, chunks, settings, embeddings, agent_llm, match_llm, limiter, today or date.today())
     deps.only = list(only) if only is not None else None
+    deps.on_blocked = on_blocked
     monitor = AnalysisMonitor(
         on_wait=lambda seconds: deps.waits.append(
             AnalysisStatus(wait_s=seconds, message=f"En attente du quota du fournisseur, reprise dans {seconds:.0f} s")
@@ -842,3 +873,17 @@ async def suggest(
 async def run_suggestions(report: MatchReport, chunks: list[Chunk], **kwargs: Any) -> list[Any]:
     """Tous les événements de `suggest`, dans l'ordre."""
     return [event async for event in suggest(report, chunks, **kwargs)]
+
+
+# Champs d'audit d'une étape (faits paraphrasés par le modèle, compétences déclarées) : gardés
+# pour l'évaluation, jamais envoyés au client.
+_PRIVATE_STEP_FIELDS = {"facts", "implied_skills"}
+
+
+def public_json(event: BaseModel) -> str:
+    """JSON d'un événement de l'agent tel qu'envoyé au client (flux SSE de POST /suggest) : une
+    suggestion n'expose que les citations sources exactes et les implications utilisées ; une
+    étape, ni les faits paraphrasés ni les compétences déclarées par le modèle."""
+    if isinstance(event, AgentStep):
+        return event.model_dump_json(exclude=_PRIVATE_STEP_FIELDS)
+    return event.model_dump_json()

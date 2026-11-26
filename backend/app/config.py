@@ -92,6 +92,10 @@ class Settings(BaseSettings):
     suggest_max_tokens_per_requirement: int = 15_000
     suggest_max_tokens_per_run: int = 45_000
     suggest_max_length_ratio: float = 1.6
+    # Durée maximale des suggestions en flux (POST /suggest), événement « error » au-delà.
+    suggest_timeout_s: float = 600
+    # Rapport d'analyse renvoyé par le client à POST /suggest : taille maximale (413 au-delà).
+    max_report_chars: int = 500_000
     match_level_points: dict[str, int] = {
         "non démontré": 0,
         "mentionné": 40,

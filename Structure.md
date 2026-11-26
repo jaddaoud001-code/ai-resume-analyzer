@@ -16,7 +16,7 @@ Application web qui analyse un CV (PDF) et évalue sa correspondance avec une of
 ```
 backend/
   app/
-    main.py            # FastAPI, routes ; POST /analyze (SSE), créneaux d'analyse, préparation avant flux
+    main.py            # FastAPI, routes ; POST /analyze et POST /suggest (SSE), créneaux partagés, préparation avant flux, vérification du rapport renvoyé (check_report), délai des suggestions (with_deadline)
     config.py          # settings (pydantic-settings, lit .env)
     pdf_parser.py      # extraction + nettoyage du texte du CV
     pii.py             # anonymisation (emails, téléphones, URLs)
@@ -30,7 +30,7 @@ backend/
     matcher.py         # matching exigence <-> passages du CV, vérifications, score ; analyze() = générateur d'événements
     schemas.py         # modèles Pydantic (Requirement, JobRequirements, MatchResult, Report)
     implications.py    # table des implications directes (framework -> langage, SGBD -> SQL, CI sur forge Git -> Git) : source unique dans le code ; le prompt du matching garde ses exemples (test : tous dans la table)
-    suggestions.py     # agent de suggestions v2 (LangGraph) : rendre explicites les preuves implicites ; graphe, prompts, événements typés ; pas encore de route ni d'interface
+    suggestions.py     # agent de suggestions v2 (LangGraph) : rendre explicites les preuves implicites ; graphe, prompts, événements typés, forme publique (public_json) ; route POST /suggest, pas encore d'interface
     terms.py           # termes de l'offre (libellé, parties, parenthèses, équivalents directs DIRECT_SYNONYMS) ; preuve implicite (is_implicit) et carte « à décrire » (to_describe)
     grounding.py       # agent de suggestions (étape 1) : contrôle d'ancrage d'une puce reformulée (sources du même item, aucun élément nouveau hors implications et termes de pratique décrits par la puce), application en mémoire (apply_rewrite)
   tests/
@@ -49,6 +49,7 @@ frontend/
     api/               # types.ts (alignés sur schemas.py), sse.ts (parseur SSE), events.ts (toAnalysisEvent),
                        # analyze.ts (POST /analyze + lecture du flux), client.ts (/health, /config)
       __fixtures__/events.sample.json   # contrat : un exemple de chaque événement, généré par le backend
+      __fixtures__/suggest_events.sample.json   # contrat de POST /suggest : un exemple de chaque événement de l'agent (forme publique)
     state/             # analysisReducer.ts : événements -> état de l'écran (fonction pure)
     hooks/             # useAnalysis (reducer + AbortController + chrono), useBackendHealth, usePublicConfig
     components/        # Header, AnalysisForm, ProgressPanel, RequirementList/Card, ResultSummary, ErrorBanner
@@ -79,7 +80,7 @@ frontend/
 9. `analyze()` est un générateur asynchrone : `started` aussitôt, puis `requirements_extracted` et `cv_indexed` (extraction et indexation en parallèle, dans l'ordre où elles terminent), un `requirement_evaluated` par exigence dès qu'elle termine, des `status` quand un 429 fait attendre l'analyse, puis `report`. Une seule `asyncio.Queue` reçoit les fins de tâches, les attentes signalées et l'expiration du délai. Les erreurs fatales sont levées : `LLMProviderError`, `NoRequirementsError`, `EmbeddingsError`, `AnalysisTimeoutError` (au-delà de `ANALYSIS_TIMEOUT_S`). À la fermeture du générateur (fin, erreur, délai, consommateur parti), toutes les tâches non terminées sont annulées : une évaluation encore en attente dans le limiteur n'appelle jamais le LLM ; le nombre d'appels interrompus et évités est journalisé (« Analyse interrompue : … »)
 10. `POST /analyze` (multipart `file` + `job_offer`) diffuse ces événements en Server-Sent Events (voir « Flux SSE »)
 
-## Agent de suggestions (`app/suggestions.py`, v2 : conception du 2026-11-23, sans route ni interface)
+## Agent de suggestions (`app/suggestions.py`, v2 : conception du 2026-11-23 ; route POST /suggest le 2026-11-26, sans interface)
 
 **Objectif (v2, `SUGGEST_PROMPT_VERSION=2`)** : rendre explicite ce que le CV prouve implicitement, pour un lecteur humain ou un tri par mots-clés. La v1 (reformuler les lacunes « mentionné » / « non démontré ») est abandonnée : le run réel du 2026-11-23 a montré que le matcher crédite déjà ce que l'agent savait faire ressortir (implications, lignes de technologies, pratiques décrites), et une lacune réelle n'a pas de reformulation honnête. Rien n'est appliqué : l'utilisateur accepte ou refuse chaque suggestion. Le CV sera renvoyé par le client (PDF + rapport), aucune session.
 
@@ -147,6 +148,31 @@ data: {"type":"requirement_evaluated","result":{…},"done":3,"total":14}
 
 ```
 
+## Flux SSE (`POST /suggest`, agent de suggestions)
+
+**Requête** : multipart `file` (PDF du CV), `job_offer` (texte de l'offre), `report` (JSON du `MatchReport` reçu dans l'événement `report` de `/analyze`). Le client renvoie tout : rien n'est conservé entre `/analyze` et `/suggest`, ni après.
+
+**Avant d'ouvrir le flux** (réponses JSON `{"detail"}`, comme `/analyze`) : refus durable du fournisseur déjà constaté (429 / 502) ; **créneau partagé avec les analyses** (`ANALYSIS_CONCURRENCY`, 429 au-delà) ; puis, dans un thread : taille de l'offre (413), taille du rapport (`MAX_REPORT_CHARS`, 413), rapport valide pour `MatchReport` (422), PDF (400 / 413), **cohérence du rapport** (`check_report`, 422) — au moins une exigence, identifiants uniques, points conformes aux niveaux, même nombre de chunks que le découpage de ce CV (`chunk_cv` avec les mêmes réglages que l'analyse), chaque preuve citée mot pour mot dans le chunk qu'elle désigne (`quote_in_chunk`) : un rapport d'un autre CV ou retouché est refusé (« Le rapport d'analyse ne correspond pas à ce CV ») ; embeddings et LLM (500 / 503) ; enfin, si l'offre est dans le cache des exigences (analysée par cette application), le rapport doit porter sur ses exigences, identifiants et libellés dans l'ordre (422 « … ne correspond pas à cette offre »). Champ absent ou vide : 422 (FastAPI).
+
+**Pendant le flux** : un événement SSE par événement de l'agent (`event:` = type, `id:` croissant, `data:` = **forme publique** `public_json`), ping toutes les `SSE_PING_S`. Forme publique : une `suggestion` n'expose dans `facts` que les **citations sources exactes** (`SourceQuote` : `chunk_id`, `quote`, étiquette « [puce N] » retirée, sans doublon), jamais la paraphrase du modèle (`claim`), et dans `implied_skills` seulement les implications de la table réellement valides (`granted_skills`) ; un `step` n'expose ni `facts` ni `implied_skills` (champs d'audit gardés pour l'évaluation). Le flux se ferme après `done` ou `error`.
+
+| `event` | Champs de `data` (outre `type`) |
+|---|---|
+| `agent_started` | `targets` [{`id`, `label`, `level`, `weight`, `terms`}], `skipped`, `to_describe` (mêmes champs), `limits` |
+| `refusal` | `requirement`, `reason` (a_decrire, deja_explicite, aucune_puce, aucune_reformulation_fidele, baisse_de_niveau, reevaluation_impossible, non_traitee, erreur), `message`, `shown`, `detail`, `usage` ; les cartes « décrivez-le » (`a_decrire`) suivent `agent_started` |
+| `target_started` | `requirement`, `level`, `rank` |
+| `step` | `requirement_id`, `kind` (search, propose, verify, reevaluate), `status` (ok, rejected), `attempt`, `detail` |
+| `suggestion` | `requirement`, `item`, `chunk_id`, `bullet_index`, `before`, `after`, `terms`, `facts` [{`chunk_id`, `quote`}], `implied_skills`, `level_before`, `level_after`, `justification`, `judge`, `usage` |
+| `status` | `reason`, `wait_s`, `message` (attente sur 429) |
+| `done` | `suggestions`, `refusals`, `to_describe`, `hidden`, `untreated`, `reevaluation_failed`, `usage` |
+| `error` | `code` (`quota_exceeded`, `provider_access_denied`, `timeout`, `internal_error`), `message` (sans détail interne) |
+
+**Délai, déconnexion, refus durables** : une seule tâche consomme l'agent de bout en bout (`with_deadline` : les `ContextVar` de l'agent restent dans un même contexte) et transmet ses événements par une file ; au-delà de `SUGGEST_TIMEOUT_S`, ou quand le client se déconnecte (sse-starlette ferme le flux, `aclosing`), cette tâche est annulée : l'appel en cours est interrompu et aucun autre ne part. Un quota journalier ou un accès refusé pendant les suggestions est retenu par l'application (`on_blocked` -> `ProviderBlock`) : les analyses et suggestions suivantes reçoivent la réponse avant le flux. Le créneau est libéré dans tous les cas.
+
+**Contrat** : `tests/test_contract.py` génère `frontend/src/api/__fixtures__/suggest_events.sample.json` (un exemple de chaque événement de l'agent, forme publique) ; `frontend/src/api/events.ts` (`toSuggestEvent`, `SUGGEST_EVENT_FIELDS`) et `types.ts` (`SuggestEvent`…) ; `events.test.ts` vérifie chaque exemple, et qu'un fait portant autre chose que `chunk_id` et `quote` (la paraphrase) est refusé.
+
+**Tests** (`tests/test_suggest_stream.py`, CV du cas de gain et son rapport conservé, faux LLM) : flux complet (ordre, identifiants, cartes, suggestion, refus, `done`), citations exactes seulement, validations avant le flux (PDF invalide, rapport invalide, rapport d'un autre CV, citation fabriquée, points incohérents, exigence en double, rapport d'une autre offre connue du cache, tailles, champ vide, créneau partagé), quota journalier (événement `error` puis 429 avant le flux), erreur inattendue sans détail, délai (appel annulé, créneau libéré), déconnexion (aucun nouvel appel au LLM).
+
 ## Configuration des fournisseurs
 Variables de `.env` (modèle complet dans `.env.example`) :
 
@@ -175,6 +201,8 @@ Variables de `.env` (modèle complet dans `.env.example`) :
 | `SUGGEST_MAX_REQUIREMENTS`, `SUGGEST_MAX_ATTEMPTS` | agent de suggestions : exigences traitées par analyse, propositions par exigence | `3`, `2` |
 | `SUGGEST_MAX_TOKENS_PER_REQUIREMENT`, `SUGGEST_MAX_TOKENS_PER_RUN` | budgets de tokens de l'agent | `15000`, `45000` |
 | `SUGGEST_MAX_LENGTH_RATIO` | longueur maximale d'une puce reformulée (rapport à l'originale) | `1.6` |
+| `SUGGEST_TIMEOUT_S` | durée maximale de POST /suggest (événement `error` `timeout` au-delà) | `600` |
+| `MAX_REPORT_CHARS` | taille maximale du rapport renvoyé à POST /suggest (413 au-delà) | `500000` |
 | `MATCH_PROFILE_SECTIONS` | mots-clés des titres de profil ou de résumé, toujours envoyés pour un savoir-être (JSON) | `["PROFIL", "RESUME", "SUMMARY", "A PROPOS"]` |
 | `MATCH_LEVEL_POINTS`, `MATCH_WEIGHTS` | JSON | voir pipeline, étape 8 |
 | `GROQ_API_KEY`, `OPENAI_API_KEY`, `MISTRAL_API_KEY` | clés | aucune |

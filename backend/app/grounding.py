@@ -246,6 +246,28 @@ def _entities(text: str) -> list[str]:
     return found
 
 
+def granted_skills(rewrite: BulletRewrite, chunks: Iterable[Chunk], sections: Iterable[str]) -> list[ImpliedSkill]:
+    """Compétences déclarées valides : implication de la table, citation exacte du même item que
+    la puce réécrite. Les autres déclarations sont ignorées (jamais un motif de rejet), et jamais
+    montrées à l'utilisateur."""
+    by_id = {c.index: c for c in chunks}
+    items = _items(by_id.values(), sections)
+    item = items.get(rewrite.chunk_id)
+    granted: list[ImpliedSkill] = []
+    for implied in rewrite.implied_skills:
+        source = by_id.get(implied.chunk_id)
+        quote = strip_bullet_label(implied.quote)
+        if (
+            item is not None
+            and source is not None
+            and items.get(source.index) == item
+            and quote_in_chunk(quote, source.text)
+            and implication_for(implied.skill, quote) is not None
+        ):
+            granted.append(implied.model_copy(update={"quote": quote}))
+    return granted
+
+
 def check_grounding(
     rewrite: BulletRewrite,
     chunks: Iterable[Chunk],
@@ -299,17 +321,7 @@ def check_grounding(
     # la table, citation exacte du même item), jamais provoquer un rejet à elles seules ; une
     # déclaration non valide est ignorée, et le texte est vérifié comme si rien n'était déclaré
     # (« REST » déclaré d'après « FastAPI » reste un élément nouveau).
-    allowed_skills: set[str] = set()
-    for implied in rewrite.implied_skills:
-        source = by_id.get(implied.chunk_id)
-        quote = strip_bullet_label(implied.quote)
-        if (
-            source is not None
-            and items.get(source.index) == item
-            and quote_in_chunk(quote, source.text)
-            and implication_for(implied.skill, quote) is not None
-        ):
-            allowed_skills.add(normalize(implied.skill))
+    allowed_skills = {normalize(i.skill) for i in granted_skills(rewrite, by_id.values(), sections)}
 
     # Noms plus larges autorisés à sens unique (« LLM » cité dans l'item -> « IA générative ») :
     # les éléments factuels du nom large sont alors admis.

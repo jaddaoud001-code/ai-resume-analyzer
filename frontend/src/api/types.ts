@@ -166,6 +166,133 @@ export type AnalysisEvent =
 
 export type AnalysisEventType = AnalysisEvent['type']
 
+// --- POST /suggest : événements de l'agent de suggestions (backend/app/suggestions.py, forme
+// publique public_json : jamais la paraphrase du modèle, seulement les citations sources). ---
+
+export interface AgentTarget {
+  id: string
+  label: string
+  level: string
+  weight: number
+  /** Termes de l'offre à nommer. */
+  terms: string[]
+}
+
+export interface AgentStartedEvent {
+  type: 'agent_started'
+  targets: AgentTarget[]
+  /** Cibles implicites au-delà de la limite d'exigences traitées. */
+  skipped: number
+  /** Compétences « mentionné » ou « non démontré » : cartes « décrivez-le ». */
+  to_describe: AgentTarget[]
+  limits: Record<string, number>
+}
+
+export interface TargetStartedEvent {
+  type: 'target_started'
+  requirement: Requirement
+  level: string
+  rank: number
+}
+
+export type AgentStepKind = 'search' | 'propose' | 'verify' | 'reevaluate'
+
+export interface AgentStepEvent {
+  type: 'step'
+  requirement_id: string
+  kind: AgentStepKind
+  status: 'ok' | 'rejected'
+  attempt: number
+  detail: string | null
+}
+
+/** Citation source exacte d'un fait de la puce reformulée (à afficher telle quelle). */
+export interface SourceQuote {
+  chunk_id: number
+  quote: string
+}
+
+export interface ImpliedSkill {
+  skill: string
+  chunk_id: number
+  quote: string
+}
+
+export interface SuggestionEvent {
+  type: 'suggestion'
+  requirement: Requirement
+  /** Expérience ou projet (intitulé). */
+  item: string
+  chunk_id: number
+  bullet_index: number
+  before: string
+  after: string
+  /** Termes de l'offre nommés par la nouvelle puce. */
+  terms: string[]
+  /** Citations sources exactes, jamais la paraphrase du modèle. */
+  facts: SourceQuote[]
+  /** Implications de la table réellement utilisées. */
+  implied_skills: ImpliedSkill[]
+  level_before: string
+  level_after: string
+  justification: string
+  /** Raison donnée par le juge. */
+  judge: string
+  usage: TokenUsage
+}
+
+export type RefusalReason =
+  | 'a_decrire'
+  | 'deja_explicite'
+  | 'aucune_puce'
+  | 'aucune_reformulation_fidele'
+  | 'baisse_de_niveau'
+  | 'reevaluation_impossible'
+  | 'non_traitee'
+  | 'erreur'
+
+export interface RefusalEvent {
+  type: 'refusal'
+  requirement: Requirement
+  reason: RefusalReason
+  message: string
+  /** false : compté, pas montré à l'utilisateur (baisse de niveau). */
+  shown: boolean
+  detail: string | null
+  usage: TokenUsage
+}
+
+export interface AgentDoneEvent {
+  type: 'done'
+  suggestions: number
+  refusals: number
+  to_describe: number
+  hidden: number
+  untreated: number
+  reevaluation_failed: number
+  usage: TokenUsage
+}
+
+export type AgentErrorCode = 'quota_exceeded' | 'provider_access_denied' | 'timeout' | 'internal_error'
+
+export interface AgentErrorEvent {
+  type: 'error'
+  code: AgentErrorCode
+  message: string
+}
+
+export type SuggestEvent =
+  | AgentStartedEvent
+  | TargetStartedEvent
+  | AgentStepEvent
+  | SuggestionEvent
+  | RefusalEvent
+  | StatusEvent
+  | AgentDoneEvent
+  | AgentErrorEvent
+
+export type SuggestEventType = SuggestEvent['type']
+
 /** Limites publiques du backend (GET /config). */
 export interface PublicConfig {
   max_pdf_size_bytes: number

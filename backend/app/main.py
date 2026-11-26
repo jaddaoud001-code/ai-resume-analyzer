@@ -15,16 +15,16 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from langchain_core.embeddings import Embeddings
 from langchain_core.language_models import BaseChatModel
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from sse_starlette import EventSourceResponse, ServerSentEvent
 from starlette.background import BackgroundTask
 
 from app.chunking import chunk_cv
 from app.config import ENV_FILE, Settings, get_settings, warn_about_env_file
 from app.embeddings import embeddings_model, get_embeddings
-from app.llm import get_llm, match_settings
+from app.llm import get_llm, match_settings, suggest_settings
 from app.llm_calls import ProviderAccessDeniedError, ProviderBlockedError, ProviderQuotaExceededError, RateLimiter
-from app.matcher import AnalysisTimeoutError, EmbeddingsError, analyze
+from app.matcher import AnalysisTimeoutError, EmbeddingsError, analyze, quote_in_chunk
 from app.pdf_parser import PDFParseError, PDFTooLargeError, TooManyPagesError, extract_text
 from app.providers import MissingAPIKeyError
 from app.requirements import (
@@ -34,10 +34,12 @@ from app.requirements import (
     RequirementsCache,
     check_job_offer,
     extract_requirements_cached,
+    requirements_cache_key,
 )
 from app.schemas import (
     AnalysisError,
     AnalysisErrorCode,
+    Chunk,
     EventTiming,
     JobOfferRequest,
     JobRequirements,
@@ -48,6 +50,7 @@ from app.schemas import (
     ReportReady,
     SearchDebugResponse,
 )
+from app.suggestions import AgentError, public_json, suggest
 from app.vectorstore import CVIndex
 
 logger = logging.getLogger(__name__)
@@ -137,8 +140,99 @@ class PreparedAnalysis:
     match_llm: BaseChatModel
 
 
+class ReportTooLargeError(ValueError):
+    """Rapport d'analyse renvoyé à POST /suggest au-delà de MAX_REPORT_CHARS."""
+
+
+class ReportMismatchError(ValueError):
+    """Rapport d'analyse invalide, ou qui ne correspond pas au CV ou à l'offre envoyés."""
+
+
+REPORT_CV_MISMATCH = "Le rapport d'analyse ne correspond pas à ce CV : relancez l'analyse."
+REPORT_OFFER_MISMATCH = "Le rapport d'analyse ne correspond pas à cette offre : relancez l'analyse."
+
+
+def check_report(report: MatchReport, chunks: list[Chunk], settings: Settings) -> None:
+    """Le rapport renvoyé par le client est une donnée non fiable : il doit être cohérent (une
+    exigence par identifiant, points conformes aux niveaux) et correspondre à ce CV (même
+    découpage, chaque preuve citée mot pour mot dans le chunk qu'elle désigne)."""
+    ids = [r.requirement.id for r in report.requirements]
+    if not ids:
+        raise ReportMismatchError("Le rapport d'analyse ne contient aucune exigence.")
+    if len(set(ids)) != len(ids):
+        raise ReportMismatchError("Le rapport d'analyse contient deux fois la même exigence.")
+    if report.chunk_count != len(chunks):
+        raise ReportMismatchError(REPORT_CV_MISMATCH)
+    by_id = {c.index: c for c in chunks}
+    for result in report.requirements:
+        if result.status != "ok":
+            continue
+        if result.level is None or result.points != settings.match_level_points.get(result.level):
+            raise ReportMismatchError("Le rapport d'analyse est incohérent : niveaux et points ne correspondent pas.")
+        for evidence in result.evidence:
+            chunk = by_id.get(evidence.chunk_id)
+            if chunk is None or not quote_in_chunk(evidence.quote, chunk.text, settings.match_quote_short_gap):
+                raise ReportMismatchError(REPORT_CV_MISMATCH)
+
+
+@dataclass
+class PreparedSuggestions:
+    report: MatchReport
+    chunks: list[Chunk]
+    embeddings: Embeddings
+    agent_llm: BaseChatModel
+    match_llm: BaseChatModel
+
+
+class SuggestTimeoutError(RuntimeError):
+    """Les suggestions ont dépassé SUGGEST_TIMEOUT_S."""
+
+
+async def with_deadline(
+    stream: AsyncIterator[BaseModel], timeout_s: float, sleep: Callable[[float], Awaitable[None]]
+) -> AsyncIterator[BaseModel]:
+    """Les événements de `stream`, jusqu'à expiration du délai (SuggestTimeoutError). Une seule
+    tâche consomme `stream` du début à la fin (les ContextVar de l'agent restent dans un même
+    contexte) ; à l'expiration ou à la fermeture (client parti), elle est annulée : l'appel en
+    cours est interrompu et aucun autre ne part."""
+    queue: asyncio.Queue[object] = asyncio.Queue()
+    finished = object()
+
+    async def pump() -> None:
+        try:
+            async for event in stream:
+                await queue.put(event)
+            await queue.put(finished)
+        except Exception as error:  # erreur de l'agent : relevée côté consommateur
+            await queue.put(error)
+
+    worker = asyncio.ensure_future(pump())
+    timer = asyncio.ensure_future(sleep(timeout_s))
+    try:
+        while True:
+            getter = asyncio.ensure_future(queue.get())
+            done, _ = await asyncio.wait({getter, timer}, return_when=asyncio.FIRST_COMPLETED)
+            if getter not in done:
+                getter.cancel()
+                raise SuggestTimeoutError(f"Les suggestions ont dépassé la durée maximale de {timeout_s:.0f} s.")
+            item = getter.result()
+            if item is finished:
+                return
+            if isinstance(item, Exception):
+                raise item
+            yield item  # type: ignore[misc]
+    finally:
+        timer.cancel()
+        worker.cancel()
+        await asyncio.gather(worker, return_exceptions=True)
+
+
 def _preparation_http_error(error: Exception) -> HTTPException | None:
     """Erreurs de validation détectables avant toute analyse -> réponse HTTP classique."""
+    if isinstance(error, ReportTooLargeError):
+        return HTTPException(status.HTTP_413_CONTENT_TOO_LARGE, str(error))
+    if isinstance(error, ReportMismatchError):
+        return HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error))
     if isinstance(error, JobOfferTooLongError):
         return HTTPException(status.HTTP_413_CONTENT_TOO_LARGE, str(error))
     if isinstance(error, PDFParseError):
@@ -239,6 +333,7 @@ def create_app(
     limiter = limiter or RateLimiter.from_settings(settings)
     # Exigences déjà extraites, par offre : en mémoire seulement, propre à cette application.
     requirements_cache = RequirementsCache(settings.requirements_cache_size)
+    app.state.requirements_cache = requirements_cache
     slots = AnalysisSlots(settings.analysis_concurrency)
     app.state.analysis_slots = slots
     app.state.provider_block = provider_block
@@ -366,6 +461,121 @@ def create_app(
             raise
         return EventSourceResponse(
             sse_events(prepared, job_offer, slot),
+            ping=settings.sse_ping_s,
+            background=BackgroundTask(slot.release),
+        )
+
+    # --- Suggestions (agent) : POST /suggest --------------------------------------------------
+
+    def prepare_suggestions(data: bytes, job_offer: str, report_json: str) -> PreparedSuggestions:
+        """Validations avant le flux (offre, rapport, PDF, cohérence, clés, modèle), dans un thread.
+        Rien n'est conservé : CV, offre et rapport restent en mémoire le temps des suggestions."""
+        check_job_offer(job_offer, settings)
+        if len(report_json) > settings.max_report_chars:
+            raise ReportTooLargeError(
+                f"Rapport d'analyse trop volumineux ({len(report_json)} caractères, "
+                f"maximum {settings.max_report_chars})."
+            )
+        try:
+            report = MatchReport.model_validate_json(report_json)
+        except ValidationError as error:
+            raise ReportMismatchError(
+                "Rapport d'analyse invalide : envoyez le rapport renvoyé par POST /analyze (événement report)."
+            ) from error
+        parsed = extract_text(data, settings)
+        chunks = chunk_cv(parsed.text, settings.chunk_max_chars, settings.chunk_overlap)
+        check_report(report, chunks, settings)
+        return PreparedSuggestions(
+            report=report,
+            chunks=chunks,
+            embeddings=load_embeddings(),
+            agent_llm=llm_factory(suggest_settings(settings)),
+            match_llm=llm_factory(match_settings(settings)),
+        )
+
+    def check_report_offer(report: MatchReport, job_offer: str) -> None:
+        """Si l'offre est dans le cache des exigences (analysée par cette application), le
+        rapport doit porter sur ses exigences (identifiants et libellés, dans l'ordre)."""
+        cached = requirements_cache.get(requirements_cache_key(job_offer, settings))
+        if cached is None:
+            return
+        expected = [(r.id, r.label) for r in cached.requirements]
+        if [(m.requirement.id, m.requirement.label) for m in report.requirements] != expected:
+            raise ReportMismatchError(REPORT_OFFER_MISMATCH)
+
+    async def suggest_events(prepared: PreparedSuggestions, slot: AnalysisSlot) -> AsyncIterator[ServerSentEvent]:
+        event_id = 0
+
+        def sse(event: BaseModel) -> ServerSentEvent:
+            nonlocal event_id
+            event_id += 1
+            # public_json : une suggestion n'expose que les citations sources exactes.
+            return ServerSentEvent(data=public_json(event), event=event.type, id=str(event_id))  # type: ignore[attr-defined]
+
+        try:
+            stream = suggest(
+                prepared.report,
+                prepared.chunks,
+                settings=settings,
+                embeddings=prepared.embeddings,
+                agent_llm=prepared.agent_llm,
+                match_llm=prepared.match_llm,
+                limiter=limiter,
+                on_blocked=provider_block.record,
+            )
+            # aclosing : si ce flux est fermé (client parti, délai), l'agent l'est aussi.
+            async with (
+                aclosing(stream) as events,
+                aclosing(with_deadline(events, settings.suggest_timeout_s, sleep)) as bounded,
+            ):
+                async for event in bounded:
+                    yield sse(event)
+        except SuggestTimeoutError as error:
+            yield sse(AgentError(code="timeout", message=str(error)))
+        except Exception as error:
+            logger.error("Suggestions : erreur inattendue %s", type(error).__name__)
+            yield sse(AgentError(code="internal_error", message="Erreur interne pendant les suggestions."))
+        finally:
+            slot.release()
+
+    @app.post(
+        "/suggest",
+        response_class=EventSourceResponse,
+        responses={
+            200: {"content": {"text/event-stream": {}}, "description": "Flux SSE des événements de l'agent."},
+            400: {"description": "PDF invalide ou sans texte."},
+            413: {"description": "PDF, offre ou rapport trop volumineux."},
+            422: {"description": "Champ manquant, rapport invalide ou qui ne correspond pas au CV ou à l'offre."},
+            429: {"description": TOO_MANY_ANALYSES + " Ou quota journalier du fournisseur LLM atteint."},
+            500: {"description": "Clé du fournisseur absente."},
+            502: {"description": "Clé ou modèle refusés par le fournisseur LLM (constaté précédemment)."},
+            503: {"description": "Modèle d'embeddings indisponible (chargement échoué)."},
+        },
+    )
+    async def suggest_stream(
+        file: UploadFile,
+        job_offer: Annotated[str, Form(min_length=1)],
+        report: Annotated[str, Form(min_length=1)],
+    ) -> EventSourceResponse:
+        """Suggestions de l'agent pour un rapport d'analyse : le client renvoie le PDF, l'offre
+        et le rapport (rien n'est conservé entre les deux appels). Même limite d'exécutions
+        simultanées que les analyses (quota du fournisseur partagé)."""
+        if (blocked := provider_block.current()) is not None:
+            raise _blocked_http_error(blocked)
+        slot = slots.try_acquire()
+        if slot is None:
+            raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, TOO_MANY_ANALYSES)
+        try:
+            data = await file.read(settings.max_pdf_size_bytes + 1)
+            prepared = await run_in_threadpool(prepare_suggestions, data, job_offer, report)
+            check_report_offer(prepared.report, job_offer)
+        except Exception as error:
+            slot.release()
+            if (http_error := _preparation_http_error(error)) is not None:
+                raise http_error from error
+            raise
+        return EventSourceResponse(
+            suggest_events(prepared, slot),
             ping=settings.sse_ping_s,
             background=BackgroundTask(slot.release),
         )

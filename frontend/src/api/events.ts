@@ -1,7 +1,7 @@
 // Conversion d'un message SSE en événement d'analyse typé, avec vérification des champs :
 // une réponse mal formée devient une erreur explicite plutôt qu'un plantage de l'écran.
 
-import type { AnalysisEvent, AnalysisEventType } from './types'
+import type { AnalysisEvent, AnalysisEventType, SuggestEvent, SuggestEventType } from './types'
 
 export class ProtocolError extends Error {
   constructor(message = 'Réponse inattendue du serveur.') {
@@ -116,4 +116,64 @@ export function toAnalysisEvent(eventName: string, data: string): AnalysisEvent 
     if (!results.every((r) => hasFields(r, MATCH_FIELDS))) throw new ProtocolError()
   }
   return payload as unknown as AnalysisEvent
+}
+
+// --- POST /suggest : événements de l'agent de suggestions ----------------------------------
+
+const SOURCE_QUOTE_FIELDS: Record<string, Check> = { chunk_id: 'number', quote: 'string' }
+
+/** Champs exigés pour chaque type d'événement de l'agent. */
+export const SUGGEST_EVENT_FIELDS: Record<SuggestEventType, Record<string, Check>> = {
+  agent_started: { targets: 'array', skipped: 'number', to_describe: 'array', limits: 'object' },
+  target_started: { requirement: 'object', level: 'string', rank: 'number' },
+  step: { requirement_id: 'string', kind: 'string', status: 'string', attempt: 'number' },
+  suggestion: {
+    requirement: 'object',
+    item: 'string',
+    before: 'string',
+    after: 'string',
+    terms: 'array',
+    facts: 'array',
+    implied_skills: 'array',
+    level_before: 'string',
+    level_after: 'string',
+    judge: 'string',
+  },
+  refusal: { requirement: 'object', reason: 'string', message: 'string', shown: 'boolean' },
+  status: { reason: 'string', wait_s: 'number', message: 'string' },
+  done: { suggestions: 'number', refusals: 'number', to_describe: 'number', hidden: 'number', usage: 'object' },
+  error: { code: 'string', message: 'string' },
+}
+
+function isKnownSuggestType(type: string): type is SuggestEventType {
+  return Object.hasOwn(SUGGEST_EVENT_FIELDS, type)
+}
+
+/**
+ * Comme toAnalysisEvent, pour le flux de POST /suggest. Les faits d'une suggestion ne
+ * doivent porter que la citation source exacte (chunk_id, quote) : un fait qui apporterait
+ * autre chose (la paraphrase du modèle) est refusé.
+ */
+export function toSuggestEvent(eventName: string, data: string): SuggestEvent | null {
+  if (!isKnownSuggestType(eventName)) return null
+  let payload: unknown
+  try {
+    payload = JSON.parse(data)
+  } catch {
+    throw new ProtocolError()
+  }
+  if (!isObject(payload) || payload.type !== eventName || !hasFields(payload, SUGGEST_EVENT_FIELDS[eventName])) {
+    throw new ProtocolError()
+  }
+  if (eventName === 'target_started' || eventName === 'suggestion' || eventName === 'refusal') {
+    if (!hasFields(payload.requirement, REQUIREMENT_FIELDS)) throw new ProtocolError()
+  }
+  if (eventName === 'suggestion') {
+    const facts = payload.facts as unknown[]
+    const exact = facts.every(
+      (f) => hasFields(f, SOURCE_QUOTE_FIELDS) && Object.keys(f as object).every((k) => k in SOURCE_QUOTE_FIELDS),
+    )
+    if (!exact) throw new ProtocolError()
+  }
+  return payload as unknown as SuggestEvent
 }
