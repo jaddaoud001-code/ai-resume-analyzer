@@ -36,6 +36,7 @@ flowchart LR
 4. Pour chaque exigence, la recherche retrouve les passages du CV les plus proches, et le LLM rend un niveau, des citations et, si l'offre exige une durée, des périodes.
 5. Le code vérifie tout ce qui est vérifiable : citations présentes mot pour mot dans le passage cité, dates présentes dans le CV, durées additionnées. Il rétrograde ce qui ne tient pas, puis calcule le score.
 6. Chaque étape est envoyée au navigateur dès qu'elle est prête (Server-Sent Events).
+7. Après l'analyse, l'utilisateur peut demander des **suggestions** : l'agent repère les compétences que le CV prouve déjà sans les nommer et propose de les nommer dans la puce qui les prouve, sans rien inventer. Chaque suggestion montre la puce d'origine, la puce proposée (mots ajoutés surlignés), les citations exactes du CV qui l'appuient et un niveau indicatif ; l'utilisateur l'accepte ou la refuse (rien n'est envoyé ni conservé), puis copie les puces acceptées. Les compétences que le CV ne prouve pas reçoivent une invitation à décrire soi-même une expérience réelle, sans texte proposé.
 
 ## Choix techniques et compromis
 

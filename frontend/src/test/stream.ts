@@ -13,7 +13,7 @@ export function sample<T extends AnalysisEventType>(type: T): Extract<AnalysisEv
 }
 
 /** Texte SSE tel qu'envoyé par sse-starlette (lignes en \r\n). */
-export function toSSE(events: AnalysisEvent[], { ping = false } = {}): string {
+export function toSSE(events: Array<{ type: string }>, { ping = false } = {}): string {
   return events
     .map((event, index) => {
       const block = `event: ${event.type}\r\nid: ${index + 1}\r\ndata: ${JSON.stringify(event)}\r\n\r\n`

@@ -1,6 +1,6 @@
 // Libellés et styles partagés par les composants.
 
-import type { AnalysisErrorCode, EvidenceLevel, RequirementMatch } from '../api/types'
+import type { AnalysisErrorCode, EvidenceLevel, RefusalReason, RequirementMatch } from '../api/types'
 
 export const LEVEL_STYLES: Record<EvidenceLevel, string> = {
   'non démontré': 'bg-slate-100 text-slate-700 ring-slate-300',
@@ -82,4 +82,15 @@ export function formatDuration(totalSeconds: number): string {
 export function formatBytes(bytes: number): string {
   if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} Mo`
   return `${Math.ceil(bytes / 1024).toLocaleString('fr-FR')} Ko`
+}
+
+/** Titres des refus de l'agent de suggestions (les cartes « décrivez-le » sont à part). */
+export const REFUSAL_TITLES: Record<Exclude<RefusalReason, 'a_decrire'>, string> = {
+  deja_explicite: 'Déjà explicite',
+  aucune_puce: 'Aucune reformulation possible',
+  aucune_reformulation_fidele: 'Aucune reformulation fidèle',
+  baisse_de_niveau: 'Reformulation écartée',
+  reevaluation_impossible: 'Réévaluation impossible',
+  non_traitee: 'Non traitée',
+  erreur: 'Erreur du fournisseur d’IA',
 }

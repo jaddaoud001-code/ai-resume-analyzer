@@ -3,14 +3,21 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import App from './App'
 import { SAMPLES, jsonResponse, pdfFile, sample, splitEvery, streamResponse, toSSE } from './test/stream'
+import { AFTER, CI_CD, fullFlow, started, targetStarted } from './test/suggestFlows'
 
 type Route = (init?: RequestInit) => Promise<Response>
 
 /** fetch simulé par route ; aucune requête réseau. */
-function stubBackend(routes: { health?: Route; config?: Route; analyze?: Route }) {
+function stubBackend(routes: { health?: Route; config?: Route; analyze?: Route; suggest?: Route }) {
   const fetchMock = vi.fn((url: string, init?: RequestInit) => {
     const path = new URL(url).pathname
-    const route = path === '/health' ? routes.health : path === '/config' ? routes.config : path === '/analyze' ? routes.analyze : undefined
+    const byPath: Record<string, Route | undefined> = {
+      '/health': routes.health,
+      '/config': routes.config,
+      '/analyze': routes.analyze,
+      '/suggest': routes.suggest,
+    }
+    const route = byPath[path]
     return route ? route(init) : Promise.reject(new TypeError('Failed to fetch'))
   })
   vi.stubGlobal('fetch', fetchMock)
@@ -140,5 +147,74 @@ describe('analyse', () => {
     expect(await screen.findAllByText('Analyse annulée.')).not.toHaveLength(0)
     expect(screen.getAllByText('Non évaluée')).toHaveLength(4)
     expect(screen.getByRole('button', { name: 'Analyser' })).toBeEnabled()
+  })
+})
+
+describe('suggestions après l’analyse', () => {
+  const analysis: Route = () => Promise.resolve(streamResponse([toSSE(SAMPLES.filter((e) => e.type !== 'error'))]))
+
+  it('le bouton n’apparaît qu’après une analyse terminée, puis renvoie le même CV, l’offre et le rapport', async () => {
+    const fetchMock = stubBackend({
+      health: healthy,
+      config: limits,
+      analyze: analysis,
+      suggest: () => Promise.resolve(streamResponse(splitEvery(toSSE(fullFlow(), { ping: true }), 40))),
+    })
+    render(<App />)
+    expect(screen.queryByRole('button', { name: 'Proposer des améliorations du CV' })).not.toBeInTheDocument()
+
+    await submit()
+    await userEvent.click(await screen.findByRole('button', { name: 'Proposer des améliorations du CV' }))
+
+    const card = await screen.findByRole('article', { name: 'Suggestion : CI/CD' })
+    expect(within(card).getByTestId('proposed-bullet')).toHaveTextContent(AFTER)
+    expect(screen.getByRole('article', { name: 'À décrire : Go' })).toBeInTheDocument()
+    expect(screen.getByText('Suggestions terminées : 1 suggestion.')).toBeInTheDocument() // aria-live
+    const call = fetchMock.mock.calls.find(([url]) => String(url).endsWith('/suggest'))
+    const body = call?.[1]?.body as FormData
+    expect((body.get('file') as File).name).toBe('cv.pdf')
+    expect(body.get('job_offer')).toBe('Développeuse backend Python')
+    expect(JSON.parse(body.get('report') as string)).toEqual(sample('report').report)
+  })
+
+  it('« Annuler » ferme la connexion et garde l’écran lisible', async () => {
+    let suggestSignal: AbortSignal | null | undefined
+    stubBackend({
+      health: healthy,
+      config: limits,
+      analyze: analysis,
+      suggest: (init) => {
+        suggestSignal = init?.signal
+        return Promise.resolve(
+          streamResponse([toSSE([started([CI_CD]), targetStarted(CI_CD)])], { end: 'hang', signal: init?.signal }),
+        )
+      },
+    })
+    render(<App />)
+    await submit()
+    await userEvent.click(await screen.findByRole('button', { name: 'Proposer des améliorations du CV' }))
+    expect(await screen.findByRole('listitem', { name: 'Exigence ciblée : CI/CD' })).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Annuler' }))
+
+    expect(await screen.findAllByText('Suggestions annulées.')).not.toHaveLength(0)
+    expect(suggestSignal?.aborted).toBe(true)
+    expect(screen.getByRole('button', { name: 'Proposer des améliorations du CV' })).toBeEnabled()
+  })
+
+  it('une erreur HTTP de /suggest s’affiche dans le panneau', async () => {
+    stubBackend({
+      health: healthy,
+      config: limits,
+      analyze: analysis,
+      suggest: () => Promise.resolve(jsonResponse({ detail: 'Le rapport d’analyse ne correspond pas à ce CV : relancez l’analyse.' }, 422)),
+    })
+    render(<App />)
+    await submit()
+    await userEvent.click(await screen.findByRole('button', { name: 'Proposer des améliorations du CV' }))
+
+    const alert = await screen.findByRole('alert')
+    expect(alert).toHaveTextContent('Suggestions refusées')
+    expect(alert).toHaveTextContent('ne correspond pas à ce CV')
   })
 })
